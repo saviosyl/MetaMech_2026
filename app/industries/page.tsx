@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
-import { Stethoscope, Cog, ArrowLeftRight, Cpu, Car, Plane, Factory, Zap, ShoppingCart, Shield } from 'lucide-react';
+import Link from 'next/link';
+import {
+  Stethoscope, Cog, ArrowLeftRight, Cpu, Car, Plane, Factory, Zap,
+  ShoppingCart, Shield, ArrowRight, Check
+} from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import JsonLd from '@/components/JsonLd';
 import AnimatedIndustriesContent from '@/components/AnimatedIndustriesContent';
@@ -31,24 +35,84 @@ const industries = [
   { name: 'Defense', icon: Shield },
 ];
 
-const featureCards = [
+const detailedIndustries = [
   {
     title: 'Medical Device Engineering',
+    icon: Stethoscope,
     description:
       'Precision and compliance for life-critical products. Our automation tools ensure accurate documentation and traceability required for medical device development.',
-    icon: Stethoscope,
+    useCases: [
+      'FDA/MDR-compliant BOM generation with full traceability',
+      'Automated drawing packages for regulatory submissions',
+      'Revision-controlled STEP exports for contract manufacturers',
+      'Standardized templates meeting ISO 13485 documentation requirements',
+    ],
+    color: 'cyan' as const,
   },
   {
-    title: 'Automation Systems',
+    title: 'Automation & Robotics',
+    icon: Cog,
     description:
       'Streamlined design for robotic and automated systems. Reduce design iteration time and improve consistency across complex automation projects.',
-    icon: Cog,
+    useCases: [
+      'Multi-configuration BOMs for modular automation cells',
+      'Batch export of 500+ components per machine build',
+      'Drawing packages with automatic index for commissioning teams',
+      'Library management for reusable actuator and sensor assemblies',
+    ],
+    color: 'gold' as const,
   },
   {
-    title: 'Custom Machinery',
+    title: 'Custom & Special Machinery',
+    icon: Factory,
     description:
       'Tailored solutions for specialized equipment. From concept to manufacturing, accelerate your custom machinery design process.',
-    icon: Factory,
+    useCases: [
+      'Project-specific BOM templates with cost tracking columns',
+      'Supplier packages with STEP files and drawing PDFs per vendor',
+      'Automatic naming by project code, assembly level, and revision',
+      'Drawing sets organized by discipline (mechanical, pneumatic, electrical)',
+    ],
+    color: 'cyan' as const,
+  },
+  {
+    title: 'Conveyor Systems',
+    icon: ArrowLeftRight,
+    description:
+      'Efficient documentation for modular conveyor designs. Handle repetitive component sets with ease and generate accurate material lists.',
+    useCases: [
+      'Flat BOMs for repeating conveyor sections and modules',
+      'Batch DXF export for sheet metal parts and laser-cut profiles',
+      'Standardized drawing packages for installation teams',
+      'Configuration-specific exports for variable-length conveyors',
+    ],
+    color: 'gold' as const,
+  },
+  {
+    title: 'Automotive & Motorsport',
+    icon: Car,
+    description:
+      'Meet demanding OEM requirements with automated documentation workflows that ensure consistency and speed across automotive design programs.',
+    useCases: [
+      'OEM-format BOM templates with PPAP documentation support',
+      'STEP exports in customer-specified naming conventions',
+      'Multi-configuration management for variant-heavy designs',
+      'Automated revision tracking across ECN workflows',
+    ],
+    color: 'cyan' as const,
+  },
+  {
+    title: 'Aerospace & Defense',
+    icon: Plane,
+    description:
+      'High-reliability documentation for safety-critical applications. Ensure traceability, revision control, and compliance across aerospace programs.',
+    useCases: [
+      'AS9100-compliant BOM generation with material certifications',
+      'Drawing packages with strict revision and approval tracking',
+      'ITAR-controlled file export with access audit trails',
+      'Standardized libraries for aerospace fasteners and hardware',
+    ],
+    color: 'gold' as const,
   },
 ];
 
@@ -65,6 +129,8 @@ export default function IndustriesPage() {
   return (
     <>
       <JsonLd data={breadcrumbSchema} />
+
+      {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden pt-[100px]">
         <div className="absolute inset-0 bg-navy">
           <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-teal/5 rounded-full blur-[200px]" />
@@ -98,25 +164,60 @@ export default function IndustriesPage() {
             ))}
           </div>
 
-          {/* Feature Cards */}
-          <div className="grid md:grid-cols-3 gap-6">
-            {featureCards.map((card, index) => (
+          {/* Detailed Industry Cards */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {detailedIndustries.map((industry, index) => (
               <div
                 key={index}
                 data-animate="feature-card"
-                className="glass-card p-6 group hover:-translate-y-3 hover:border-cyan-500/30 transition-all duration-300 card-tilt"
+                className={`glass-card p-6 group hover:-translate-y-3 transition-all duration-300 card-tilt ${industry.color === 'cyan' ? 'hover:border-cyan-500/30' : 'hover:border-gold/30'}`}
               >
-                <div className="w-14 h-14 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                  <card.icon size={28} className="text-cyan-400" />
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 ${industry.color === 'cyan' ? 'bg-cyan-500/20' : 'bg-gold/20'}`}>
+                  <industry.icon size={28} className={industry.color === 'cyan' ? 'text-cyan-400' : 'text-gold'} />
                 </div>
-                <h2 className="font-orbitron text-lg font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">
-                  {card.title}
+                <h2 className={`font-orbitron text-lg font-bold text-white mb-3 transition-colors ${industry.color === 'cyan' ? 'group-hover:text-cyan-400' : 'group-hover:text-gold'}`}>
+                  {industry.title}
                 </h2>
-                <p className="text-gray-400 text-sm leading-relaxed">{card.description}</p>
+                <p className="text-gray-400 text-sm leading-relaxed mb-4">{industry.description}</p>
+
+                <div className="border-t border-white/10 pt-4">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase mb-3">Key Use Cases</h3>
+                  <ul className="space-y-2">
+                    {industry.useCases.map((useCase, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-400">
+                        <Check size={14} className={`mt-0.5 flex-shrink-0 ${industry.color === 'cyan' ? 'text-cyan-400' : 'text-gold'}`} />
+                        <span>{useCase}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             ))}
           </div>
           </AnimatedIndustriesContent>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-navy-light">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-teal/5 rounded-full blur-[200px]" />
+        </div>
+        <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="font-orbitron text-3xl sm:text-4xl font-bold text-white mb-4">
+            YOUR INDUSTRY, <span className="text-gradient-teal text-shimmer">AUTOMATED</span>
+          </h2>
+          <p className="text-gray-400 text-lg mb-8">
+            No matter your sector, MetaMech adapts to your workflows. Try it free for 3 days.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/download" className="btn-primary flex items-center gap-2">
+              Download Free Trial <ArrowRight size={18} />
+            </Link>
+            <Link href="/contact" className="btn-secondary flex items-center gap-2">
+              Talk to an Engineer <ArrowRight size={18} />
+            </Link>
+          </div>
         </div>
       </section>
     </>
