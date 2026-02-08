@@ -1,10 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function AnimatedServicesContent({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -13,33 +9,49 @@ export default function AnimatedServicesContent({ children }: { children: React.
     const el = ref.current;
     if (!el) return;
 
-    const cards = el.querySelectorAll('.glass-card');
-    if (cards.length === 0) return;
+    let cancelled = false;
 
-    gsap.set(cards, { opacity: 0 });
+    Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ])
+      .then(([gsapMod, scrollMod]) => {
+        if (cancelled) return;
 
-    const tween = gsap.from(cards, {
-      opacity: 0,
-      y: 60,
-      rotateY: -15,
-      rotateX: 8,
-      transformPerspective: 800,
-      duration: 0.7,
-      stagger: 0.15,
-      ease: 'expo.out',
-      scrollTrigger: {
-        trigger: el,
-        start: 'top 80%',
-        toggleActions: 'play none none none',
-      },
-    });
+        const gsap = gsapMod.default || gsapMod;
+        const ScrollTrigger = scrollMod.ScrollTrigger || scrollMod.default;
+        gsap.registerPlugin(ScrollTrigger);
 
-    return () => {
-      tween.kill();
-      ScrollTrigger.getAll().forEach((st) => {
-        if (st.trigger === el) st.kill();
+        const cards = el.querySelectorAll('.glass-card');
+        if (cards.length === 0) return;
+
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 60, rotateY: -15, rotateX: 8, transformPerspective: 800 },
+          {
+            opacity: 1, y: 0, rotateY: 0, rotateX: 0, transformPerspective: 800,
+            duration: 0.7, stagger: 0.15, ease: 'expo.out',
+            scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' },
+          }
+        );
+      })
+      .catch(() => {
+        const cards = el.querySelectorAll('.glass-card');
+        cards.forEach((t) => { (t as HTMLElement).style.opacity = '1'; });
       });
-    };
+
+    const fallbackTimer = setTimeout(() => {
+      const cards = el.querySelectorAll('.glass-card');
+      cards.forEach((t) => {
+        if (window.getComputedStyle(t).opacity === '0') {
+          (t as HTMLElement).style.opacity = '1';
+          (t as HTMLElement).style.transform = 'none';
+          (t as HTMLElement).style.transition = 'opacity 0.5s ease';
+        }
+      });
+    }, 3000);
+
+    return () => { cancelled = true; clearTimeout(fallbackTimer); };
   }, []);
 
   return <div ref={ref}>{children}</div>;

@@ -94,7 +94,7 @@ const featureMatrix = [
 ];
 
 const trustBadges = [
-  { icon: RotateCcw, label: '14-Day Money Back' },
+  { icon: RotateCcw, label: '3-Day Free Trial' },
   { icon: Lock, label: 'SSL Secure' },
   { icon: Download, label: 'No Card for Trial' },
   { icon: CreditCard, label: 'Cancel Anytime' },

@@ -1,10 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function AnimatedIndustriesContent({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -13,48 +9,62 @@ export default function AnimatedIndustriesContent({ children }: { children: Reac
     const el = ref.current;
     if (!el) return;
 
-    // Animate industry chips
-    const chips = el.querySelectorAll('[data-animate="chip"]');
-    if (chips.length > 0) {
-      gsap.set(chips, { opacity: 0 });
-      gsap.from(chips, {
-        opacity: 0,
-        y: 30,
-        scale: 0.8,
-        duration: 0.5,
-        stagger: 0.05,
-        ease: 'back.out(1.7)',
-        scrollTrigger: {
-          trigger: chips[0]?.parentElement,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        },
-      });
-    }
+    let cancelled = false;
 
-    // Animate feature cards
-    const cards = el.querySelectorAll('[data-animate="feature-card"]');
-    if (cards.length > 0) {
-      gsap.set(cards, { opacity: 0 });
-      gsap.from(cards, {
-        opacity: 0,
-        y: 50,
-        rotateY: -10,
-        transformPerspective: 800,
-        duration: 0.7,
-        stagger: 0.15,
-        ease: 'expo.out',
-        scrollTrigger: {
-          trigger: cards[0]?.parentElement,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        },
-      });
-    }
+    Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ])
+      .then(([gsapMod, scrollMod]) => {
+        if (cancelled) return;
 
-    return () => {
-      ScrollTrigger.getAll().forEach((st) => st.kill());
-    };
+        const gsap = gsapMod.default || gsapMod;
+        const ScrollTrigger = scrollMod.ScrollTrigger || scrollMod.default;
+        gsap.registerPlugin(ScrollTrigger);
+
+        const chips = el.querySelectorAll('[data-animate="chip"]');
+        if (chips.length > 0) {
+          gsap.fromTo(
+            chips,
+            { opacity: 0, y: 30, scale: 0.8 },
+            {
+              opacity: 1, y: 0, scale: 1,
+              duration: 0.5, stagger: 0.05, ease: 'back.out(1.7)',
+              scrollTrigger: { trigger: chips[0]?.parentElement, start: 'top 90%', toggleActions: 'play none none none' },
+            }
+          );
+        }
+
+        const cards = el.querySelectorAll('[data-animate="feature-card"]');
+        if (cards.length > 0) {
+          gsap.fromTo(
+            cards,
+            { opacity: 0, y: 50, rotateY: -10, transformPerspective: 800 },
+            {
+              opacity: 1, y: 0, rotateY: 0, transformPerspective: 800,
+              duration: 0.7, stagger: 0.15, ease: 'expo.out',
+              scrollTrigger: { trigger: cards[0]?.parentElement, start: 'top 90%', toggleActions: 'play none none none' },
+            }
+          );
+        }
+      })
+      .catch(() => {
+        const all = el.querySelectorAll('[data-animate]');
+        all.forEach((t) => { (t as HTMLElement).style.opacity = '1'; });
+      });
+
+    const fallbackTimer = setTimeout(() => {
+      const all = el.querySelectorAll('[data-animate]');
+      all.forEach((t) => {
+        if (window.getComputedStyle(t).opacity === '0') {
+          (t as HTMLElement).style.opacity = '1';
+          (t as HTMLElement).style.transform = 'none';
+          (t as HTMLElement).style.transition = 'opacity 0.5s ease';
+        }
+      });
+    }, 3000);
+
+    return () => { cancelled = true; clearTimeout(fallbackTimer); };
   }, []);
 
   return <div ref={ref}>{children}</div>;

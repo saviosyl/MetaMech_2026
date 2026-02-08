@@ -1,10 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function AnimatedPricingContent({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -13,80 +9,127 @@ export default function AnimatedPricingContent({ children }: { children: React.R
     const el = ref.current;
     if (!el) return;
 
-    // Animate plan cards
-    const planCards = el.querySelectorAll('[data-animate="plan-card"]');
-    if (planCards.length > 0) {
-      gsap.set(planCards, { opacity: 0 });
-      gsap.from(planCards, {
-        opacity: 0,
-        y: 60,
-        scale: 0.95,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: 'expo.out',
-        scrollTrigger: {
-          trigger: planCards[0]?.parentElement,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        },
-      });
-    }
+    let cancelled = false;
 
-    // Animate ROI section
-    const roiSection = el.querySelector('[data-animate="roi"]');
-    if (roiSection) {
-      gsap.set(roiSection, { opacity: 0 });
-      gsap.from(roiSection, {
-        opacity: 0,
-        y: 50,
-        duration: 0.8,
-        ease: 'expo.out',
-        scrollTrigger: {
-          trigger: roiSection,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        },
-      });
-    }
+    Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ])
+      .then(([gsapMod, scrollMod]) => {
+        if (cancelled) return;
 
-    // Animate FAQ items
-    const faqItems = el.querySelectorAll('[data-animate="faq"]');
-    if (faqItems.length > 0) {
-      gsap.set(faqItems, { opacity: 0 });
-      gsap.from(faqItems, {
-        opacity: 0,
-        y: 30,
-        x: -20,
-        duration: 0.5,
-        stagger: 0.08,
-        ease: 'expo.out',
-        scrollTrigger: {
-          trigger: faqItems[0]?.parentElement,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        },
-      });
-    }
+        const gsap = gsapMod.default || gsapMod;
+        const ScrollTrigger = scrollMod.ScrollTrigger || scrollMod.default;
+        gsap.registerPlugin(ScrollTrigger);
 
-    // Animate checkout section
-    const checkout = el.querySelector('[data-animate="checkout"]');
-    if (checkout) {
-      gsap.set(checkout, { opacity: 0 });
-      gsap.from(checkout, {
-        opacity: 0,
-        y: 40,
-        duration: 0.8,
-        ease: 'expo.out',
-        scrollTrigger: {
-          trigger: checkout,
-          start: 'top 85%',
-          toggleActions: 'play none none none',
-        },
+        // Animate plan cards
+        const planCards = el.querySelectorAll('[data-animate="plan-card"]');
+        if (planCards.length > 0) {
+          gsap.fromTo(
+            planCards,
+            { opacity: 0, y: 60, scale: 0.95 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.7,
+              stagger: 0.12,
+              ease: 'expo.out',
+              scrollTrigger: {
+                trigger: planCards[0]?.parentElement,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+        }
+
+        // Animate ROI section
+        const roiSection = el.querySelector('[data-animate="roi"]');
+        if (roiSection) {
+          gsap.fromTo(
+            roiSection,
+            { opacity: 0, y: 50 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              ease: 'expo.out',
+              scrollTrigger: {
+                trigger: roiSection,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+        }
+
+        // Animate FAQ items
+        const faqItems = el.querySelectorAll('[data-animate="faq"]');
+        if (faqItems.length > 0) {
+          gsap.fromTo(
+            faqItems,
+            { opacity: 0, y: 30, x: -20 },
+            {
+              opacity: 1,
+              y: 0,
+              x: 0,
+              duration: 0.5,
+              stagger: 0.08,
+              ease: 'expo.out',
+              scrollTrigger: {
+                trigger: faqItems[0]?.parentElement,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+        }
+
+        // Animate checkout section
+        const checkout = el.querySelector('[data-animate="checkout"]');
+        if (checkout) {
+          gsap.fromTo(
+            checkout,
+            { opacity: 0, y: 40 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              ease: 'expo.out',
+              scrollTrigger: {
+                trigger: checkout,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+            }
+          );
+        }
+      })
+      .catch(() => {
+        // GSAP failed — show everything
+        const all = el.querySelectorAll('[data-animate]');
+        all.forEach((t) => {
+          (t as HTMLElement).style.opacity = '1';
+        });
       });
-    }
+
+    // Safety fallback: force-show after 3s
+    const fallbackTimer = setTimeout(() => {
+      const all = el.querySelectorAll('[data-animate]');
+      all.forEach((t) => {
+        const computed = window.getComputedStyle(t);
+        if (computed.opacity === '0') {
+          (t as HTMLElement).style.opacity = '1';
+          (t as HTMLElement).style.transform = 'none';
+          (t as HTMLElement).style.transition = 'opacity 0.5s ease';
+        }
+      });
+    }, 3000);
 
     return () => {
-      ScrollTrigger.getAll().forEach((st) => st.kill());
+      cancelled = true;
+      clearTimeout(fallbackTimer);
     };
   }, []);
 
