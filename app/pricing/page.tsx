@@ -103,15 +103,13 @@ const trustBadges = [
 const pricingTestimonials = [
   {
     quote: 'At €999/year, MetaMech saves us roughly €50,000 in engineering time annually. The ROI calculation on their site was actually conservative.',
-    name: 'Marcus Lindberg',
-    role: 'VP Engineering',
-    company: 'NordicTech Automation',
+    name: 'VP Engineering',
+    role: 'Automation Industry',
   },
   {
     quote: 'We started with Standard, upgraded to Premium within a month. The STEP export alone is worth the difference. Best money we spent on tools this year.',
-    name: 'Priya Deshmukh',
-    role: 'Design Team Lead',
-    company: 'Precision MedTech',
+    name: 'Design Team Lead',
+    role: 'Medical Devices',
   },
 ];
 
@@ -357,7 +355,7 @@ export default function PricingPage() {
                   </div>
                   <div>
                     <p className="text-white font-semibold text-sm">{t.name}</p>
-                    <p className="text-gray-500 text-xs">{t.role}, {t.company}</p>
+                    <p className="text-gray-500 text-xs">{t.role}</p>
                   </div>
                 </div>
               </div>

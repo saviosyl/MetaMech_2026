@@ -104,21 +104,18 @@ const comparisonRows = [
 const testimonials = [
   {
     quote: 'MetaMech cut our drawing package time from 3 hours to 5 minutes. The PDF merge with auto-index alone paid for itself in the first week.',
-    name: 'Marcus Lindberg',
-    role: 'Lead Mechanical Engineer',
-    company: 'NordicTech Automation',
+    name: 'Lead Mechanical Engineer',
+    role: 'Automation Industry',
   },
   {
     quote: "We used to lose half a day every release just exporting STEP files and building BOMs. Now it's a single click before lunch. Game changer.",
-    name: 'Priya Deshmukh',
-    role: 'Design Team Lead',
-    company: 'Precision MedTech',
+    name: 'Design Team Lead',
+    role: 'Medical Devices',
   },
   {
     quote: 'The accuracy improvement alone justified the purchase. We caught zero BOM errors in the last 6 months — previously it was 2-3 per release.',
-    name: 'Jan-Erik Müller',
-    role: 'Engineering Manager',
-    company: 'Volker Systems GmbH',
+    name: 'Engineering Manager',
+    role: 'Industrial Equipment',
   },
 ];
 
@@ -327,7 +324,7 @@ export default function ToolsPage() {
                     </div>
                     <div>
                       <p className="text-white font-semibold text-sm">{testimonial.name}</p>
-                      <p className="text-gray-500 text-xs">{testimonial.role}, {testimonial.company}</p>
+                      <p className="text-gray-500 text-xs">{testimonial.role}</p>
                     </div>
                   </div>
                 </div>

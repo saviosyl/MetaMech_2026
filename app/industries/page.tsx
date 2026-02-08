@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  Stethoscope, Cog, ArrowLeftRight, Cpu, Car, Plane, Factory, Zap,
-  ShoppingCart, Shield, ArrowRight, Check
+  Stethoscope, Cog, ArrowLeftRight, Cpu, Car, Factory, Zap,
+  ShoppingCart, ArrowRight, Check
 } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import JsonLd from '@/components/JsonLd';
@@ -11,10 +11,10 @@ import AnimatedIndustriesContent from '@/components/AnimatedIndustriesContent';
 export const metadata: Metadata = {
   title: 'Industries Served',
   description:
-    'MetaMech SolidWorks automation tools are trusted across Medical Devices, Aerospace, Automotive, Robotics, Manufacturing, and more industries worldwide.',
+    'MetaMech SolidWorks automation tools are trusted across Medical Devices, Automotive, Robotics, Manufacturing, Food & Beverage, and more industries worldwide.',
   openGraph: {
     title: 'Industries Served | MetaMech Solutions',
-    description: 'MetaMech tools are trusted across Medical Devices, Aerospace, Automotive, Robotics, and more.',
+    description: 'MetaMech tools are trusted across Medical Devices, Automotive, Robotics, Food & Beverage, and more.',
     url: 'https://metamechsolutions.com/industries',
   },
   alternates: { canonical: 'https://metamechsolutions.com/industries' },
@@ -27,12 +27,12 @@ const industries = [
   { name: 'Special Machinery', icon: Cpu },
   { name: 'Robotics', icon: Factory },
   { name: 'Automotive', icon: Car },
-  { name: 'Aerospace', icon: Plane },
+  { name: 'Food & Beverage', icon: Factory },
   { name: 'Industrial Equipment', icon: Factory },
   { name: 'Manufacturing', icon: Cog },
   { name: 'Energy', icon: Zap },
   { name: 'Consumer Products', icon: ShoppingCart },
-  { name: 'Defense', icon: Shield },
+  { name: 'Packaging', icon: ShoppingCart },
 ];
 
 const detailedIndustries = [
@@ -102,15 +102,15 @@ const detailedIndustries = [
     color: 'cyan' as const,
   },
   {
-    title: 'Aerospace & Defense',
-    icon: Plane,
+    title: 'Food & Beverage Equipment',
+    icon: Factory,
     description:
-      'High-reliability documentation for safety-critical applications. Ensure traceability, revision control, and compliance across aerospace programs.',
+      'Hygienic design documentation for food-grade machinery. Streamline compliance and material traceability for processing and packaging equipment.',
     useCases: [
-      'AS9100-compliant BOM generation with material certifications',
-      'Drawing packages with strict revision and approval tracking',
-      'ITAR-controlled file export with access audit trails',
-      'Standardized libraries for aerospace fasteners and hardware',
+      'Material-grade BOMs tracking stainless steel specifications',
+      'Drawing packages for factory acceptance testing (FAT)',
+      'Batch STEP exports for CNC and fabrication vendors',
+      'Standardized templates for washdown and clean-in-place assemblies',
     ],
     color: 'gold' as const,
   },

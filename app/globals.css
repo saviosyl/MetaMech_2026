@@ -98,6 +98,7 @@
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
+    animation: border-rotate 8s linear infinite;
   }
 
   .btn-primary {
@@ -273,6 +274,12 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 4s ease-in-out infinite;
+}
+
+/* ========== Border Rotate Animation ========== */
+@keyframes border-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* ========== Scale-in Animation ========== */

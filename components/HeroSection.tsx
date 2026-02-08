@@ -89,6 +89,15 @@ export default function HeroSection() {
         <div className="absolute top-20 left-10 w-[400px] h-[400px] bg-teal/15 rounded-full blur-[120px] animate-float" />
         <div className="absolute bottom-20 right-10 w-[300px] h-[300px] bg-gold/10 rounded-full blur-[100px] animate-float-delayed" />
         <div className="absolute top-1/2 right-1/4 w-[250px] h-[250px] bg-teal/[0.08] rounded-full blur-[80px] animate-pulse-glow" />
+        {/* Rotating squares */}
+        <div className="absolute top-[15%] right-[8%] w-[120px] h-[120px] border border-cyan-500/20 rounded-lg"
+          style={{ animation: 'border-rotate 12s linear infinite' }} />
+        <div className="absolute top-[12%] right-[6%] w-[180px] h-[180px] border border-gold/10 rounded-lg"
+          style={{ animation: 'border-rotate 18s linear infinite reverse' }} />
+        <div className="absolute bottom-[20%] left-[5%] w-[100px] h-[100px] border border-cyan-500/15 rounded-lg"
+          style={{ animation: 'border-rotate 15s linear infinite' }} />
+        <div className="absolute bottom-[25%] left-[3%] w-[150px] h-[150px] border border-gold/8 rounded-lg"
+          style={{ animation: 'border-rotate 20s linear infinite reverse' }} />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{

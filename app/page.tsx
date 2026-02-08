@@ -91,15 +91,12 @@ const comparisonWith = [
   { label: 'Consistency', value: '100% every time' },
 ];
 
-const trustedCompanies = [
-  'NordicTech', 'Precision MedTech', 'Volker Systems',
-  'Keller Maschinenbau', 'AtlasConvey', 'ClearPath Robotics',
-];
+const trustedCompanies: string[] = [];
 
 const industries = [
   'Medical Devices', 'Automation', 'Conveyors', 'Special Machinery',
-  'Robotics', 'Automotive', 'Aerospace', 'Industrial Equipment',
-  'Manufacturing', 'Energy', 'Consumer Products', 'Defense',
+  'Robotics', 'Automotive', 'Food & Beverage', 'Industrial Equipment',
+  'Manufacturing', 'Energy', 'Consumer Products', 'Packaging',
 ];
 
 const howItWorksSteps = [
@@ -133,21 +130,18 @@ const stats = [
 const testimonials = [
   {
     quote: 'MetaMech paid for itself in the first week. Our BOM creation went from hours to seconds, and the accuracy is flawless.',
-    name: 'Sarah Johansson',
-    role: 'Senior Design Engineer',
-    company: 'Scandia Robotics AB',
+    name: 'Senior Design Engineer',
+    role: 'Robotics & Automation',
   },
   {
     quote: 'We tried other automation tools before — MetaMech is the only one that actually understands the SolidWorks workflow. It just works.',
-    name: 'Thomas Keller',
-    role: 'Engineering Manager',
-    company: 'Keller Maschinenbau',
+    name: 'Engineering Manager',
+    role: 'Special Machinery',
   },
   {
     quote: 'The PDF merge tool alone saved our documentation team 15 hours per week. The ROI was immediate and obvious.',
-    name: 'Elena Vasquez',
-    role: 'Technical Lead',
-    company: 'MedPrecision Systems',
+    name: 'Technical Lead',
+    role: 'Medical Devices',
   },
 ];
 
@@ -433,7 +427,7 @@ function TestimonialsSection() {
                   </div>
                   <div>
                     <p className="text-white font-semibold text-sm">{testimonial.name}</p>
-                    <p className="text-gray-500 text-xs">{testimonial.role}, {testimonial.company}</p>
+                    <p className="text-gray-500 text-xs">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
@@ -526,7 +520,6 @@ export default function HomePage() {
       <HowItWorks />
       <ComparisonSection />
       <StatsSection />
-      <TrustedBySection />
       <TestimonialsSection />
       <IndustriesStrip />
       <CTASection />
