@@ -59,6 +59,46 @@ const articles = [
     date: 'February 12, 2026',
     readTime: '10 min read',
   },
+  {
+    title: 'SolidWorks Macros: The Complete Guide to Automating Your CAD Workflow',
+    href: '/blog/solidworks-macros-guide',
+    description:
+      'Master SolidWorks macros and VBA macro automation to speed up your CAD workflow. Learn common macros, limitations, and better alternatives.',
+    date: 'February 8, 2026',
+    readTime: '10 min read',
+  },
+  {
+    title: 'Mechanical Design Consulting Services — SolidWorks Experts in Ireland',
+    href: '/blog/mechanical-design-consultant-ireland',
+    description:
+      'Professional mechanical design consultant services in Ireland. SolidWorks design services for concept design, FEA, prototyping, and production engineering.',
+    date: 'February 8, 2026',
+    readTime: '10 min read',
+  },
+  {
+    title: 'Best SolidWorks Add-ins for Engineering Productivity in 2026',
+    href: '/blog/solidworks-add-ins-productivity',
+    description:
+      'Discover the best SolidWorks add-ins and plugins for engineering productivity. Compare automation, simulation, and data management tools.',
+    date: 'February 8, 2026',
+    readTime: '11 min read',
+  },
+  {
+    title: 'CAD Automation for Engineering Teams: A Practical Guide',
+    href: '/blog/cad-automation-engineering-teams',
+    description:
+      'Learn how CAD automation and engineering automation tools save time and reduce errors. Practical guide to design automation for engineering teams.',
+    date: 'February 8, 2026',
+    readTime: '11 min read',
+  },
+  {
+    title: 'SolidWorks Drawing & File Management: 7 Tips to Stay Organized',
+    href: '/blog/solidworks-drawing-management-tips',
+    description:
+      'Master SolidWorks drawing management and file management with 7 practical tips for naming, revision control, and engineering document management.',
+    date: 'February 8, 2026',
+    readTime: '10 min read',
+  },
 ];
 
 export default function BlogPage() {
