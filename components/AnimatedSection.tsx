@@ -27,77 +27,30 @@ export default function AnimatedSection({
 
     let cancelled = false;
 
-    Promise.all([
-      import('gsap'),
-      import('gsap/ScrollTrigger'),
-    ])
-      .then(([gsapMod, scrollMod]) => {
+    import('gsap')
+      .then((gsapMod) => {
         if (cancelled) return;
-
         const gsap = gsapMod.default || gsapMod;
-        const ScrollTrigger = scrollMod.ScrollTrigger || scrollMod.default;
-        gsap.registerPlugin(ScrollTrigger);
 
-        const fromVars: Record<string, unknown> = {
-          opacity: 0,
-          duration,
-          delay,
-          ease: 'expo.out',
+        const fromVars: Record<string, unknown> = { opacity: 0 };
+        const toVars: Record<string, unknown> = {
+          opacity: 1, duration, delay, ease: 'expo.out', y: 0, x: 0,
         };
 
         switch (direction) {
-          case 'up':
-            fromVars.y = distance;
-            break;
-          case 'down':
-            fromVars.y = -distance;
-            break;
-          case 'left':
-            fromVars.x = distance;
-            break;
-          case 'right':
-            fromVars.x = -distance;
-            break;
+          case 'up': fromVars.y = distance; break;
+          case 'down': fromVars.y = -distance; break;
+          case 'left': fromVars.x = distance; break;
+          case 'right': fromVars.x = -distance; break;
         }
 
-        const toVars: Record<string, unknown> = {
-          opacity: 1,
-          y: 0,
-          x: 0,
-          duration,
-          delay,
-          ease: 'expo.out',
-        };
-
-        gsap.fromTo(el, fromVars, {
-          ...toVars,
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 90%',
-            end: 'top 50%',
-            toggleActions: 'play none none none',
-          },
-        });
+        gsap.fromTo(el, fromVars, toVars);
       })
       .catch(() => {
-        // GSAP failed to load — show content immediately
         el.style.opacity = '1';
       });
 
-    // Safety fallback
-    const fallbackTimer = setTimeout(() => {
-      const computed = window.getComputedStyle(el);
-      if (computed.opacity === '0') {
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-        el.style.transition = 'opacity 0.5s ease';
-      }
-    }, 3000);
-
-    return () => {
-      cancelled = true;
-      clearTimeout(fallbackTimer);
-    };
+    return () => { cancelled = true; };
   }, [delay, direction, duration, distance]);
 
   return (

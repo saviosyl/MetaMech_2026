@@ -11,28 +11,17 @@ export default function AnimatedServicesContent({ children }: { children: React.
 
     let cancelled = false;
 
-    Promise.all([
-      import('gsap'),
-      import('gsap/ScrollTrigger'),
-    ])
-      .then(([gsapMod, scrollMod]) => {
+    import('gsap')
+      .then((gsapMod) => {
         if (cancelled) return;
-
         const gsap = gsapMod.default || gsapMod;
-        const ScrollTrigger = scrollMod.ScrollTrigger || scrollMod.default;
-        gsap.registerPlugin(ScrollTrigger);
 
         const cards = el.querySelectorAll('.glass-card');
         if (cards.length === 0) return;
 
-        gsap.fromTo(
-          cards,
+        gsap.fromTo(cards,
           { opacity: 0, y: 60, rotateY: -15, rotateX: 8, transformPerspective: 800 },
-          {
-            opacity: 1, y: 0, rotateY: 0, rotateX: 0, transformPerspective: 800,
-            duration: 0.7, stagger: 0.15, ease: 'expo.out',
-            scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' },
-          }
+          { opacity: 1, y: 0, rotateY: 0, rotateX: 0, transformPerspective: 800, duration: 0.7, stagger: 0.15, ease: 'expo.out' }
         );
       })
       .catch(() => {
@@ -40,18 +29,7 @@ export default function AnimatedServicesContent({ children }: { children: React.
         cards.forEach((t) => { (t as HTMLElement).style.opacity = '1'; });
       });
 
-    const fallbackTimer = setTimeout(() => {
-      const cards = el.querySelectorAll('.glass-card');
-      cards.forEach((t) => {
-        if (window.getComputedStyle(t).opacity === '0') {
-          (t as HTMLElement).style.opacity = '1';
-          (t as HTMLElement).style.transform = 'none';
-          (t as HTMLElement).style.transition = 'opacity 0.5s ease';
-        }
-      });
-    }, 3000);
-
-    return () => { cancelled = true; clearTimeout(fallbackTimer); };
+    return () => { cancelled = true; };
   }, []);
 
   return <div ref={ref}>{children}</div>;
