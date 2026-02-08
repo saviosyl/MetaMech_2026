@@ -1,10 +1,6 @@
 'use client';
 
 import { useEffect, useRef, ReactNode } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface AnimatedSectionProps {
   children: ReactNode;
@@ -29,45 +25,78 @@ export default function AnimatedSection({
     const el = ref.current;
     if (!el) return;
 
-    const fromVars: gsap.TweenVars = {
-      opacity: 0,
-      duration,
-      delay,
-      ease: 'expo.out',
-    };
+    let cancelled = false;
 
-    switch (direction) {
-      case 'up':
-        fromVars.y = distance;
-        break;
-      case 'down':
-        fromVars.y = -distance;
-        break;
-      case 'left':
-        fromVars.x = distance;
-        break;
-      case 'right':
-        fromVars.x = -distance;
-        break;
-    }
+    Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ])
+      .then(([gsapMod, scrollMod]) => {
+        if (cancelled) return;
 
-    gsap.set(el, { opacity: 0 });
+        const gsap = gsapMod.default || gsapMod;
+        const ScrollTrigger = scrollMod.ScrollTrigger || scrollMod.default;
+        gsap.registerPlugin(ScrollTrigger);
 
-    const tween = gsap.from(el, {
-      ...fromVars,
-      scrollTrigger: {
-        trigger: el,
-        start: 'top 85%',
-        end: 'top 50%',
-        toggleActions: 'play none none none',
-      },
-    });
+        const fromVars: Record<string, unknown> = {
+          opacity: 0,
+          duration,
+          delay,
+          ease: 'expo.out',
+        };
+
+        switch (direction) {
+          case 'up':
+            fromVars.y = distance;
+            break;
+          case 'down':
+            fromVars.y = -distance;
+            break;
+          case 'left':
+            fromVars.x = distance;
+            break;
+          case 'right':
+            fromVars.x = -distance;
+            break;
+        }
+
+        const toVars: Record<string, unknown> = {
+          opacity: 1,
+          y: 0,
+          x: 0,
+          duration,
+          delay,
+          ease: 'expo.out',
+        };
+
+        gsap.fromTo(el, fromVars, {
+          ...toVars,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 90%',
+            end: 'top 50%',
+            toggleActions: 'play none none none',
+          },
+        });
+      })
+      .catch(() => {
+        // GSAP failed to load — show content immediately
+        el.style.opacity = '1';
+      });
+
+    // Safety fallback
+    const fallbackTimer = setTimeout(() => {
+      const computed = window.getComputedStyle(el);
+      if (computed.opacity === '0') {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+        el.style.transition = 'opacity 0.5s ease';
+      }
+    }, 3000);
 
     return () => {
-      tween.kill();
-      ScrollTrigger.getAll().forEach((st) => {
-        if (st.trigger === el) st.kill();
-      });
+      cancelled = true;
+      clearTimeout(fallbackTimer);
     };
   }, [delay, direction, duration, distance]);
 

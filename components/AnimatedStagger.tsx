@@ -1,10 +1,6 @@
 'use client';
 
 import { useEffect, useRef, ReactNode } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface AnimatedStaggerProps {
   children: ReactNode;
@@ -35,55 +31,103 @@ export default function AnimatedStagger({
     const el = ref.current;
     if (!el) return;
 
-    const targets = el.querySelectorAll(childSelector);
-    if (targets.length === 0) return;
+    let cancelled = false;
 
-    const fromVars: gsap.TweenVars = {
-      opacity: 0,
-      duration,
-      stagger,
-      delay,
-      ease: 'expo.out',
-    };
+    // Dynamically import GSAP so a load failure doesn't hide content forever
+    Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ])
+      .then(([gsapMod, scrollMod]) => {
+        if (cancelled) return;
 
-    switch (direction) {
-      case 'up':
-        fromVars.y = distance;
-        break;
-      case 'down':
-        fromVars.y = -distance;
-        break;
-      case 'left':
-        fromVars.x = distance;
-        break;
-      case 'right':
-        fromVars.x = -distance;
-        break;
-    }
+        const gsap = gsapMod.default || gsapMod;
+        const ScrollTrigger = scrollMod.ScrollTrigger || scrollMod.default;
+        gsap.registerPlugin(ScrollTrigger);
 
-    if (rotate3D) {
-      fromVars.rotateY = -15;
-      fromVars.rotateX = 8;
-      fromVars.transformPerspective = 800;
-    }
+        const targets = el.querySelectorAll(childSelector);
+        if (targets.length === 0) return;
 
-    gsap.set(targets, { opacity: 0 });
+        const fromVars: Record<string, unknown> = {
+          opacity: 0,
+          duration,
+          stagger,
+          delay,
+          ease: 'expo.out',
+        };
 
-    const tween = gsap.from(targets, {
-      ...fromVars,
-      scrollTrigger: {
-        trigger: el,
-        start: 'top 85%',
-        end: 'top 40%',
-        toggleActions: 'play none none none',
-      },
-    });
+        switch (direction) {
+          case 'up':
+            fromVars.y = distance;
+            break;
+          case 'down':
+            fromVars.y = -distance;
+            break;
+          case 'left':
+            fromVars.x = distance;
+            break;
+          case 'right':
+            fromVars.x = -distance;
+            break;
+        }
+
+        if (rotate3D) {
+          fromVars.rotateY = -15;
+          fromVars.rotateX = 8;
+          fromVars.transformPerspective = 800;
+        }
+
+        const toVars: Record<string, unknown> = {
+          opacity: 1,
+          y: 0,
+          x: 0,
+          duration,
+          stagger,
+          delay,
+          ease: 'expo.out',
+        };
+
+        if (rotate3D) {
+          toVars.rotateY = 0;
+          toVars.rotateX = 0;
+          toVars.transformPerspective = 800;
+        }
+
+        // Use fromTo for reliability — ensures end state is always opacity:1
+        gsap.fromTo(targets, fromVars, {
+          ...toVars,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 90%',
+            end: 'top 40%',
+            toggleActions: 'play none none none',
+          },
+        });
+      })
+      .catch(() => {
+        // If GSAP fails to load, make everything visible
+        const targets = el.querySelectorAll(childSelector);
+        targets.forEach((t) => {
+          (t as HTMLElement).style.opacity = '1';
+        });
+      });
+
+    // Safety fallback: if elements are still invisible after 3s, force show
+    const fallbackTimer = setTimeout(() => {
+      const targets = el.querySelectorAll(childSelector);
+      targets.forEach((t) => {
+        const computed = window.getComputedStyle(t);
+        if (computed.opacity === '0') {
+          (t as HTMLElement).style.opacity = '1';
+          (t as HTMLElement).style.transform = 'none';
+          (t as HTMLElement).style.transition = 'opacity 0.5s ease';
+        }
+      });
+    }, 3000);
 
     return () => {
-      tween.kill();
-      ScrollTrigger.getAll().forEach((st) => {
-        if (st.trigger === el) st.kill();
-      });
+      cancelled = true;
+      clearTimeout(fallbackTimer);
     };
   }, [childSelector, stagger, delay, duration, distance, direction, rotate3D]);
 
