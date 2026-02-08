@@ -5,10 +5,25 @@ import {
   Cpu, Sparkles, ShieldCheck, TrendingUp, MousePointerClick, RefreshCw,
   XCircle, CheckCircle2
 } from 'lucide-react';
+import type { Metadata } from 'next';
 import HeroSection from '@/components/HeroSection';
 import JsonLd from '@/components/JsonLd';
 import AnimatedSection from '@/components/AnimatedSection';
 import AnimatedStagger from '@/components/AnimatedStagger';
+
+export const metadata: Metadata = {
+  title: 'SolidWorks Automation Tools — Save 85% Design Time | MetaMech',
+  description:
+    'MetaMech automates your SolidWorks workflow: BOM generation in 30 seconds, one-click PDF merge with index, batch STEP/DXF export. Free 3-day trial. No coding required.',
+  alternates: { canonical: 'https://metamechsolutions.com' },
+  openGraph: {
+    title: 'SolidWorks Automation Tools — Save 85% Design Time | MetaMech',
+    description:
+      'MetaMech automates your SolidWorks workflow: BOM generation in 30 seconds, one-click PDF merge with index, batch STEP/DXF export. Free 3-day trial. No coding required.',
+    url: 'https://metamechsolutions.com',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
+  },
+};
 
 const tools = [
   {
@@ -511,9 +526,45 @@ export default function HomePage() {
     sameAs: ['https://www.linkedin.com/company/metamech-solutions/'],
   };
 
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'MetaMech Solutions',
+    url: 'https://metamechsolutions.com',
+    description: 'SolidWorks automation tools for engineers',
+    publisher: {
+      '@type': 'Organization',
+      name: 'MetaMech Solutions',
+    },
+  };
+
+  const softwareSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'MetaMech',
+    applicationCategory: 'EngineeringApplication',
+    operatingSystem: 'Windows',
+    description: 'SolidWorks automation tools: BOM generation, PDF merge, STEP/DXF batch export',
+    url: 'https://metamechsolutions.com',
+    offers: {
+      '@type': 'AggregateOffer',
+      lowPrice: '0',
+      highPrice: '1599',
+      priceCurrency: 'EUR',
+      offerCount: '4',
+    },
+    creator: {
+      '@type': 'Organization',
+      name: 'MetaMech Solutions',
+      url: 'https://metamechsolutions.com',
+    },
+  };
+
   return (
     <>
       <JsonLd data={organizationSchema} />
+      <JsonLd data={websiteSchema} />
+      <JsonLd data={softwareSchema} />
       <HeroSection />
       <ToolCards />
       <WhyMetaMechSection />

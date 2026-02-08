@@ -9,13 +9,14 @@ import JsonLd from '@/components/JsonLd';
 import AnimatedToolsContent from '@/components/AnimatedToolsContent';
 
 export const metadata: Metadata = {
-  title: 'SolidWorks Automation Tools',
+  title: 'SolidWorks Automation Tools — BOM, PDF Merge, STEP Export | MetaMech',
   description:
-    'Explore MetaMech SolidWorks automation tools: BOM Automation, PDF Merge with Index, and STEP/DXF Batch Export. Streamline your engineering workflow.',
+    'Explore MetaMech SolidWorks automation tools: BOM generation in 30 seconds, PDF merge with auto index & bookmarks, batch STEP/DXF export. Free 3-day trial.',
   openGraph: {
-    title: 'SolidWorks Automation Tools | MetaMech Solutions',
-    description: 'Explore MetaMech SolidWorks automation tools for BOM, PDF Merge, and STEP/DXF Export.',
+    title: 'SolidWorks Automation Tools — BOM, PDF Merge, STEP Export | MetaMech',
+    description: 'Explore MetaMech SolidWorks automation tools: BOM generation in 30 seconds, PDF merge with auto index, batch STEP/DXF export.',
     url: 'https://metamechsolutions.com/tools',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
   },
   alternates: { canonical: 'https://metamechsolutions.com/tools' },
 };

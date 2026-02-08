@@ -10,13 +10,14 @@ import JsonLd from '@/components/JsonLd';
 import AnimatedToolsContent from '@/components/AnimatedToolsContent';
 
 export const metadata: Metadata = {
-  title: 'PDF Merge + Index',
+  title: 'SolidWorks PDF Merge — Combine Drawings with Auto Index & Bookmarks',
   description:
-    'Merge SolidWorks drawings into a single PDF with automatic index generation, clickable bookmarks, and custom page numbering. Batch PDF merging tool.',
+    'Merge SolidWorks drawings into a single PDF with automatic index generation, clickable bookmarks, and custom page numbering. One-click PDF merge tool. Free trial.',
   openGraph: {
-    title: 'PDF Merge + Index | MetaMech Solutions',
-    description: 'Merge SolidWorks drawings into a single PDF with automatic index and bookmarks.',
+    title: 'SolidWorks PDF Merge — Combine Drawings with Auto Index & Bookmarks',
+    description: 'Merge SolidWorks drawings into a single PDF with automatic index, clickable bookmarks, and custom page numbering.',
     url: 'https://metamechsolutions.com/tools/pdf-merge',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
   },
   alternates: { canonical: 'https://metamechsolutions.com/tools/pdf-merge' },
 };

@@ -3,20 +3,21 @@ import Link from 'next/link';
 import {
   Settings, DraftingCompass, Library, Check, ArrowRight,
   Search, Pencil, Wrench, HeadphonesIcon, Stethoscope, Cog, Factory,
-  FileOutput, BarChart3
+  FileOutput, BarChart3, Table
 } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import JsonLd from '@/components/JsonLd';
 import AnimatedServicesContent from '@/components/AnimatedServicesContent';
 
 export const metadata: Metadata = {
-  title: 'Engineering Services',
+  title: 'Engineering Services — SolidWorks Design & CAD Automation | MetaMech',
   description:
-    'Professional mechanical design, CAD/Layout/Manufacturing, and SolidWorks library services. Comprehensive engineering support from MetaMech Solutions.',
+    'Professional mechanical design, CAD automation, and SolidWorks library services. From concept to production — comprehensive engineering support from MetaMech Solutions.',
   openGraph: {
-    title: 'Engineering Services | MetaMech Solutions',
-    description: 'Professional mechanical design, CAD, and SolidWorks library services.',
+    title: 'Engineering Services — SolidWorks Design & CAD Automation | MetaMech',
+    description: 'Professional mechanical design, CAD automation, and SolidWorks library services from MetaMech Solutions.',
     url: 'https://metamechsolutions.com/services',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
   },
   alternates: { canonical: 'https://metamechsolutions.com/services' },
 };
@@ -301,9 +302,53 @@ export default function ServicesPage() {
         </div>
       </section>
 
+      {/* Automation Tools Section */}
+      <section className="relative py-20 lg:py-28 overflow-hidden">
+        <div className="absolute inset-0 bg-navy-light" />
+        <div className="relative z-10 max-w-7xl xl:max-w-8xl 2xl:max-w-9xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="text-center mb-12">
+            <h2 className="font-orbitron text-3xl sm:text-4xl font-bold text-white mb-4">
+              OUR AUTOMATION <span className="text-gradient-teal">TOOLS</span>
+            </h2>
+            <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
+              Complement our engineering services with powerful SolidWorks automation tools.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+            <Link href="/tools/bom" className="glass-card p-6 group hover:-translate-y-2 transition-all duration-300 hover:border-cyan-500/30 block">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Table size={24} className="text-cyan-400" />
+              </div>
+              <h3 className="font-orbitron text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">BOM Automation</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Generate accurate Bills of Materials in 30 seconds with custom Excel templates.</p>
+              <span className="flex items-center gap-2 text-cyan-400 text-sm font-medium mt-4 group-hover:gap-3 transition-all">Learn More <ArrowRight size={14} /></span>
+            </Link>
+
+            <Link href="/tools/pdf-merge" className="glass-card p-6 group hover:-translate-y-2 transition-all duration-300 hover:border-gold/30 block">
+              <div className="w-12 h-12 rounded-xl bg-gold/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <FileOutput size={24} className="text-gold" />
+              </div>
+              <h3 className="font-orbitron text-lg font-bold text-white mb-2 group-hover:text-gold transition-colors">PDF Merge + Index</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Combine multiple drawings into a single PDF with automatic index and bookmarks.</p>
+              <span className="flex items-center gap-2 text-gold text-sm font-medium mt-4 group-hover:gap-3 transition-all">Learn More <ArrowRight size={14} /></span>
+            </Link>
+
+            <Link href="/tools/file-export" className="glass-card p-6 group hover:-translate-y-2 transition-all duration-300 hover:border-cyan-500/30 block">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <BarChart3 size={24} className="text-cyan-400" />
+              </div>
+              <h3 className="font-orbitron text-lg font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">STEP / DXF Export</h3>
+              <p className="text-gray-400 text-sm leading-relaxed">Batch export files with consistent naming and automatic folder organization.</p>
+              <span className="flex items-center gap-2 text-cyan-400 text-sm font-medium mt-4 group-hover:gap-3 transition-all">Learn More <ArrowRight size={14} /></span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="relative py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-navy-light">
+        <div className="absolute inset-0 bg-navy">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gold/5 rounded-full blur-[200px]" />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

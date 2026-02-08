@@ -10,13 +10,14 @@ import JsonLd from '@/components/JsonLd';
 import AnimatedToolsContent from '@/components/AnimatedToolsContent';
 
 export const metadata: Metadata = {
-  title: 'BOM Automation',
+  title: 'SolidWorks BOM Automation — Generate Bills of Materials in Seconds',
   description:
-    'Automate SolidWorks Bill of Materials generation with custom Excel templates, automatic part numbering, multi-configuration support, and real-time updates.',
+    'Automate SolidWorks Bill of Materials generation in 30 seconds. Custom Excel templates, automatic part numbering, multi-configuration support. Free 3-day trial.',
   openGraph: {
-    title: 'BOM Automation | MetaMech Solutions',
-    description: 'Automate SolidWorks Bill of Materials generation with custom Excel templates.',
+    title: 'SolidWorks BOM Automation — Generate Bills of Materials in Seconds',
+    description: 'Automate SolidWorks BOM generation in 30 seconds. Custom Excel templates, automatic part numbering, multi-config support.',
     url: 'https://metamechsolutions.com/tools/bom',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
   },
   alternates: { canonical: 'https://metamechsolutions.com/tools/bom' },
 };

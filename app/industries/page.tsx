@@ -9,13 +9,14 @@ import JsonLd from '@/components/JsonLd';
 import AnimatedIndustriesContent from '@/components/AnimatedIndustriesContent';
 
 export const metadata: Metadata = {
-  title: 'Industries Served',
+  title: 'Industries — SolidWorks Automation for Medical, Automotive, Robotics & More',
   description:
-    'MetaMech SolidWorks automation tools are trusted across Medical Devices, Automotive, Robotics, Manufacturing, Food & Beverage, and more industries worldwide.',
+    'MetaMech SolidWorks automation tools trusted across Medical Devices, Automotive, Robotics, Manufacturing, Food & Beverage, and more. Industry-specific use cases & templates.',
   openGraph: {
-    title: 'Industries Served | MetaMech Solutions',
-    description: 'MetaMech tools are trusted across Medical Devices, Automotive, Robotics, Food & Beverage, and more.',
+    title: 'Industries — SolidWorks Automation for Medical, Automotive, Robotics & More',
+    description: 'MetaMech SolidWorks automation tools trusted across Medical Devices, Automotive, Robotics, Food & Beverage, and more.',
     url: 'https://metamechsolutions.com/industries',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
   },
   alternates: { canonical: 'https://metamechsolutions.com/industries' },
 };

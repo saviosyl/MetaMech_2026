@@ -13,13 +13,14 @@ import CheckoutForm from '@/components/CheckoutForm';
 import AnimatedPricingContent from '@/components/AnimatedPricingContent';
 
 export const metadata: Metadata = {
-  title: 'Pricing & Plans',
+  title: 'MetaMech Pricing — SolidWorks Automation from €999/year',
   description:
-    'MetaMech Solutions pricing: Trial €0 (3 days), Standard €999/yr, Premium €1,299/yr, Premium Plus €1,599/yr. Calculate your ROI and choose the right plan.',
+    'MetaMech Solutions pricing: Free 3-day trial, Standard €999/yr, Premium €1,299/yr, Premium Plus €1,599/yr. Calculate your ROI. Save 85% engineering time.',
   openGraph: {
-    title: 'Pricing & Plans | MetaMech Solutions',
-    description: 'Flexible pricing for SolidWorks automation tools. Trial, Standard, Premium, and Premium Plus plans.',
+    title: 'MetaMech Pricing — SolidWorks Automation from €999/year',
+    description: 'Flexible pricing for SolidWorks automation tools. Free trial, Standard, Premium, and Premium Plus plans. Calculate your ROI.',
     url: 'https://metamechsolutions.com/pricing',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
   },
   alternates: { canonical: 'https://metamechsolutions.com/pricing' },
 };
@@ -149,6 +150,59 @@ const faqs = [
 ];
 
 export default function PricingPage() {
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'MetaMech SolidWorks Automation Tools',
+    description: 'SolidWorks automation tools: BOM generation, PDF merge with index, STEP/DXF batch export.',
+    brand: {
+      '@type': 'Brand',
+      name: 'MetaMech Solutions',
+    },
+    url: 'https://metamechsolutions.com/pricing',
+    offers: [
+      {
+        '@type': 'Offer',
+        name: 'Trial',
+        price: '0',
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/InStock',
+        description: '3-day free trial with full feature access',
+        url: 'https://metamechsolutions.com/download',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Standard',
+        price: '999',
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/InStock',
+        priceValidUntil: '2026-12-31',
+        description: 'BOM Automation + PDF Merge for single user',
+        url: 'https://metamechsolutions.com/pricing',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Premium',
+        price: '1299',
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/InStock',
+        priceValidUntil: '2026-12-31',
+        description: 'All tools including STEP/DXF Export, priority support, custom templates',
+        url: 'https://metamechsolutions.com/pricing',
+      },
+      {
+        '@type': 'Offer',
+        name: 'Premium Plus',
+        price: '1599',
+        priceCurrency: 'EUR',
+        availability: 'https://schema.org/InStock',
+        priceValidUntil: '2026-12-31',
+        description: 'Enterprise solution with custom development, API access, dedicated support',
+        url: 'https://metamechsolutions.com/pricing',
+      },
+    ],
+  };
+
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -170,6 +224,7 @@ export default function PricingPage() {
 
   return (
     <>
+      <JsonLd data={productSchema} />
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={faqSchema} />
 

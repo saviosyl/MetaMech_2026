@@ -10,13 +10,14 @@ import JsonLd from '@/components/JsonLd';
 import AnimatedToolsContent from '@/components/AnimatedToolsContent';
 
 export const metadata: Metadata = {
-  title: 'STEP / DXF Export',
+  title: 'SolidWorks Batch Export — STEP & DXF Files with Auto Naming',
   description:
-    'Batch export SolidWorks files to STEP and DXF formats with custom naming conventions, automatic folder structure, and format validation.',
+    'Batch export SolidWorks files to STEP and DXF formats with custom naming conventions, automatic folder structure, and format validation. Free 3-day trial.',
   openGraph: {
-    title: 'STEP / DXF Export | MetaMech Solutions',
-    description: 'Batch export SolidWorks files to STEP and DXF with custom naming and folder structure.',
+    title: 'SolidWorks Batch Export — STEP & DXF Files with Auto Naming',
+    description: 'Batch export SolidWorks files to STEP and DXF with custom naming, auto folder structure, and format validation.',
     url: 'https://metamechsolutions.com/tools/file-export',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
   },
   alternates: { canonical: 'https://metamechsolutions.com/tools/file-export' },
 };

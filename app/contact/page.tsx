@@ -6,13 +6,14 @@ import ContactForm from '@/components/ContactForm';
 import AnimatedContactContent from '@/components/AnimatedContactContent';
 
 export const metadata: Metadata = {
-  title: 'Contact Us',
+  title: 'Contact MetaMech — Get a Demo | SolidWorks Automation Experts',
   description:
-    'Contact MetaMech Solutions for a demo, support, or custom engineering project. Based in Galway, Ireland. Email: hi@metamechsolutions.com',
+    'Contact MetaMech Solutions for a live demo, support, or custom engineering project. SolidWorks automation experts based in Galway, Ireland. Response within 24 hours.',
   openGraph: {
-    title: 'Contact Us | MetaMech Solutions',
-    description: 'Get in touch with MetaMech Solutions. Request a demo or discuss your engineering project.',
+    title: 'Contact MetaMech — Get a Demo | SolidWorks Automation Experts',
+    description: 'Get in touch with MetaMech Solutions. Request a demo or discuss your SolidWorks automation needs.',
     url: 'https://metamechsolutions.com/contact',
+    images: [{ url: 'https://metamechsolutions.com/metamech-logo.png', width: 1200, height: 630, alt: 'MetaMech Solutions - SolidWorks Automation Tools' }],
   },
   alternates: { canonical: 'https://metamechsolutions.com/contact' },
 };
