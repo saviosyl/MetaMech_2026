@@ -121,10 +121,10 @@ const howItWorksSteps = [
 ];
 
 const stats = [
-  { value: '10,000+', label: 'Hours Saved', icon: Clock },
-  { value: '500+', label: 'Engineers', icon: Users },
-  { value: '99.9%', label: 'Accuracy', icon: Target },
-  { value: '50+', label: 'Companies', icon: Building2 },
+  { value: '85%', label: 'Time Saved on BOMs', icon: Clock },
+  { value: '<2 min', label: 'Setup Time', icon: Users },
+  { value: '99.9%', label: 'Output Accuracy', icon: Target },
+  { value: '3 Days', label: 'Free Trial', icon: Building2 },
 ];
 
 const testimonials = [
