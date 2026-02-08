@@ -129,8 +129,8 @@ const faqs = [
     a: 'Absolutely. You can upgrade or downgrade your plan at any time. We\'ll prorate the difference.',
   },
   {
-    q: 'Is there a money-back guarantee?',
-    a: 'Yes, all plans include a 14-day money-back guarantee. No questions asked.',
+    q: 'Is there a free trial?',
+    a: 'Yes — every plan comes with a free 3-day trial so you can test all features before committing. All sales are final after purchase.',
   },
   {
     q: 'Do you offer volume discounts?',
@@ -256,9 +256,9 @@ export default function PricingPage() {
             ))}
           </div>
 
-          {/* Guarantee + Trust Badges */}
+          {/* Trust Badges */}
           <div className="mt-12 text-center">
-            <p className="text-gray-500 text-sm mb-6">All plans include a 14-day money-back guarantee. No questions asked.</p>
+            <p className="text-gray-500 text-sm mb-6">Try free for 3 days — explore every feature before you buy.</p>
             <div className="flex flex-wrap justify-center gap-6">
               {trustBadges.map((badge, i) => (
                 <div key={i} className="flex items-center gap-2 text-gray-500 text-xs">

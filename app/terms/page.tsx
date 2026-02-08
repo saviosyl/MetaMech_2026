@@ -21,7 +21,7 @@ export default function TermsPage() {
             <h2 className="font-orbitron text-xl text-white">2. Trial Period</h2>
             <p>The 3-day free trial provides full access to all features. After the trial period, a paid license is required for continued use.</p>
             <h2 className="font-orbitron text-xl text-white">3. Refund Policy</h2>
-            <p>All paid plans include a 14-day money-back guarantee. If you are not satisfied with MetaMech, contact us within 14 days of purchase for a full refund.</p>
+            <p>All sales are final. We encourage you to take advantage of the free 3-day trial to evaluate the software before purchasing. If you experience a technical issue that prevents the software from functioning, please contact us at <a href="mailto:hi@metamechsolutions.com" className="text-cyan-400 hover:text-cyan-300">hi@metamechsolutions.com</a> and we will work to resolve it.</p>
             <h2 className="font-orbitron text-xl text-white">4. Limitation of Liability</h2>
             <p>MetaMech Solutions provides tools on an &quot;as is&quot; basis. We are not liable for any damages arising from the use of our software.</p>
             <h2 className="font-orbitron text-xl text-white">5. Contact</h2>
