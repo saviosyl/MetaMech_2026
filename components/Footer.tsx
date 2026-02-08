@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Linkedin, Twitter, Youtube, Github } from 'lucide-react';
+import { Linkedin, Youtube } from 'lucide-react';
 
 const navLinks = [
   { name: 'Tools', href: '/tools' },
@@ -19,10 +19,8 @@ const legalLinks = [
 ];
 
 const socialLinks = [
-  { name: 'LinkedIn', icon: Linkedin, href: '#' },
-  { name: 'Twitter', icon: Twitter, href: '#' },
+  { name: 'LinkedIn', icon: Linkedin, href: 'https://www.linkedin.com/company/metamech-solutions/' },
   { name: 'YouTube', icon: Youtube, href: '#' },
-  { name: 'GitHub', icon: Github, href: '#' },
 ];
 
 export default function Footer() {
