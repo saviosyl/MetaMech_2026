@@ -38,7 +38,7 @@ const STRIPE_LINKS: Record<string, string> = {
 };
 
 const REVOLUT_LINK = 'https://revolut.me/saviosyl';
-const WEB3FORMS_KEY = 'c7e2117e-876a-443f-9e05-b3a9b0eca813';
+const FORMSPREE_URL = 'https://formspree.io/f/xvzzkjwd';
 
 export default function CheckoutForm() {
   const [step, setStep] = useState(1);
@@ -64,21 +64,20 @@ export default function CheckoutForm() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const fd = new FormData();
-    fd.append('access_key', WEB3FORMS_KEY);
-    fd.append('subject', `Order Details - ${formData.companyName}`);
-    fd.append('from_name', formData.fullName);
-    fd.append('from_email', formData.email);
-    fd.append('plan', selectedPlan);
-    Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
-
     try {
-      const response = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd });
-      const data = await response.json();
-      if (response.ok && data.success) {
+      const response = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: `Order Details - ${formData.companyName}`,
+          plan: selectedPlan,
+          ...formData,
+        }),
+      });
+      if (response.ok) {
         setStep(2);
       } else {
-        throw new Error(data.message || 'Form submission failed');
+        throw new Error('Form submission failed');
       }
     } catch {
       alert('Something went wrong. Please email us directly at hi@metamechsolutions.com');

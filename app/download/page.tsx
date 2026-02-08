@@ -3,12 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Download, Check, User, Building, MapPin, Mail, FileDown, Calendar, Phone, Briefcase, MessageSquare } from 'lucide-react';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
-
-const WEB3FORMS_KEY = 'c7e2117e-876a-443f-9e05-b3a9b0eca813';
+const FORMSPREE_URL = 'https://formspree.io/f/xvzzkjwd';
 
 export default function DownloadPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -27,20 +22,12 @@ export default function DownloadPage() {
 
   useEffect(() => {
     if (!formRef.current) return;
-    gsap.from(formRef.current, {
-      opacity: 0,
-      y: 50,
-      duration: 0.8,
-      ease: 'expo.out',
-      scrollTrigger: {
-        trigger: formRef.current,
-        start: 'top 85%',
-        toggleActions: 'play none none none',
-      },
+    import('gsap').then((gsapMod) => {
+      const gsap = gsapMod.default || gsapMod;
+      gsap.fromTo(formRef.current, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' });
+    }).catch(() => {
+      if (formRef.current) formRef.current.style.opacity = '1';
     });
-    return () => {
-      ScrollTrigger.getAll().forEach((st) => st.kill());
-    };
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -51,23 +38,17 @@ export default function DownloadPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const body = new FormData();
-    body.append('access_key', WEB3FORMS_KEY);
-    body.append('subject', `Trial Download Request - ${formData.companyName}`);
-    body.append('from_name', formData.fullName);
-    body.append('from_email', formData.email);
-    body.append('Full Name', formData.fullName);
-    body.append('Designation', formData.designation);
-    body.append('Phone Number', formData.phone);
-    body.append('Company Name', formData.companyName);
-    body.append('Company Address', formData.companyAddress);
-    body.append('Email', formData.email);
-    body.append('Notes', formData.notes);
     try {
-      const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body });
-      const data = await res.json();
-      if (res.ok && data.success) setIsSubmitted(true);
-      else throw new Error(data.message || 'Failed');
+      const res = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: `Trial Download Request - ${formData.companyName}`,
+          ...formData,
+        }),
+      });
+      if (res.ok) setIsSubmitted(true);
+      else throw new Error('Failed');
     } catch { alert('Something went wrong. Please email us at hi@metamechsolutions.com'); }
     finally { setIsSubmitting(false); }
   };
