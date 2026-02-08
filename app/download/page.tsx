@@ -55,8 +55,8 @@ export default function DownloadPage() {
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.href = '/MetaMechTrial.exe';
-    link.download = 'MetaMechTrial.exe';
+    link.href = '/metamech-trial.rar';
+    link.download = 'metamech-trial.rar';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -149,7 +149,7 @@ export default function DownloadPage() {
                 <button onClick={handleDownload} className="btn-primary flex items-center justify-center gap-2 mx-auto mb-4">
                   <FileDown size={18} /> Download MetaMech Trial
                 </button>
-                <p className="text-sm text-gray-500">MetaMechTrial.exe (45 MB)</p>
+                <p className="text-sm text-gray-500">metamech-trial.rar (335 KB)</p>
               </div>
             )}
           </div>
