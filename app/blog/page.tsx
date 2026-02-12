@@ -20,6 +20,38 @@ export const metadata: Metadata = {
 
 const articles = [
   {
+    title: 'The Complete Guide to SolidWorks Automation in 2026',
+    href: '/blog/solidworks-automation-guide-2026',
+    description:
+      'Learn everything about SolidWorks automation — from macros and API scripting to dedicated tools like MetaMech. Boost productivity, reduce errors, and save hundreds of engineering hours.',
+    date: 'February 12, 2026',
+    readTime: '12 min read',
+  },
+  {
+    title: '15 Best SolidWorks Macros Every Engineer Needs in 2026',
+    href: '/blog/best-solidworks-macros-2026',
+    description:
+      'Discover the 15 best SolidWorks macros for 2026 — from batch PDF export to BOM automation. Learn what each macro does, plus how MetaMech bundles them all into one powerful tool.',
+    date: 'February 12, 2026',
+    readTime: '14 min read',
+  },
+  {
+    title: 'Mechanical Design in Ireland: Tools, Trends & Automation in 2026',
+    href: '/blog/mechanical-design-ireland-2026',
+    description:
+      'Explore the state of mechanical design in Ireland in 2026 — key industries, emerging trends, and why Irish engineers are turning to design automation tools like MetaMech.',
+    date: 'February 12, 2026',
+    readTime: '13 min read',
+  },
+  {
+    title: 'SolidWorks Macros vs Automation Tools: Which Should You Use?',
+    href: '/blog/solidworks-macro-vs-automation-tool',
+    description:
+      'SolidWorks macros or a dedicated automation tool? Compare VBA macros vs tools like MetaMech — pros, cons, and when to use each.',
+    date: 'February 12, 2026',
+    readTime: '14 min read',
+  },
+  {
     title: 'How to Automate SolidWorks Bill of Materials: A Complete Guide',
     href: '/blog/solidworks-bom-automation-guide',
     description:
