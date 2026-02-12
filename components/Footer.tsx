@@ -105,7 +105,7 @@ export default function Footer() {
 
           {/* Disclaimer */}
           <p className="text-gray-600/60 text-xs text-center mt-6 max-w-3xl mx-auto leading-relaxed">
-            MetaMech Solutions is an independent software provider and is not affiliated with, endorsed by, or sponsored by Dassault Systèmes or SolidWorks Corporation. SolidWorks® is a registered trademark of Dassault Systèmes SolidWorks Corporation.
+            MetaMech Solutions is an independent software provider and is not affiliated with, endorsed by, or sponsored by Dassault Systèmes, SolidWorks Corporation, or DriveWorks Ltd. SolidWorks® is a registered trademark of Dassault Systèmes SolidWorks Corporation. DriveWorks® is a registered trademark of DriveWorks Ltd. All other trademarks are the property of their respective owners.
           </p>
         </div>
       </div>

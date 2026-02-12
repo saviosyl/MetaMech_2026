@@ -685,6 +685,12 @@ export default function SolidWorksDesignAutomationPage() {
           <p className="text-gray-500 text-sm text-center mt-8 italic">
             MetaMech Solutions — SolidWorks design automation from Ireland, built for engineers everywhere.
           </p>
+
+          <div className="mt-8 p-4 border border-gray-700/50 rounded-lg">
+            <p className="text-gray-500 text-xs leading-relaxed">
+              <strong className="text-gray-400">Disclaimer:</strong> MetaMech Solutions is an independent software provider and is not affiliated with, endorsed by, or sponsored by Dassault Systèmes, SolidWorks Corporation, or DriveWorks Ltd. SolidWorks® is a registered trademark of Dassault Systèmes SolidWorks Corporation. DriveWorks® is a registered trademark of DriveWorks Ltd. All other product names, trademarks, and registered trademarks mentioned on this page are the property of their respective owners. References to third-party products are for informational comparison purposes only.
+            </p>
+          </div>
         </div>
       </main>
     </>
