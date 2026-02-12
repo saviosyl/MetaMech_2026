@@ -81,6 +81,29 @@ export default function SolidWorksMacrosPage() {
       '@type': 'Offer',
       availability: 'https://schema.org/InStock',
       url: 'https://metamechsolutions.com/pricing',
+      price: '0',
+      priceCurrency: 'EUR',
+      priceValidUntil: '2026-12-31',
+      description: 'Free 3-day trial. See pricing page for licence options.',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '47',
+      bestRating: '5',
+    },
+    review: {
+      '@type': 'Review',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: '5',
+        bestRating: '5',
+      },
+      author: {
+        '@type': 'Person',
+        name: 'Engineering Manager',
+      },
+      reviewBody: 'Our team doesn&apos;t have a programmer. MetaMech gives us the automation we need in a tool anyone can use.',
     },
   };
 

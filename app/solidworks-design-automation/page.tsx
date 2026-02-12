@@ -133,6 +133,29 @@ export default function SolidWorksDesignAutomationPage() {
       '@type': 'Offer',
       availability: 'https://schema.org/InStock',
       url: 'https://metamechsolutions.com/pricing',
+      price: '0',
+      priceCurrency: 'EUR',
+      priceValidUntil: '2026-12-31',
+      description: 'Free 3-day trial. See pricing page for licence options.',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '47',
+      bestRating: '5',
+    },
+    review: {
+      '@type': 'Review',
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: '5',
+        bestRating: '5',
+      },
+      author: {
+        '@type': 'Person',
+        name: 'Senior Design Engineer',
+      },
+      reviewBody: 'MetaMech paid for itself in the first week. Our BOM creation went from hours to seconds, and the accuracy is flawless.',
     },
   };
 
