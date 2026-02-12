@@ -4,6 +4,16 @@ import { ArrowRight, Download, MapPin, Users, Heart, Shield, Lightbulb } from 'l
 import Breadcrumbs from '@/components/Breadcrumbs';
 import JsonLd from '@/components/JsonLd';
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-954RBCT27V"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-954RBCT27V');
+</script>
+  
 export const metadata: Metadata = {
   title: 'About MetaMech Solutions — SolidWorks Automation from Ireland',
   description:
