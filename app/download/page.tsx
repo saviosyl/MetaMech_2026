@@ -149,7 +149,12 @@ export default function DownloadPage() {
                 <button onClick={handleDownload} className="btn-primary flex items-center justify-center gap-2 mx-auto mb-4">
                   <FileDown size={18} /> Download MetaMech Trial
                 </button>
-                <p className="text-sm text-gray-500">metamech-trial.rar (335 KB)</p>
+                <p className="text-sm text-gray-500 mb-6">MetaMech-Trial.zip</p>
+                <div className="text-left bg-gray-800/50 rounded-lg p-4 max-w-md mx-auto">
+                  <p className="text-xs font-bold text-cyan-400 mb-2">⚠️ Windows SmartScreen Notice</p>
+                  <p className="text-xs text-gray-400">Windows may show a protection warning because MetaMech is new software. This is normal for all new applications.</p>
+                  <p className="text-xs text-gray-400 mt-2">To proceed: Click <span className="text-white font-semibold">&quot;More info&quot;</span> → then click <span className="text-white font-semibold">&quot;Run anyway&quot;</span></p>
+                </div>
               </div>
             )}
           </div>
