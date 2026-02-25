@@ -55,8 +55,8 @@ export default function DownloadPage() {
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.href = '/metamech-trial.rar';
-    link.download = 'metamech-trial.rar';
+    link.href = 'https://github.com/saviosyl/MDAT/releases/latest/download/MetaMech-Trial.zip';
+    link.download = 'MetaMech-Trial.zip';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
