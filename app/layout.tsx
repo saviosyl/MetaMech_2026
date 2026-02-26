@@ -108,6 +108,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-30" />
           <a href="/download" className="block py-2.5 px-4 text-center relative">
             <span className="inline-flex items-center gap-3 text-sm md:text-base font-semibold text-white">
+              <img src="/metamech-logo.png" alt="MetaMech" className="h-6 w-6 rounded" />
               <span className="animate-pulse text-lg">🚀</span>
               <span className="font-orbitron tracking-wide">FREE TRIAL IS LIVE!</span>
               <span className="hidden sm:inline text-white/90 font-normal">— Download MetaMech MDAT now. 3 days, all tools unlocked.</span>
