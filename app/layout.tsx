@@ -104,7 +104,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-navy text-white overflow-x-hidden">
         <ParticleBackground />
         {/* Launch Banner */}
-        <div className="relative z-50 bg-gradient-to-r from-cyan-600 via-cyan-500 to-blue-500 overflow-hidden">
+        <div className="relative z-10 bg-gradient-to-r from-cyan-600 via-cyan-500 to-blue-500 overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-30" />
           <a href="/download" className="block py-2.5 px-4 text-center relative">
             <span className="inline-flex items-center gap-3 text-sm md:text-base font-semibold text-white">
