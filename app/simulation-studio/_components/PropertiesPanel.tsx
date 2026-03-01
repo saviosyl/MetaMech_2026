@@ -14,6 +14,9 @@ import {
   Scale,
   Palette,
   Sliders,
+  Pin,
+  Minimize2,
+  Menu,
 } from 'lucide-react';
 import { useEditorStore } from '../_store/editorStore';
 
@@ -143,7 +146,12 @@ function ColorInput({ label, value, onChange }: ColorInputProps) {
   );
 }
 
-export default function PropertiesPanel() {
+interface PropertiesPanelProps {
+  isVisible?: boolean;
+  onVisibilityChange?: (visible: boolean) => void;
+}
+
+export default function PropertiesPanel({ isVisible = true, onVisibilityChange }: PropertiesPanelProps) {
   const {
     selectedObjectId,
     selectedObjectType,
@@ -161,6 +169,7 @@ export default function PropertiesPanel() {
   } = useEditorStore();
 
   const [showSceneSettings, setShowSceneSettings] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
 
   // Get selected object
   const selectedObject = selectedObjectId ? (
@@ -441,24 +450,61 @@ export default function PropertiesPanel() {
     return parameterInputs;
   };
 
+  // Collapsed view when not visible
+  if (!isVisible) {
+    return (
+      <div className="w-8 h-full flex flex-col justify-center items-center bg-[#252536] border-l border-gray-600">
+        <button
+          onClick={() => onVisibilityChange?.(true)}
+          className="p-2 text-gray-400 hover:text-teal-400 transition-colors"
+          title="Show Properties Panel"
+        >
+          <Menu size={20} />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full flex flex-col bg-[#252536]">
+    <div className="h-full flex flex-col bg-[#252536]" style={{fontFamily: 'Inter', fontSize: '13px'}}>
       {/* Header */}
-      <div className="p-4 lg:p-6 border-b border-[#3a3a4a]">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-orbitron text-lg font-bold text-[#e0e0e0]">
-            Properties
-          </h2>
-          <button
-            onClick={() => setShowSceneSettings(!showSceneSettings)}
-            className={`p-2 rounded-lg transition-colors touch-target ${
-              showSceneSettings
-                ? 'bg-teal-100 text-teal-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            <Settings size={18} />
-          </button>
+      <div className="p-4 border-b border-gray-600">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-base">⚙️</span>
+            <span className="font-semibold text-white">Properties</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setIsPinned(!isPinned)}
+              className={`p-1.5 rounded transition-colors ${
+                isPinned 
+                  ? 'text-teal-400 bg-teal-400/20' 
+                  : 'text-gray-400 hover:text-teal-400'
+              }`}
+              title={isPinned ? 'Unpin panel' : 'Pin panel'}
+            >
+              <Pin size={16} />
+            </button>
+            <button
+              onClick={() => setShowSceneSettings(!showSceneSettings)}
+              className={`p-1.5 rounded transition-colors ${
+                showSceneSettings
+                  ? 'text-teal-400 bg-teal-400/20'
+                  : 'text-gray-400 hover:text-teal-400'
+              }`}
+              title="Scene settings"
+            >
+              <Settings size={16} />
+            </button>
+            <button
+              onClick={() => onVisibilityChange?.(false)}
+              className="p-1.5 text-gray-400 hover:text-teal-400 transition-colors"
+              title="Hide panel"
+            >
+              <Minimize2 size={16} />
+            </button>
+          </div>
         </div>
       </div>
 

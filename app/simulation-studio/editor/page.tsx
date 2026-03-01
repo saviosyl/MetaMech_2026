@@ -56,6 +56,9 @@ export default function EditorPage() {
   const [scenePreset, setScenePreset] = useState('warehouse');
   const [isResizingLeft, setIsResizingLeft] = useState(false);
   const [isResizingRight, setIsResizingRight] = useState(false);
+  const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(true);
+  const [isRightPanelVisible, setIsRightPanelVisible] = useState(true);
+  const [showSceneSettings, setShowSceneSettings] = useState(false);
   
   // Store state
   const {
@@ -348,20 +351,34 @@ export default function EditorPage() {
   };
 
   useEffect(() => {
+    let animationFrame: number;
+    let currentMouseX = 0;
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (isResizingLeft) {
-        const newWidth = Math.min(Math.max(e.clientX, 200), 400);
-        setLeftPanelWidth(newWidth);
+      currentMouseX = e.clientX;
+      
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
       }
-      if (isResizingRight) {
-        const newWidth = Math.min(Math.max(window.innerWidth - e.clientX, 200), 450);
-        setRightPanelWidth(newWidth);
-      }
+      
+      animationFrame = requestAnimationFrame(() => {
+        if (isResizingLeft) {
+          const newWidth = Math.min(Math.max(currentMouseX, 200), 500);
+          setLeftPanelWidth(newWidth);
+        }
+        if (isResizingRight) {
+          const newWidth = Math.min(Math.max(window.innerWidth - currentMouseX, 200), 500);
+          setRightPanelWidth(newWidth);
+        }
+      });
     };
 
     const handleMouseUp = () => {
       setIsResizingLeft(false);
       setIsResizingRight(false);
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
     };
 
     if (isResizingLeft || isResizingRight) {
@@ -376,8 +393,55 @@ export default function EditorPage() {
       document.removeEventListener('mouseup', handleMouseUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
     };
   }, [isResizingLeft, isResizingRight]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts when typing in input fields
+      const activeElement = document.activeElement;
+      if (activeElement && (
+        activeElement.tagName === 'INPUT' || 
+        activeElement.tagName === 'TEXTAREA' || 
+        activeElement.getAttribute('contenteditable') === 'true'
+      )) {
+        return;
+      }
+
+      switch (e.key) {
+        case '1':
+          e.preventDefault();
+          setIsLeftPanelVisible(!isLeftPanelVisible);
+          break;
+        case '2':
+          e.preventDefault();
+          setIsRightPanelVisible(!isRightPanelVisible);
+          break;
+        case 'f':
+        case 'F':
+          e.preventDefault();
+          // Dispatch fit all objects event to viewport
+          window.dispatchEvent(new CustomEvent('fitAllObjects'));
+          break;
+        case 'Delete':
+        case 'Backspace':
+          if (selectedObjectId && selectedObjectType) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to delete the selected object?')) {
+              removeObject(selectedObjectId, selectedObjectType);
+            }
+          }
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isLeftPanelVisible, isRightPanelVisible, selectedObjectId, selectedObjectType, removeObject]);
 
   return (
     <div className="h-screen bg-[#1e1e2e] flex flex-col overflow-hidden font-inter text-sm text-[#e0e0e0]">
@@ -612,31 +676,24 @@ export default function EditorPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT PANEL - resizable */}
         <div 
-          className="bg-[#252536] border-r border-[#3a3a4a] overflow-hidden flex flex-col relative"
-          style={{ width: leftPanelWidth }}
+          className="overflow-hidden flex flex-col relative"
+          style={{ width: isLeftPanelVisible ? leftPanelWidth : 'auto' }}
         >
-          {/* Search bar */}
-          <div className="p-3 border-b border-[#3a3a4a]">
-            <div className="relative">
-              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#888]" />
-              <input
-                type="text"
-                placeholder="Search components..."
-                className="w-full bg-[#1a1a2a] border border-[#3a3a4a] rounded pl-10 pr-3 py-2 text-[#e0e0e0] text-sm focus:outline-none focus:border-[#06b6d4]"
-              />
-            </div>
-          </div>
-
           {/* Library Panel */}
-          <div className="flex-1 overflow-hidden">
-            <LibraryPanel />
-          </div>
+          <LibraryPanel 
+            isVisible={isLeftPanelVisible} 
+            onVisibilityChange={setIsLeftPanelVisible} 
+          />
 
           {/* Left Resize Handle */}
-          <div
-            className="absolute right-0 top-0 bottom-0 w-1 bg-[#3a3a4a] hover:bg-[#06b6d4] cursor-col-resize transition-colors"
-            onMouseDown={handleLeftResizeStart}
-          />
+          {isLeftPanelVisible && (
+            <div
+              className="absolute right-0 top-0 bottom-0 w-1.5 bg-transparent hover:bg-teal-500 cursor-col-resize transition-colors"
+              onMouseDown={handleLeftResizeStart}
+              onDoubleClick={() => setLeftPanelWidth(280)}
+              title="Resize panel (double-click to reset)"
+            />
+          )}
         </div>
 
         {/* 3D VIEWPORT */}
@@ -644,20 +701,26 @@ export default function EditorPage() {
           <EditorViewport />
         </div>
 
-        {/* RIGHT PANEL - resizable (only when object selected) */}
-        {selectedObjectId && (
-          <div 
-            className="bg-[#252536] border-l border-[#3a3a4a] overflow-hidden relative"
-            style={{ width: rightPanelWidth }}
-          >
-            {/* Right Resize Handle */}
+        {/* RIGHT PANEL - resizable */}
+        <div 
+          className="overflow-hidden relative"
+          style={{ width: (isRightPanelVisible && selectedObjectId) ? rightPanelWidth : 'auto' }}
+        >
+          {/* Right Resize Handle */}
+          {isRightPanelVisible && selectedObjectId && (
             <div
-              className="absolute left-0 top-0 bottom-0 w-1 bg-[#3a3a4a] hover:bg-[#06b6d4] cursor-col-resize transition-colors"
+              className="absolute left-0 top-0 bottom-0 w-1.5 bg-transparent hover:bg-teal-500 cursor-col-resize transition-colors"
               onMouseDown={handleRightResizeStart}
+              onDoubleClick={() => setRightPanelWidth(300)}
+              title="Resize panel (double-click to reset)"
             />
-            <PropertiesPanel />
-          </div>
-        )}
+          )}
+          
+          <PropertiesPanel 
+            isVisible={isRightPanelVisible && (selectedObjectId !== null)}
+            onVisibilityChange={setIsRightPanelVisible}
+          />
+        </div>
       </div>
 
       {/* BOTTOM BAR - 32px height */}
