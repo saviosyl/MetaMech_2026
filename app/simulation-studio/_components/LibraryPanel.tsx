@@ -136,9 +136,12 @@ export default function LibraryPanel() {
   ] as const;
 
   const handleAddItem = (type: string, category: 'process' | 'environment' | 'actors') => {
+    // Convert 'actors' to 'actor' for consistency with the store and viewport
+    const categoryName = category === 'actors' ? 'actor' : category;
+    
     // Request placement mode in viewport
     window.dispatchEvent(new CustomEvent('requestPlacement', {
-      detail: { type, category }
+      detail: { type, category: categoryName }
     }));
   };
 
