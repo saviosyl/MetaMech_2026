@@ -19,6 +19,7 @@ import ProcessNodeComponent from './assets/ProcessNodeComponent';
 import EnvironmentAssetComponent from './assets/EnvironmentAssetComponent';
 import ActorComponent from './assets/ActorComponent';
 import SimulationItem from './SimulationItem';
+import EdgeComponent from './EdgeComponent';
 
 // Scene Component
 function Scene() {
@@ -26,6 +27,7 @@ function Scene() {
     processNodes,
     environmentAssets, 
     actors,
+    edges,
     simulationItems,
     selectedObjectId,
     selectedObjectType,
@@ -186,6 +188,25 @@ function Scene() {
           />
         </group>
       ))}
+
+      {/* Edges */}
+      {edges.map((edge) => {
+        const fromNode = processNodes.find(n => n.id === edge.from);
+        const toNode = processNodes.find(n => n.id === edge.to);
+        
+        if (!fromNode || !toNode) return null;
+        
+        return (
+          <EdgeComponent
+            key={edge.id}
+            edge={edge}
+            fromPosition={fromNode.position}
+            toPosition={toNode.position}
+            onClick={(event) => handleObjectClick(edge.id, 'process', event)}
+            isSelected={selectedObjectId === edge.id}
+          />
+        );
+      })}
 
       {/* Simulation Items */}
       {simulationItems.map((item) => (

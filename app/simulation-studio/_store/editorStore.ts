@@ -117,7 +117,7 @@ interface EditorState {
   simulationTime: number;
   
   // UI state
-  activeLibraryTab: 'process' | 'environment' | 'actors';
+  activeLibraryTab: 'process' | 'environment' | 'actors' | 'samples';
   showPropertiesPanel: boolean;
   
   // Project state
@@ -140,7 +140,7 @@ interface EditorState {
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
   
   setSceneSettings: (settings: Partial<SceneSettings>) => void;
-  setActiveLibraryTab: (tab: 'process' | 'environment' | 'actors') => void;
+  setActiveLibraryTab: (tab: 'process' | 'environment' | 'actors' | 'samples') => void;
   setShowPropertiesPanel: (show: boolean) => void;
   
   // Simulation controls

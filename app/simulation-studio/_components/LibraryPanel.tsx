@@ -114,13 +114,16 @@ export default function LibraryPanel() {
     setActiveLibraryTab, 
     addProcessNode, 
     addEnvironmentAsset, 
-    addActor 
+    addActor,
+    addEdge,
+    clearScene
   } = useEditorStore();
 
   const tabs = [
     { id: 'process', name: 'Process', icon: Package },
     { id: 'environment', name: 'Environment', icon: Building },
     { id: 'actors', name: 'Actors', icon: Users },
+    { id: 'samples', name: 'Samples', icon: Settings },
   ] as const;
 
   const handleAddItem = (type: string, category: 'process' | 'environment' | 'actors') => {
@@ -140,7 +143,65 @@ export default function LibraryPanel() {
     }
   };
 
-  const currentItems = libraryItems[activeLibraryTab];
+  const createSampleLayout = (layoutType: string) => {
+    clearScene();
+    
+    setTimeout(() => {
+      switch (layoutType) {
+        case 'basic-line':
+          // Create a simple source -> conveyor -> sink line
+          addProcessNode('source', [-8, 0, 0]);
+          addProcessNode('conveyor', [0, 0, 0]);
+          addProcessNode('sink', [8, 0, 0]);
+          break;
+        
+      case 'assembly-line':
+        // Create an assembly line with buffer and machine
+        addProcessNode('source', [-12, 0, 0]);
+        addProcessNode('conveyor', [-6, 0, 0]);
+        addProcessNode('buffer', [0, 0, 0]);
+        addProcessNode('machine', [6, 0, 0]);
+        addProcessNode('conveyor', [12, 0, 0]);
+        addProcessNode('sink', [18, 0, 0]);
+        break;
+        
+      case 'warehouse':
+        // Create a warehouse setup
+        addEnvironmentAsset('warehouse-shell', [0, 0, 0]);
+        addEnvironmentAsset('pallet-rack', [-8, 0, -5]);
+        addEnvironmentAsset('pallet-rack', [8, 0, -5]);
+        addProcessNode('source', [0, 0, 8]);
+        addProcessNode('conveyor', [0, 0, 4]);
+        addProcessNode('router', [0, 0, 0]);
+        addActor('forklift', [-5, 0, 0]);
+        addActor('operator', [5, 0, 0]);
+        break;
+    }
+    }, 50);
+  };
+
+  const currentItems = activeLibraryTab === 'samples' ? [] : libraryItems[activeLibraryTab];
+  
+  const sampleLayouts = [
+    { 
+      id: 'basic-line', 
+      name: 'Basic Line', 
+      icon: '➡️', 
+      description: 'Simple source → conveyor → sink flow'
+    },
+    { 
+      id: 'assembly-line', 
+      name: 'Assembly Line', 
+      icon: '🏭', 
+      description: 'Manufacturing line with buffer and machine'
+    },
+    { 
+      id: 'warehouse', 
+      name: 'Warehouse', 
+      icon: '🏢', 
+      description: 'Warehouse with racks, forklift, and operators'
+    },
+  ];
 
   return (
     <div className="h-full flex flex-col bg-white">
@@ -186,18 +247,33 @@ export default function LibraryPanel() {
             {activeLibraryTab === 'actors' && 
               'People and vehicles that operate within your simulation.'
             }
+            {activeLibraryTab === 'samples' && 
+              'Pre-built sample layouts to get started quickly.'
+            }
           </div>
 
           {/* Items Grid */}
-          <div className="space-y-2">
-            {currentItems.map((item) => (
-              <LibraryItem
-                key={item.type}
-                item={item}
-                onAdd={() => handleAddItem(item.type, activeLibraryTab)}
-              />
-            ))}
-          </div>
+          {activeLibraryTab === 'samples' ? (
+            <div className="space-y-2">
+              {sampleLayouts.map((layout) => (
+                <LibraryItem
+                  key={layout.id}
+                  item={layout}
+                  onAdd={() => createSampleLayout(layout.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {currentItems.map((item) => (
+                <LibraryItem
+                  key={item.type}
+                  item={item}
+                  onAdd={() => handleAddItem(item.type, activeLibraryTab)}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Footer Tips */}
