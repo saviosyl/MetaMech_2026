@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SimulationItem as SimulationItemType } from '../_store/editorStore';
@@ -9,7 +9,7 @@ interface Props {
   item: SimulationItemType;
 }
 
-export default function SimulationItem({ item }: Props) {
+function SimulationItem({ item }: Props) {
   const meshRef = useRef<THREE.Mesh>(null);
   
   // Gentle rotation animation
@@ -77,3 +77,5 @@ export default function SimulationItem({ item }: Props) {
     </mesh>
   );
 }
+
+export default memo(SimulationItem);

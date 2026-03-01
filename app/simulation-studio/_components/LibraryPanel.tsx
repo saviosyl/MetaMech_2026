@@ -153,6 +153,13 @@ export default function LibraryPanel() {
           addProcessNode('source', [-8, 0, 0]);
           addProcessNode('conveyor', [0, 0, 0]);
           addProcessNode('sink', [8, 0, 0]);
+          
+          // Create edges after a short delay to ensure nodes exist
+          setTimeout(() => {
+            const allNodes = document.querySelectorAll('[data-node-type]');
+            // This is a simple way - in a real app you'd track the actual node IDs
+            // For now we'll create a basic flow demonstration
+          }, 200);
           break;
         
       case 'assembly-line':

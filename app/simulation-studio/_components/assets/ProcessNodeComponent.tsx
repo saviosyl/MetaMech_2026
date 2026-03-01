@@ -14,13 +14,28 @@ interface Props {
 export default function ProcessNodeComponent({ node, onClick, isSelected }: Props) {
   const groupRef = useRef<THREE.Group>(null);
   
-  // Pulsing animation for selected objects
+  // Animation for selected objects and working machines
   useFrame(({ clock }) => {
-    if (isSelected && groupRef.current) {
-      const scale = 1 + Math.sin(clock.getElapsedTime() * 4) * 0.05;
-      groupRef.current.scale.setScalar(scale);
-    } else if (groupRef.current && !isSelected) {
-      groupRef.current.scale.setScalar(1);
+    if (groupRef.current) {
+      if (isSelected) {
+        // Pulsing animation for selected objects
+        const scale = 1 + Math.sin(clock.getElapsedTime() * 4) * 0.05;
+        groupRef.current.scale.setScalar(scale);
+      } else {
+        groupRef.current.scale.setScalar(1);
+        
+        // Special animations for different node types
+        if (node.type === 'conveyor') {
+          // Subtle conveyor belt movement animation
+          const beltMesh = groupRef.current.getObjectByName('belt');
+          if (beltMesh) {
+            beltMesh.rotation.x = clock.getElapsedTime() * 2; // Rotating belt effect
+          }
+        } else if (node.type === 'machine') {
+          // Gentle vibration for active machines
+          groupRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 8) * 0.02;
+        }
+      }
     }
   });
 
@@ -94,7 +109,7 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
               <meshStandardMaterial color="#4b5563" />
             </mesh>
             {/* Belt */}
-            <mesh position={[0, 0.21, 0]} onClick={onClick}>
+            <mesh name="belt" position={[0, 0.21, 0]} onClick={onClick}>
               <boxGeometry args={[length - 0.1, 0.02, width - 0.1]} />
               <meshStandardMaterial color="#1f2937" />
             </mesh>

@@ -35,7 +35,11 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
         return (
           <mesh position={[0, height/2, 0]} castShadow onClick={onClick}>
             <boxGeometry args={[width, height, thickness]} />
-            <meshStandardMaterial color="#d1d5db" roughness={0.8} />
+            <meshStandardMaterial 
+              color="#d1d5db" 
+              roughness={0.9} 
+              metalness={0.1}
+            />
           </mesh>
         );
 
@@ -48,17 +52,17 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
             {/* Door frame */}
             <mesh position={[0, doorHeight/2, 0]} onClick={onClick}>
               <boxGeometry args={[doorWidth + 0.2, doorHeight + 0.1, doorThickness + 0.05]} />
-              <meshStandardMaterial color="#9ca3af" />
+              <meshStandardMaterial color="#9ca3af" roughness={0.7} />
             </mesh>
             {/* Door panel */}
             <mesh position={[doorWidth/4, doorHeight/2, doorThickness/4]} castShadow onClick={onClick}>
               <boxGeometry args={[doorWidth - 0.1, doorHeight - 0.1, doorThickness]} />
-              <meshStandardMaterial color="#6b7280" />
+              <meshStandardMaterial color="#6b7280" roughness={0.6} />
             </mesh>
             {/* Door handle */}
             <mesh position={[doorWidth/2 - 0.2, doorHeight/2, doorThickness/2 + 0.05]} onClick={onClick}>
               <sphereGeometry args={[0.05]} />
-              <meshStandardMaterial color="#374151" metalness={0.8} />
+              <meshStandardMaterial color="#374151" metalness={0.9} roughness={0.1} />
             </mesh>
           </group>
         );
