@@ -18,7 +18,8 @@ import {
   Search,
   Grid3x3,
   List,
-  ArrowLeft
+  ArrowLeft,
+  X
 } from 'lucide-react';
 
 interface Project {
