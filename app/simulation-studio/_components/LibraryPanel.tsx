@@ -127,20 +127,10 @@ export default function LibraryPanel() {
   ] as const;
 
   const handleAddItem = (type: string, category: 'process' | 'environment' | 'actors') => {
-    // Add item at origin for now - viewport should handle placement
-    const position: [number, number, number] = [0, 0, 0];
-    
-    switch (category) {
-      case 'process':
-        addProcessNode(type as any, position);
-        break;
-      case 'environment':
-        addEnvironmentAsset(type as any, position);
-        break;
-      case 'actors':
-        addActor(type as any, position);
-        break;
-    }
+    // Request placement mode in viewport
+    window.dispatchEvent(new CustomEvent('requestPlacement', {
+      detail: { type, category }
+    }));
   };
 
   const createSampleLayout = (layoutType: string) => {
