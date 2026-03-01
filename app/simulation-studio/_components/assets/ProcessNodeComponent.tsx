@@ -807,46 +807,168 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
   };
 
   const renderSource = () => {
+    const itemType = node.parameters?.itemType || 'box';
+    
+    // Item-specific preview in hopper area
+    let itemPreview;
+    switch (itemType) {
+      case 'box':
+        itemPreview = (
+          <mesh position={[0, 1.6, 0]} onClick={onClick}>
+            <boxGeometry args={[0.25, 0.25, 0.25]} />
+            <meshStandardMaterial color="#D2691E" metalness={0.1} roughness={0.8} />
+          </mesh>
+        );
+        break;
+      case 'tote':
+        itemPreview = (
+          <mesh position={[0, 1.6, 0]} onClick={onClick}>
+            <boxGeometry args={[0.35, 0.2, 0.3]} />
+            <meshStandardMaterial color="#4169E1" metalness={0.3} roughness={0.6} />
+          </mesh>
+        );
+        break;
+      case 'pallet':
+        itemPreview = (
+          <group position={[0, 1.5, 0]}>
+            <mesh onClick={onClick}>
+              <boxGeometry args={[0.4, 0.06, 0.32]} />
+              <meshStandardMaterial color="#8B4513" metalness={0.1} roughness={0.9} />
+            </mesh>
+          </group>
+        );
+        break;
+      case 'bottle':
+        itemPreview = (
+          <mesh position={[0, 1.6, 0]} onClick={onClick}>
+            <cylinderGeometry args={[0.04, 0.04, 0.2]} />
+            <meshStandardMaterial color="#228B22" metalness={0.8} roughness={0.1} transparent opacity={0.8} />
+          </mesh>
+        );
+        break;
+      case 'bag':
+        itemPreview = (
+          <mesh position={[0, 1.6, 0]} onClick={onClick}>
+            <sphereGeometry args={[0.15]} />
+            <meshStandardMaterial color="#FF6347" metalness={0.1} roughness={0.7} />
+          </mesh>
+        );
+        break;
+      case 'drum':
+        itemPreview = (
+          <mesh position={[0, 1.6, 0]} onClick={onClick}>
+            <cylinderGeometry args={[0.15, 0.15, 0.28]} />
+            <meshStandardMaterial color="#C0C0C0" metalness={0.7} roughness={0.3} />
+          </mesh>
+        );
+        break;
+      default:
+        itemPreview = (
+          <mesh position={[0, 1.6, 0]} onClick={onClick}>
+            <boxGeometry args={[0.25, 0.25, 0.25]} />
+            <meshStandardMaterial color="#D2691E" metalness={0.1} roughness={0.8} />
+          </mesh>
+        );
+    }
+
     return (
       <group>
-        {/* Main hopper body */}
+        {/* Base cabinet - industrial steel */}
         <mesh position={[0, 0.6, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[1.2, 1.2, 1.2]} />
-          <meshStandardMaterial color={colors.safetyGreen} metalness={0.4} roughness={0.6} />
+          <boxGeometry args={[1.4, 1.2, 1.0]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
         </mesh>
         
-        {/* Tapered funnel top */}
+        {/* Top hopper section - trapezoidal funnel */}
         <mesh position={[0, 1.4, 0]} castShadow onClick={onClick}>
-          <coneGeometry args={[0.8, 0.6, 8]} />
-          <meshStandardMaterial color={colors.safetyGreen} metalness={0.4} roughness={0.6} />
+          <coneGeometry args={[0.6, 0.6, 8]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* Output chute - small conveyor section */}
+        <mesh position={[0, 0.35, 0.7]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.6, 0.3, 0.4]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* Control panel - angled face */}
+        <mesh position={[0.5, 1.1, 0.3]} rotation={[0, -0.3, -0.15]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.3, 0.25, 0.08]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
+        </mesh>
+        
+        {/* Screen area */}
+        <mesh position={[0.51, 1.1, 0.3]} rotation={[0, -0.3, -0.15]} onClick={onClick}>
+          <boxGeometry args={[0.18, 0.01, 0.12]} />
+          <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
+        </mesh>
+        
+        {/* Status light tower */}
+        <mesh position={[0, 1.9, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.015, 0.015, 0.25]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        
+        {/* Status lights */}
+        <mesh position={[0, 2.02, 0]} onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.05]} />
+          <meshStandardMaterial color={colors.safetyGreen} emissive={colors.safetyGreen} emissiveIntensity={0.3} />
+        </mesh>
+        <mesh position={[0, 2.08, 0]} onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.05]} />
+          <meshStandardMaterial color={colors.safetyYellow} />
+        </mesh>
+        <mesh position={[0, 2.14, 0]} onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.05]} />
+          <meshStandardMaterial color={colors.safetyRed} />
+        </mesh>
+        
+        {/* Item counter display */}
+        <mesh position={[-0.4, 1.2, 0.51]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.2, 0.12, 0.04]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.4} roughness={0.6} />
+        </mesh>
+        
+        {/* Display screen */}
+        <mesh position={[-0.4, 1.2, 0.53]} onClick={onClick}>
+          <boxGeometry args={[0.15, 0.01, 0.08]} />
+          <meshStandardMaterial color="#003300" emissive="#00ff00" emissiveIntensity={0.2} />
         </mesh>
         
         {/* Support legs */}
         {[-0.5, 0.5].map(x =>
-          [-0.5, 0.5].map(z => (
-            <mesh key={`leg-${x}-${z}`} position={[x, 0.25, z]} castShadow onClick={onClick}>
-              <cylinderGeometry args={[0.04, 0.04, 0.5]} />
-              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.3} />
+          [-0.3, 0.3].map(z => (
+            <mesh key={`leg-${x}-${z}`} position={[x, 0.3, z]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.025, 0.025, 0.6]} />
+              <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.7} />
             </mesh>
           ))
         )}
         
-        {/* Output chute */}
-        <mesh position={[0, 0.3, 0.8]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.4, 0.3, 0.6]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.7} roughness={0.3} />
-        </mesh>
-        
-        {/* Green indicator light */}
-        <mesh position={[0, 1.8, 0]} onClick={onClick}>
-          <sphereGeometry args={[0.08]} />
-          <meshStandardMaterial color={colors.safetyGreen} emissive={colors.safetyGreen} emissiveIntensity={0.3} />
-        </mesh>
-        
         {/* Vibration motor */}
-        <mesh position={[0.7, 0.8, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.06, 0.06, 0.2]} />
+        <mesh position={[0.6, 0.8, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.05, 0.05, 0.15]} />
           <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.2} />
+        </mesh>
+        
+        {/* Motor mounting bracket */}
+        <mesh position={[0.55, 0.8, 0]} onClick={onClick}>
+          <boxGeometry args={[0.08, 0.08, 0.05]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.6} roughness={0.4} />
+        </mesh>
+        
+        {itemPreview}
+        
+        {/* Connection port - output only */}
+        <mesh position={[0, 0.5, 1.1]} onClick={onClick}>
+          <sphereGeometry args={[0.05]} />
+          <meshStandardMaterial 
+            color="#3b82f6" 
+            emissive="#3b82f6" 
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.8}
+          />
         </mesh>
       </group>
     );
@@ -855,38 +977,102 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
   const renderSink = () => {
     return (
       <group>
-        {/* Collection bin - tapered */}
-        <mesh position={[0, 0.5, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.8, 0.6, 1]} />
-          <meshStandardMaterial color={colors.safetyRed} metalness={0.4} roughness={0.6} />
+        {/* Large collection bin - 5 faces (open top) with slight outward taper */}
+        <mesh position={[0, 0.5, -0.4]} castShadow onClick={onClick}>
+          <boxGeometry args={[1.4, 0.8, 0.05]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.5, 0.4]} castShadow onClick={onClick}>
+          <boxGeometry args={[1.4, 0.8, 0.05]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[-0.65, 0.5, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.05, 0.8, 0.8]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[0.65, 0.5, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.05, 0.8, 0.8]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.1, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[1.4, 0.05, 0.8]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
         </mesh>
         
-        {/* Bin support frame */}
+        {/* Bin liner edge - thin lip around top */}
+        <mesh position={[0, 0.91, 0]} onClick={onClick}>
+          <boxGeometry args={[1.44, 0.02, 0.84]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* Support frame - 4 angled legs */}
         {[-0.6, 0.6].map(x =>
-          [-0.6, 0.6].map(z => (
-            <mesh key={`support-${x}-${z}`} position={[x, 0.25, z]} castShadow onClick={onClick}>
-              <cylinderGeometry args={[0.03, 0.03, 0.5]} />
-              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.3} />
+          [-0.35, 0.35].map(z => (
+            <mesh key={`leg-${x}-${z}`} position={[x, 0.35, z]} rotation={[0, 0, x > 0 ? -0.1 : 0.1]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.025, 0.025, 0.7]} />
+              <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.7} />
             </mesh>
           ))
         )}
         
+        {/* Sensor arch - two posts + top bar over input area */}
+        <mesh position={[-0.4, 1.2, -0.6]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.02, 0.02, 0.6]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        <mesh position={[0.4, 1.2, -0.6]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.02, 0.02, 0.6]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 1.5, -0.6]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.8, 0.04, 0.04]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        
+        {/* Sensor beams */}
+        <mesh position={[-0.2, 1.4, -0.6]} onClick={onClick}>
+          <boxGeometry args={[0.03, 0.03, 0.03]} />
+          <meshStandardMaterial color={colors.safetyRed} emissive={colors.safetyRed} emissiveIntensity={0.4} />
+        </mesh>
+        <mesh position={[0.2, 1.4, -0.6]} onClick={onClick}>
+          <boxGeometry args={[0.03, 0.03, 0.03]} />
+          <meshStandardMaterial color={colors.safetyRed} emissive={colors.safetyRed} emissiveIntensity={0.4} />
+        </mesh>
+        
         {/* Counter display panel */}
-        <mesh position={[0.6, 0.8, 0]} castShadow onClick={onClick}>
+        <mesh position={[0.8, 1.0, 0]} rotation={[0, -0.3, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[0.3, 0.2, 0.05]} />
           <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
         </mesh>
         
-        {/* LED display screen */}
-        <mesh position={[0.61, 0.8, 0]} onClick={onClick}>
-          <boxGeometry args={[0.2, 0.1, 0.01]} />
-          <meshStandardMaterial color="#000000" emissive="#00ff00" emissiveIntensity={0.1} />
+        {/* Digital display screen */}
+        <mesh position={[0.81, 1.0, 0]} rotation={[0, -0.3, 0]} onClick={onClick}>
+          <boxGeometry args={[0.2, 0.01, 0.12]} />
+          <meshStandardMaterial color="#000000" emissive="#00ff00" emissiveIntensity={0.2} />
         </mesh>
         
-        {/* Red indicator light */}
-        <mesh position={[0, 1.2, 0]} onClick={onClick}>
-          <sphereGeometry args={[0.06]} />
-          <meshStandardMaterial color={colors.safetyRed} emissive={colors.safetyRed} emissiveIntensity={0.2} />
+        {/* Status light */}
+        <mesh position={[0, 1.6, -0.6]} onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.05]} />
+          <meshStandardMaterial color={colors.safetyGreen} emissive={colors.safetyGreen} emissiveIntensity={0.3} />
+        </mesh>
+        
+        {/* Safety warning signs */}
+        <mesh position={[0.65, 0.7, 0]} rotation={[0, -Math.PI/2, 0]} onClick={onClick}>
+          <boxGeometry args={[0.15, 0.15, 0.005]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        
+        {/* Connection port - input only */}
+        <mesh position={[0, 0.5, -0.8]} onClick={onClick}>
+          <sphereGeometry args={[0.05]} />
+          <meshStandardMaterial 
+            color="#22c55e" 
+            emissive="#22c55e" 
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.8}
+          />
         </mesh>
       </group>
     );
