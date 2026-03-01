@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useGLTF } from '@react-three/drei';
 import { ProcessNode } from '../../_store/editorStore';
 import ConveyorComponent from './ConveyorComponent';
 
@@ -11,6 +12,24 @@ interface Props {
   onClick: (event: any) => void;
   onContextMenu?: (event: any) => void;
   isSelected: boolean;
+}
+
+// Belt Conveyor GLB Model Component
+function BeltConveyorModel({ onClick }: { onClick: (event: any) => void }) {
+  const { scene } = useGLTF('/models/belt-conveyor/scene.gltf');
+  const model = scene.clone();
+  
+  // Scale and position to fit (conveyors are typically 1-3m long, ~0.6m wide, ~0.8m tall)
+  // Scale down from model size to fit our coordinate system
+  model.scale.set(0.01, 0.01, 0.01);
+  
+  // Center the model at origin
+  const box = new THREE.Box3().setFromObject(model);
+  const center = box.getCenter(new THREE.Vector3());
+  model.position.sub(center);
+  model.position.y += 0.4; // Lift to ground level
+  
+  return <primitive object={model} onClick={onClick} />;
 }
 
 export default function ProcessNodeComponent({ node, onClick, onContextMenu, isSelected }: Props) {
@@ -60,6 +79,8 @@ export default function ProcessNodeComponent({ node, onClick, onContextMenu, isS
     rackOrange: '#f97316',
     forkliftYellow: '#eab308'
   };
+
+
 
   const renderConveyor = () => {
     const length = node.parameters?.length || 5;
@@ -159,25 +180,32 @@ export default function ProcessNodeComponent({ node, onClick, onContextMenu, isS
       </group>
     );
 
+
+
     // Type-specific conveying surfaces
     let conveyingSurface;
     switch (conveyorType) {
       case 'belt':
+        // Try GLB model first, fallback to procedural
         conveyingSurface = (
-          <group>
-            <mesh position={[0, height - 0.05, length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
-              <cylinderGeometry args={[0.08, 0.08, width - 0.1]} />
-              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
-            </mesh>
-            <mesh position={[0, height - 0.05, -length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
-              <cylinderGeometry args={[0.08, 0.08, width - 0.1]} />
-              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
-            </mesh>
-            <mesh position={[0, height + 0.01, 0]} name="belt" castShadow onClick={onClick}>
-              <boxGeometry args={[width - 0.1, 0.02, length]} />
-              <meshStandardMaterial color={colors.darkRubber} metalness={0.1} roughness={0.9} />
-            </mesh>
-          </group>
+          <Suspense fallback={
+            <group>
+              <mesh position={[0, height - 0.05, length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+                <cylinderGeometry args={[0.08, 0.08, width - 0.1]} />
+                <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+              </mesh>
+              <mesh position={[0, height - 0.05, -length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+                <cylinderGeometry args={[0.08, 0.08, width - 0.1]} />
+                <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+              </mesh>
+              <mesh position={[0, height + 0.01, 0]} name="belt" castShadow onClick={onClick}>
+                <boxGeometry args={[width - 0.1, 0.02, length]} />
+                <meshStandardMaterial color={colors.darkRubber} metalness={0.1} roughness={0.9} />
+              </mesh>
+            </group>
+          }>
+            <BeltConveyorModel onClick={onClick} />
+          </Suspense>
         );
         break;
         
@@ -1551,3 +1579,6 @@ export default function ProcessNodeComponent({ node, onClick, onContextMenu, isS
     </group>
   );
 }
+
+// Preload the GLB models
+useGLTF.preload('/models/belt-conveyor/scene.gltf');

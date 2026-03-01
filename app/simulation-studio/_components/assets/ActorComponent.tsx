@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { useGLTF } from '@react-three/drei';
 import { Actor } from '../../_store/editorStore';
 
 interface Props {
@@ -10,6 +11,23 @@ interface Props {
   onClick: (event: any) => void;
   onContextMenu?: (event: any) => void;
   isSelected: boolean;
+}
+
+// Operator GLB Model Component
+function OperatorModel({ onClick }: { onClick: (event: any) => void }) {
+  const { scene } = useGLTF('/models/operator/scene.gltf');
+  const model = scene.clone();
+  
+  // Scale to human size (~1.8m tall)
+  model.scale.set(0.01, 0.01, 0.01);
+  
+  // Center the model at origin
+  const box = new THREE.Box3().setFromObject(model);
+  const center = box.getCenter(new THREE.Vector3());
+  model.position.sub(center);
+  model.position.y += 0.9; // Lift to ground level (half of human height)
+  
+  return <primitive object={model} onClick={onClick} />;
 }
 
 export default function ActorComponent({ actor, onClick, onContextMenu, isSelected }: Props) {
@@ -60,7 +78,9 @@ export default function ActorComponent({ actor, onClick, onContextMenu, isSelect
     safetyRed: '#ef4444'
   };
 
-  const renderOperator = () => {
+
+
+  const OperatorFallback = () => {
     return (
       <group>
         {/* Torso - proper box body */}
@@ -205,6 +225,8 @@ export default function ActorComponent({ actor, onClick, onContextMenu, isSelect
       </group>
     );
   };
+
+
 
   const renderEngineer = () => {
     return (
@@ -759,7 +781,11 @@ export default function ActorComponent({ actor, onClick, onContextMenu, isSelect
   const renderGeometry = () => {
     switch (actor.type) {
       case 'operator':
-        return renderOperator();
+        return (
+          <Suspense fallback={<OperatorFallback />}>
+            <OperatorModel onClick={onClick} />
+          </Suspense>
+        );
       case 'engineer':
         return renderEngineer();
       case 'forklift':
@@ -798,3 +824,6 @@ export default function ActorComponent({ actor, onClick, onContextMenu, isSelect
     </group>
   );
 }
+
+// Preload the GLB models
+useGLTF.preload('/models/operator/scene.gltf');
