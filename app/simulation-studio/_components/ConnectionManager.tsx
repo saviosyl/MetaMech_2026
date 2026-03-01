@@ -119,7 +119,12 @@ export default function ConnectionManager() {
       ];
 
       // Find closest compatible connection
-      let bestConnection: { sourcePort: string, targetPort: string, distance: number } | null = null;
+      interface BestConnection {
+        sourcePort: string;
+        targetPort: string;
+        distance: number;
+      }
+      let bestConnection: BestConnection | null = null;
 
       connectionPoints.forEach(point => {
         if (point.objectId === selectedObjectId || point.connected) return;
@@ -164,13 +169,14 @@ export default function ConnectionManager() {
 
       if (bestConnection) {
         // Snap objects together
+        const { sourcePort, targetPort } = bestConnection;
         const targetPoint = connectionPoints.find(p => 
-          p.portId === bestConnection!.targetPort || p.portId === bestConnection!.sourcePort
+          p.portId === targetPort || p.portId === sourcePort
         );
         
         if (targetPoint && targetPoint.objectId !== selectedObjectId) {
           // Calculate snap position
-          const isOutputToInput = bestConnection.sourcePort.includes(selectedObjectId);
+          const isOutputToInput = sourcePort.includes(selectedObjectId);
           const targetNode = processNodes.find(n => n.id === targetPoint.objectId);
           
           if (targetNode) {

@@ -363,9 +363,6 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
           <cylinderGeometry args={[0.005, 0.005, 0.1]} />
           <meshStandardMaterial color="#cc0000" metalness={0.6} roughness={0.3} />
         </mesh>
-      </group>
-    );
-  };
         
         {/* Hands */}
         <mesh position={[-0.28, 1.2, 0]} castShadow onClick={onClick}>
