@@ -192,18 +192,21 @@ export default function LibraryPanel() {
   const sampleLayouts = [
     { 
       id: 'basic-line', 
+      type: 'sample',
       name: 'Basic Line', 
       icon: '➡️', 
       description: 'Simple source → conveyor → sink flow'
     },
     { 
       id: 'assembly-line', 
+      type: 'sample',
       name: 'Assembly Line', 
       icon: '🏭', 
       description: 'Manufacturing line with buffer and machine'
     },
     { 
       id: 'warehouse', 
+      type: 'sample',
       name: 'Warehouse', 
       icon: '🏢', 
       description: 'Warehouse with racks, forklift, and operators'
