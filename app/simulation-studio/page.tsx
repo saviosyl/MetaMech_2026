@@ -1,144 +1,97 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Crown, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff, ArrowRight, Crown, LogIn } from 'lucide-react';
 
-type Step = 'login' | 'verify' | 'studio';
+// ============================================================
+// ADMIN ACCOUNTS — Premium Plus subscribers
+// In production, move this to a backend API + database.
+// For now, this allows you to test the simulation tool.
+// ============================================================
+const ADMIN_ACCOUNTS = [
+  { email: 'saviosyl@gmail.com', password: '@Meta123456', role: 'admin' },
+];
+
+// The URL of the Simulation Studio app (separate deployment)
+const STUDIO_URL = 'https://metamech-simulation-studio.vercel.app';
 
 export default function SimulationStudioPage() {
-  const [step, setStep] = useState<Step>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [countdown, setCountdown] = useState(0);
-  const codeRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [authenticated, setAuthenticated] = useState(false);
 
-  // Countdown timer for resend
+  // Check if already logged in
   useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
+    const session = localStorage.getItem('sim_studio_session');
+    if (session) {
+      try {
+        const data = JSON.parse(session);
+        if (data.expires > Date.now()) {
+          setAuthenticated(true);
+        } else {
+          localStorage.removeItem('sim_studio_session');
+        }
+      } catch {
+        localStorage.removeItem('sim_studio_session');
+      }
     }
-  }, [countdown]);
+  }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    try {
-      const res = await fetch('/api/simulation-studio/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
+    // Simulate network delay for UX
+    setTimeout(() => {
+      const account = ADMIN_ACCOUNTS.find(
+        (a) => a.email.toLowerCase() === email.toLowerCase() && a.password === password
+      );
 
-      if (!res.ok) {
-        setError(data.error || 'Invalid credentials or not a Premium Plus subscriber.');
+      if (!account) {
+        setError('Invalid credentials or this email is not linked to a Premium Plus subscription.');
         setLoading(false);
         return;
       }
 
-      // Login successful — verification code sent to email
-      setStep('verify');
-      setCountdown(60);
-    } catch {
-      setError('Connection error. Please try again.');
-    }
-    setLoading(false);
+      // Store session (7 days)
+      const session = {
+        email: account.email,
+        role: account.role,
+        expires: Date.now() + 7 * 24 * 3600 * 1000,
+      };
+      localStorage.setItem('sim_studio_session', JSON.stringify(session));
+
+      // Generate a simple auth token for the simulation app
+      const token = btoa(JSON.stringify({ email: account.email, role: account.role, exp: session.expires }));
+
+      setAuthenticated(true);
+      setLoading(false);
+
+      // Redirect to simulation studio with auth token
+      window.location.href = `${STUDIO_URL}?auth=${encodeURIComponent(token)}`;
+    }, 800);
   };
 
-  const handleCodeInput = (index: number, value: string) => {
-    if (!/^\d*$/.test(value)) return;
-    const newCode = [...verificationCode];
-    newCode[index] = value.slice(-1);
-    setVerificationCode(newCode);
-
-    // Auto-advance to next input
-    if (value && index < 5) {
-      codeRefs.current[index + 1]?.focus();
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('sim_studio_session');
+    setAuthenticated(false);
+    setEmail('');
+    setPassword('');
   };
 
-  const handleCodeKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
-      codeRefs.current[index - 1]?.focus();
+  const handleGoToStudio = () => {
+    const session = localStorage.getItem('sim_studio_session');
+    if (session) {
+      const data = JSON.parse(session);
+      const token = btoa(JSON.stringify({ email: data.email, role: data.role, exp: data.expires }));
+      window.location.href = `${STUDIO_URL}?auth=${encodeURIComponent(token)}`;
     }
-  };
-
-  const handleCodePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    const newCode = [...verificationCode];
-    for (let i = 0; i < pasted.length; i++) {
-      newCode[i] = pasted[i];
-    }
-    setVerificationCode(newCode);
-    const nextEmpty = Math.min(pasted.length, 5);
-    codeRefs.current[nextEmpty]?.focus();
-  };
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const code = verificationCode.join('');
-    if (code.length !== 6) {
-      setError('Please enter the full 6-digit code.');
-      return;
-    }
-    setLoading(true);
-    setError('');
-
-    try {
-      const res = await fetch('/api/simulation-studio/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
-      });
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || 'Invalid or expired code.');
-        setLoading(false);
-        return;
-      }
-
-      // Verified — redirect to the actual studio app
-      setStep('studio');
-      // Store session token
-      if (data.token) {
-        document.cookie = `sim_token=${data.token}; path=/simulation-studio; max-age=${7 * 24 * 3600}; SameSite=Lax`;
-      }
-      // Redirect to editor
-      window.location.href = '/simulation-studio/editor';
-    } catch {
-      setError('Connection error. Please try again.');
-    }
-    setLoading(false);
-  };
-
-  const handleResendCode = async () => {
-    if (countdown > 0) return;
-    setLoading(true);
-    setError('');
-
-    try {
-      await fetch('/api/simulation-studio/resend-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      setCountdown(60);
-      setVerificationCode(['', '', '', '', '', '']);
-    } catch {
-      setError('Could not resend code.');
-    }
-    setLoading(false);
   };
 
   return (
@@ -193,11 +146,33 @@ export default function SimulationStudioPage() {
             </div>
           </div>
 
-          {/* ===== LOGIN STEP ===== */}
-          {step === 'login' && (
+          {/* Already authenticated */}
+          {authenticated ? (
+            <div className="glass-card p-8 border border-white/10 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-teal/10 border border-teal/20 flex items-center justify-center">
+                <Crown size={28} className="text-teal" />
+              </div>
+              <h2 className="font-orbitron text-lg text-white mb-2">Welcome Back!</h2>
+              <p className="text-sm text-gray-400 mb-6">You&apos;re logged in as a Premium Plus member.</p>
+              <button
+                onClick={handleGoToStudio}
+                className="w-full py-3 bg-gradient-to-r from-teal to-teal-light text-navy font-bold rounded-lg hover:shadow-glow-teal transition-all duration-300 flex items-center justify-center gap-2 mb-3"
+              >
+                Open Simulation Studio
+                <ArrowRight size={16} />
+              </button>
+              <button
+                onClick={handleLogout}
+                className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            /* Login Form */
             <div className="glass-card p-8 border border-white/10">
               <div className="flex items-center gap-2 mb-6">
-                <Lock size={18} className="text-teal" />
+                <LogIn size={18} className="text-teal" />
                 <h2 className="font-orbitron text-lg text-white">Sign In</h2>
               </div>
 
@@ -253,7 +228,7 @@ export default function SimulationStudioPage() {
                     <div className="w-5 h-5 border-2 border-navy/30 border-t-navy rounded-full animate-spin" />
                   ) : (
                     <>
-                      Sign In
+                      Sign In &amp; Launch Studio
                       <ArrowRight size={16} />
                     </>
                   )}
@@ -263,88 +238,12 @@ export default function SimulationStudioPage() {
               <div className="mt-6 pt-4 border-t border-white/10">
                 <p className="text-xs text-gray-500 text-center leading-relaxed">
                   This tool is exclusively available to <strong className="text-gold">Premium Plus</strong> subscribers.
-                  Your login credentials were sent to the email used for your purchase.
-                  A verification code will be sent to your email on every login.
+                  Your credentials were sent to the email used for your purchase.
                 </p>
               </div>
             </div>
           )}
 
-          {/* ===== VERIFY STEP ===== */}
-          {step === 'verify' && (
-            <div className="glass-card p-8 border border-white/10">
-              <div className="flex items-center gap-2 mb-2">
-                <ShieldCheck size={18} className="text-teal" />
-                <h2 className="font-orbitron text-lg text-white">Email Verification</h2>
-              </div>
-              <p className="text-sm text-gray-400 mb-6">
-                We sent a 6-digit code to <strong className="text-white">{email}</strong>
-              </p>
-
-              <form onSubmit={handleVerify} className="space-y-5">
-                {/* 6-digit code input */}
-                <div className="flex justify-center gap-2" onPaste={handleCodePaste}>
-                  {verificationCode.map((digit, i) => (
-                    <input
-                      key={i}
-                      ref={(el) => { codeRefs.current[i] = el; }}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleCodeInput(i, e.target.value)}
-                      onKeyDown={(e) => handleCodeKeyDown(i, e)}
-                      className="w-12 h-14 text-center text-xl font-mono font-bold bg-navy/60 border border-white/15 rounded-lg text-white focus:outline-none focus:border-teal focus:ring-1 focus:ring-teal/50 transition-all"
-                    />
-                  ))}
-                </div>
-
-                {error && (
-                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-sm text-red-400 text-center">
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 bg-gradient-to-r from-teal to-teal-light text-navy font-bold rounded-lg hover:shadow-glow-teal transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <div className="w-5 h-5 border-2 border-navy/30 border-t-navy rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <CheckCircle2 size={16} />
-                      Verify &amp; Enter Studio
-                    </>
-                  )}
-                </button>
-
-                <div className="text-center">
-                  <button
-                    type="button"
-                    onClick={handleResendCode}
-                    disabled={countdown > 0}
-                    className="text-sm text-gray-400 hover:text-teal transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    {countdown > 0
-                      ? `Resend code in ${countdown}s`
-                      : 'Resend verification code'}
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => { setStep('login'); setError(''); setVerificationCode(['', '', '', '', '', '']); }}
-                  className="w-full text-center text-sm text-gray-500 hover:text-gray-300 transition-colors"
-                >
-                  ← Back to login
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* Footer */}
           <p className="text-center text-xs text-gray-500 mt-6">
             © {new Date().getFullYear()} MetaMech Solutions. All rights reserved.
           </p>
