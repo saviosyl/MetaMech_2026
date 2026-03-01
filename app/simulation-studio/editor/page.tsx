@@ -271,22 +271,25 @@ export default function EditorPage() {
         duplicateSelectedObject();
       }
 
-      // Transform modes: W/E/R
+      // Transform modes: W/E/R (only if no input is focused)
       if (!e.metaKey && !e.ctrlKey && !e.altKey) {
-        switch (e.key.toLowerCase()) {
-          case 'w':
-            setTransformMode('translate');
-            break;
-          case 'e':
-            setTransformMode('rotate');
-            break;
-          case 'r':
-            setTransformMode('scale');
-            break;
-          case ' ':
-            e.preventDefault();
-            isPlaying ? pause() : play();
-            break;
+        const activeElement = document.activeElement;
+        if (!activeElement || (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA')) {
+          switch (e.key.toLowerCase()) {
+            case 'w':
+              setTransformMode('translate');
+              break;
+            case 'e':
+              setTransformMode('rotate');
+              break;
+            case 'r':
+              setTransformMode('scale');
+              break;
+            case ' ':
+              e.preventDefault();
+              isPlaying ? pause() : play();
+              break;
+          }
         }
       }
     };

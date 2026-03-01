@@ -264,6 +264,14 @@ function Scene() {
     
     event.stopPropagation();
     setSelectedObject(id, type);
+    
+    // Force update transform controls
+    if (transformControlsRef.current) {
+      const target = scene.getObjectByName(id);
+      if (target) {
+        transformControlsRef.current.attach(target);
+      }
+    }
   };
 
   // Handle background click (deselect or place)
@@ -410,6 +418,20 @@ function Scene() {
     }
   }, [selectedObjectId, selectedObjectType, updateObject]);
 
+  // Attach TransformControls to selected object when selection changes
+  useEffect(() => {
+    if (transformControlsRef.current && selectedObjectId) {
+      const target = scene.getObjectByName(selectedObjectId);
+      if (target) {
+        transformControlsRef.current.attach(target);
+      } else {
+        transformControlsRef.current.detach();
+      }
+    } else if (transformControlsRef.current) {
+      transformControlsRef.current.detach();
+    }
+  }, [selectedObjectId, scene]);
+
   // Find selected object
   const selectedObject = selectedObjectId ? scene.getObjectByName(selectedObjectId) : null;
 
@@ -547,6 +569,7 @@ function Scene() {
           showZ={true}
           size={0.8}
           space="world"
+          enabled={true}
         />
       )}
 
