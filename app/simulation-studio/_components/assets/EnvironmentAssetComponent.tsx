@@ -43,39 +43,50 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
   };
 
   const renderWall = () => {
-    const width = asset.parameters?.width || 5;
+    const length = asset.parameters?.length || 5;
     const height = asset.parameters?.height || 3;
     const thickness = asset.parameters?.thickness || 0.2;
 
     return (
       <group>
-        {/* Main wall structure */}
+        {/* Main slab (box, concrete gray #9ca3af) */}
         <mesh position={[0, height/2, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[width, height, thickness]} />
-          <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
+          <boxGeometry args={[length, height, thickness]} />
+          <meshStandardMaterial color="#9ca3af" metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Slight texture variation: use 2-3 boxes with slightly different roughness values layered */}
+        <mesh position={[0, height/2, thickness/2 + 0.005]} onClick={onClick}>
+          <boxGeometry args={[length - 0.1, height - 0.1, 0.01]} />
+          <meshStandardMaterial color="#a1a8b0" metalness={0.1} roughness={0.7} />
+        </mesh>
+        
+        <mesh position={[0, height/2, thickness/2 + 0.01]} onClick={onClick}>
+          <boxGeometry args={[length - 0.2, height - 0.2, 0.005]} />
+          <meshStandardMaterial color="#8a939d" metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Base strip (thin darker box along bottom) */}
+        <mesh position={[0, 0.05, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[length + 0.1, 0.1, thickness + 0.05]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
         </mesh>
         
         {/* Wall texture lines to simulate concrete blocks */}
         {Array.from({ length: Math.floor(height * 2) }, (_, i) => (
-          <mesh key={`line-${i}`} position={[0, (i + 0.5) * 0.5, thickness/2 + 0.005]} onClick={onClick}>
-            <boxGeometry args={[width, 0.01, 0.005]} />
+          <mesh key={`line-${i}`} position={[0, (i + 0.5) * 0.5, thickness/2 + 0.008]} onClick={onClick}>
+            <boxGeometry args={[length, 0.005, 0.002]} />
             <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.9} />
           </mesh>
         ))}
         
         {/* Vertical joints */}
-        {Array.from({ length: Math.floor(width / 2) }, (_, i) => (
-          <mesh key={`vjoint-${i}`} position={[(i - Math.floor(width/4)) * 2, height/2, thickness/2 + 0.005]} onClick={onClick}>
-            <boxGeometry args={[0.01, height, 0.005]} />
+        {Array.from({ length: Math.floor(length / 2) }, (_, i) => (
+          <mesh key={`vjoint-${i}`} position={[(i - Math.floor(length/4)) * 2, height/2, thickness/2 + 0.008]} onClick={onClick}>
+            <boxGeometry args={[0.005, height, 0.002]} />
             <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.9} />
           </mesh>
         ))}
-        
-        {/* Base foundation */}
-        <mesh position={[0, 0.05, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[width + 0.2, 0.1, thickness + 0.1]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.3} roughness={0.7} />
-        </mesh>
       </group>
     );
   };
@@ -84,60 +95,109 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
     const width = asset.parameters?.width || 2;
     const height = asset.parameters?.height || 2.5;
     const thickness = asset.parameters?.thickness || 0.1;
+    const doorType = asset.parameters?.doorType || 'single'; // single/double
 
     return (
       <group>
-        {/* Door frame */}
+        {/* Frame: 4 boxes forming doorframe (slightly darker than wall) */}
         <mesh position={[-width/2 - 0.05, height/2, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[0.1, height + 0.2, thickness + 0.1]} />
-          <meshStandardMaterial color={colors.steel} metalness={0.7} roughness={0.3} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
         </mesh>
         <mesh position={[width/2 + 0.05, height/2, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[0.1, height + 0.2, thickness + 0.1]} />
-          <meshStandardMaterial color={colors.steel} metalness={0.7} roughness={0.3} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
         </mesh>
         <mesh position={[0, height + 0.05, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[width + 0.2, 0.1, thickness + 0.1]} />
-          <meshStandardMaterial color={colors.steel} metalness={0.7} roughness={0.3} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, -0.05, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[width + 0.2, 0.1, thickness + 0.1]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
         </mesh>
         
-        {/* Door panel */}
-        <mesh position={[0, height/2, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[width, height, thickness]} />
-          <meshStandardMaterial color="#ffffff" metalness={0.2} roughness={0.6} />
-        </mesh>
-        
-        {/* Door panel inset */}
-        <mesh position={[0, height/2, thickness/2 - 0.01]} onClick={onClick}>
-          <boxGeometry args={[width - 0.3, height - 0.3, 0.02]} />
-          <meshStandardMaterial color="#f0f0f0" metalness={0.1} roughness={0.7} />
-        </mesh>
-        
-        {/* Door handle */}
-        <mesh position={[width/2 - 0.15, height/2 - 0.1, thickness/2 + 0.05]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.02, 0.02, 0.1]} />
-          <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.2} />
-        </mesh>
-        
-        {/* Door handle lever */}
-        <mesh position={[width/2 - 0.1, height/2 - 0.1, thickness/2 + 0.05]} rotation={[0, 0, 0]} onClick={onClick}>
-          <boxGeometry args={[0.1, 0.02, 0.03]} />
-          <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.2} />
-        </mesh>
-        
-        {/* Lock cylinder */}
-        <mesh position={[width/2 - 0.15, height/2 - 0.3, thickness/2 + 0.01]} onClick={onClick}>
-          <cylinderGeometry args={[0.015, 0.015, 0.02]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.9} roughness={0.1} />
-        </mesh>
-        
-        {/* Hinges */}
-        {[0.2, 0.8].map(ratio => (
-          <mesh key={`hinge-${ratio}`} position={[-width/2, height * ratio, thickness/2 + 0.02]} onClick={onClick}>
-            <cylinderGeometry args={[0.03, 0.03, 0.04]} />
-            <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
-          </mesh>
-        ))}
+        {doorType === 'single' ? (
+          <group>
+            {/* Panel: 1 panel for single (recessed box) */}
+            <mesh position={[0, height/2, 0]} castShadow onClick={onClick}>
+              <boxGeometry args={[width, height, thickness]} />
+              <meshStandardMaterial color="#ffffff" metalness={0.2} roughness={0.6} />
+            </mesh>
+            
+            {/* Panel inset */}
+            <mesh position={[0, height/2, thickness/2 - 0.01]} onClick={onClick}>
+              <boxGeometry args={[width - 0.3, height - 0.3, 0.02]} />
+              <meshStandardMaterial color="#f0f0f0" metalness={0.1} roughness={0.7} />
+            </mesh>
+            
+            {/* Handle: small cylinder on panel */}
+            <mesh position={[width/2 - 0.15, height/2, thickness/2 + 0.03]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.02, 0.02, 0.06]} />
+              <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            
+            {/* Hinges: 2-3 small dark cylinders on frame edge */}
+            {[0.2, 0.5, 0.8].map((ratio, i) => (
+              <mesh key={`hinge-${i}`} position={[-width/2, height * ratio, thickness/2 + 0.02]} onClick={onClick}>
+                <cylinderGeometry args={[0.02, 0.02, 0.04]} />
+                <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.3} />
+              </mesh>
+            ))}
+          </group>
+        ) : (
+          <group>
+            {/* Panels: 2 panels for double (recessed boxes) */}
+            <mesh position={[-width/4, height/2, 0]} castShadow onClick={onClick}>
+              <boxGeometry args={[width/2 - 0.05, height, thickness]} />
+              <meshStandardMaterial color="#ffffff" metalness={0.2} roughness={0.6} />
+            </mesh>
+            <mesh position={[width/4, height/2, 0]} castShadow onClick={onClick}>
+              <boxGeometry args={[width/2 - 0.05, height, thickness]} />
+              <meshStandardMaterial color="#ffffff" metalness={0.2} roughness={0.6} />
+            </mesh>
+            
+            {/* Panel insets */}
+            <mesh position={[-width/4, height/2, thickness/2 - 0.01]} onClick={onClick}>
+              <boxGeometry args={[width/2 - 0.35, height - 0.3, 0.02]} />
+              <meshStandardMaterial color="#f0f0f0" metalness={0.1} roughness={0.7} />
+            </mesh>
+            <mesh position={[width/4, height/2, thickness/2 - 0.01]} onClick={onClick}>
+              <boxGeometry args={[width/2 - 0.35, height - 0.3, 0.02]} />
+              <meshStandardMaterial color="#f0f0f0" metalness={0.1} roughness={0.7} />
+            </mesh>
+            
+            {/* Handles: small cylinder on each panel */}
+            <mesh position={[-0.1, height/2, thickness/2 + 0.03]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.02, 0.02, 0.06]} />
+              <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            <mesh position={[0.1, height/2, thickness/2 + 0.03]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.02, 0.02, 0.06]} />
+              <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            
+            {/* Center divider */}
+            <mesh position={[0, height/2, 0]} castShadow onClick={onClick}>
+              <boxGeometry args={[0.1, height + 0.1, thickness + 0.05]} />
+              <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
+            </mesh>
+            
+            {/* Hinges for double doors */}
+            {[0.2, 0.5, 0.8].map((ratio, i) => (
+              <group key={`hinge-group-${i}`}>
+                <mesh position={[-width/2, height * ratio, thickness/2 + 0.02]} onClick={onClick}>
+                  <cylinderGeometry args={[0.02, 0.02, 0.04]} />
+                  <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.3} />
+                </mesh>
+                <mesh position={[width/2, height * ratio, thickness/2 + 0.02]} onClick={onClick}>
+                  <cylinderGeometry args={[0.02, 0.02, 0.04]} />
+                  <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.3} />
+                </mesh>
+              </group>
+            ))}
+          </group>
+        )}
       </group>
     );
   };
@@ -149,7 +209,7 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
 
     return (
       <group>
-        {/* Window frame */}
+        {/* Frame: 4 boxes */}
         <mesh position={[-width/2 - 0.05, height/2, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[0.1, height + 0.1, thickness + 0.05]} />
           <meshStandardMaterial color={colors.steel} metalness={0.7} roughness={0.3} />
@@ -167,16 +227,23 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
           <meshStandardMaterial color={colors.steel} metalness={0.7} roughness={0.3} />
         </mesh>
         
-        {/* Glass panes */}
+        {/* Glass: transparent plane (MeshPhysicalMaterial, transmission:0.9, roughness:0.05, ior:1.5) */}
         <mesh position={[0, height/2, 0]} onClick={onClick}>
           <boxGeometry args={[width, height, thickness]} />
-          <meshStandardMaterial 
-            color={colors.glass} 
-            metalness={0.9} 
-            roughness={0.1} 
-            transparent 
-            opacity={0.3} 
+          <meshPhysicalMaterial 
+            color="#ffffff"
+            transmission={0.9}
+            roughness={0.05}
+            ior={1.5}
+            thickness={thickness}
+            transparent
           />
+        </mesh>
+        
+        {/* Sill: small box at bottom */}
+        <mesh position={[0, -0.05, thickness/2 + 0.03]} castShadow onClick={onClick}>
+          <boxGeometry args={[width + 0.2, 0.1, 0.06]} />
+          <meshStandardMaterial color={colors.steel} metalness={0.6} roughness={0.4} />
         </mesh>
         
         {/* Window mullions - cross pattern */}
@@ -200,7 +267,7 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
 
     return (
       <group>
-        {/* Individual steps */}
+        {/* Loop to create individual steps (each = box, stacked up) */}
         {Array.from({ length: steps }, (_, i) => (
           <group key={`step-${i}`}>
             {/* Step tread */}
@@ -215,7 +282,7 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
               <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
             </mesh>
             
-            {/* Anti-slip strips */}
+            {/* Anti-slip strips on each step (thin colored box) */}
             {[0, 1, 2].map(strip => (
               <mesh key={`strip-${strip}`} position={[(strip - 1) * width * 0.3, (i + 1) * stepHeight + 0.005, (i + 0.8) * stepDepth]} onClick={onClick}>
                 <boxGeometry args={[0.05, 0.01, 0.15]} />
@@ -225,23 +292,44 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
           </group>
         ))}
         
-        {/* Handrails - left and right */}
+        {/* 2 handrail systems: posts + top rail */}
         {[-width/2 - 0.1, width/2 + 0.1].map(x => (
           <group key={`handrail-${x}`}>
-            {/* Handrail posts */}
-            {Array.from({ length: Math.ceil(steps / 3) }, (_, i) => {
-              const stepIndex = i * 3;
+            {/* Handrail posts (thin cylinders every 2 steps) */}
+            {Array.from({ length: Math.ceil(steps / 2) + 1 }, (_, i) => {
+              const stepIndex = i * 2;
+              const postHeight = 1;
               return (
-                <mesh key={`post-${i}`} position={[x, stepIndex * stepHeight + 1, stepIndex * stepDepth]} castShadow onClick={onClick}>
-                  <cylinderGeometry args={[0.02, 0.02, 1]} />
+                <mesh key={`post-${i}`} position={[x, stepIndex * stepHeight + postHeight/2, stepIndex * stepDepth]} castShadow onClick={onClick}>
+                  <cylinderGeometry args={[0.02, 0.02, postHeight]} />
                   <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
                 </mesh>
               );
             })}
             
-            {/* Handrail top rail */}
+            {/* Top rail (horizontal cylinder) */}
             <mesh position={[x, steps * stepHeight / 2 + 1, steps * stepDepth / 2]} rotation={[Math.atan2(steps * stepHeight, steps * stepDepth), 0, 0]} castShadow onClick={onClick}>
               <cylinderGeometry args={[0.03, 0.03, Math.sqrt((steps * stepDepth) ** 2 + (steps * stepHeight) ** 2)]} />
+              <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.2} />
+            </mesh>
+          </group>
+        ))}
+        
+        {/* Landing platform at top */}
+        <mesh position={[0, steps * stepHeight + 0.05, steps * stepDepth + 0.5]} castShadow onClick={onClick}>
+          <boxGeometry args={[width + 0.4, 0.1, 1]} />
+          <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Landing platform handrail */}
+        {[-width/2 - 0.1, width/2 + 0.1].map(x => (
+          <group key={`landing-rail-${x}`}>
+            <mesh position={[x, steps * stepHeight + 0.6, steps * stepDepth + 0.5]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.02, 0.02, 1.1]} />
+              <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
+            </mesh>
+            <mesh position={[x, steps * stepHeight + 1.1, steps * stepDepth + 0.5]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.03, 0.03, 1]} />
               <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.2} />
             </mesh>
           </group>
@@ -253,33 +341,42 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
   const renderSafetyRail = () => {
     const length = asset.parameters?.length || 5;
     const height = asset.parameters?.height || 1.2;
+    const postSpacing = 1.5; // Posts spaced every 1.5m
 
     return (
       <group>
-        {/* Vertical posts every 2 meters */}
-        {Array.from({ length: Math.ceil(length / 2) + 1 }, (_, i) => (
-          <mesh key={`post-${i}`} position={[(i * 2) - length/2, height/2, 0]} castShadow onClick={onClick}>
-            <cylinderGeometry args={[0.03, 0.03, height]} />
-            <meshStandardMaterial color={colors.safetyYellow} metalness={0.4} roughness={0.6} />
-          </mesh>
+        {/* Posts: yellow #eab308 cylinders, spaced every 1.5m along length */}
+        {Array.from({ length: Math.ceil(length / postSpacing) + 1 }, (_, i) => (
+          <group key={`post-group-${i}`}>
+            <mesh position={[(i * postSpacing) - length/2, height/2, 0]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.03, 0.03, height]} />
+              <meshStandardMaterial color="#eab308" metalness={0.4} roughness={0.6} />
+            </mesh>
+            
+            {/* Base plates: small flat cylinders at each post */}
+            <mesh position={[(i * postSpacing) - length/2, 0.02, 0]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.08, 0.08, 0.04]} />
+              <meshStandardMaterial color={colors.darkGray} metalness={0.6} roughness={0.5} />
+            </mesh>
+          </group>
         ))}
         
-        {/* Top rail */}
-        <mesh position={[0, height - 0.15, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[length, 0.05, 0.05]} />
-          <meshStandardMaterial color={colors.safetyYellow} metalness={0.4} roughness={0.6} />
+        {/* Top rail: horizontal yellow cylinder */}
+        <mesh position={[0, height - 0.05, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.025, 0.025, length]} />
+          <meshStandardMaterial color="#eab308" metalness={0.4} roughness={0.6} />
         </mesh>
         
-        {/* Mid rail */}
+        {/* Mid rail: horizontal yellow cylinder at half height */}
         <mesh position={[0, height/2, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[length, 0.05, 0.05]} />
-          <meshStandardMaterial color={colors.safetyYellow} metalness={0.4} roughness={0.6} />
+          <cylinderGeometry args={[0.025, 0.025, length]} />
+          <meshStandardMaterial color="#eab308" metalness={0.4} roughness={0.6} />
         </mesh>
         
         {/* Kick plate */}
         <mesh position={[0, 0.1, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[length, 0.2, 0.02]} />
-          <meshStandardMaterial color={colors.safetyYellow} metalness={0.4} roughness={0.6} />
+          <meshStandardMaterial color="#eab308" metalness={0.4} roughness={0.6} />
         </mesh>
         
         {/* Warning signs on posts */}
@@ -298,144 +395,164 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
     const width = asset.parameters?.width || 0.2;
     const color = asset.parameters?.color || 'yellow';
 
-    const markingColor = color === 'yellow' ? colors.safetyYellow : 
-                        color === 'red' ? colors.warningRed : 
-                        color === 'white' ? '#ffffff' : colors.safetyYellow;
+    // Color from params (yellow, white, red, blue)
+    const markingColor = color === 'yellow' ? '#eab308' : 
+                        color === 'red' ? '#ef4444' : 
+                        color === 'blue' ? '#3b82f6' :
+                        color === 'white' ? '#ffffff' : '#eab308';
 
     return (
       <group>
-        {/* Main marking stripe */}
-        <mesh position={[0, 0.01, 0]} onClick={onClick}>
-          <boxGeometry args={[length, 0.02, width]} />
+        {/* Very thin flat box (height: 0.005m) at y=0.003 */}
+        <mesh position={[0, 0.003, 0]} onClick={onClick}>
+          <boxGeometry args={[length, 0.005, width]} />
           <meshStandardMaterial color={markingColor} metalness={0.2} roughness={0.8} />
         </mesh>
         
-        {/* Dashed pattern for certain markings */}
+        {/* Dashed pattern for white markings */}
         {color === 'white' && Array.from({ length: Math.floor(length / 0.5) }, (_, i) => {
           if (i % 2 === 0) return null; // Skip every other dash for dashed effect
           return (
-            <mesh key={`dash-${i}`} position={[(i * 0.5) - length/2, 0.015, 0]} onClick={onClick}>
-              <boxGeometry args={[0.2, 0.005, width]} />
+            <mesh key={`dash-${i}`} position={[(i * 0.5) - length/2, 0.006, 0]} onClick={onClick}>
+              <boxGeometry args={[0.2, 0.002, width]} />
               <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.9} />
             </mesh>
           );
         })}
+        
+        {/* Safety reflective elements for yellow markings */}
+        {color === 'yellow' && Array.from({ length: Math.floor(length / 1) }, (_, i) => (
+          <mesh key={`reflect-${i}`} position={[(i - Math.floor(length / 2)) * 1, 0.004, 0]} onClick={onClick}>
+            <boxGeometry args={[0.1, 0.001, width - 0.02]} />
+            <meshStandardMaterial 
+              color="#ffffff" 
+              metalness={0.9} 
+              roughness={0.1}
+              emissive="#ffffff"
+              emissiveIntensity={0.1}
+            />
+          </mesh>
+        ))}
       </group>
     );
   };
 
   const renderPalletRack = () => {
-    const width = asset.parameters?.width || 3;
+    const levels = asset.parameters?.levels || 4;
+    const bays = asset.parameters?.bays || 3;
+    const width = bays * 2.5; // Each bay is ~2.5m wide
     const height = asset.parameters?.height || 4;
     const depth = asset.parameters?.depth || 1.2;
-    const levels = asset.parameters?.levels || 4;
 
     return (
       <group>
-        {/* Upright frames - front uprights */}
-        {[-width/2, width/2].map(x => (
-          <group key={`front-upright-${x}`}>
-            {/* Main vertical posts */}
-            <mesh position={[x, height/2, depth/2]} castShadow onClick={onClick}>
-              <boxGeometry args={[0.08, height, 0.08]} />
-              <meshStandardMaterial color={colors.rackBlue} metalness={0.6} roughness={0.4} />
-            </mesh>
-            
-            {/* Diagonal bracing */}
-            {Array.from({ length: levels - 1 }, (_, i) => (
-              <mesh key={`diag-${i}`} position={[x, (i + 1) * (height / levels) - 0.3, depth/2]} rotation={[0, 0, x > 0 ? Math.PI/6 : -Math.PI/6]} castShadow onClick={onClick}>
-                <boxGeometry args={[0.6, 0.03, 0.03]} />
-                <meshStandardMaterial color={colors.rackBlue} metalness={0.7} roughness={0.3} />
-              </mesh>
-            ))}
-          </group>
-        ))}
-        
-        {/* Back uprights */}
-        {[-width/2, width/2].map(x => (
-          <mesh key={`back-upright-${x}`} position={[x, height/2, -depth/2]} castShadow onClick={onClick}>
-            <boxGeometry args={[0.08, height, 0.08]} />
-            <meshStandardMaterial color={colors.rackBlue} metalness={0.6} roughness={0.4} />
-          </mesh>
-        ))}
-        
-        {/* Horizontal beams at each level */}
-        {Array.from({ length: levels + 1 }, (_, i) => {
-          const y = (i * height / levels);
+        {/* For EACH bay - upright frames */}
+        {Array.from({ length: bays + 1 }, (_, bayIndex) => {
+          const x = (bayIndex - bays/2) * 2.5;
           return (
-            <group key={`level-${i}`}>
-              {/* Front beam */}
-              <mesh position={[0, y, depth/2]} castShadow onClick={onClick}>
-                <boxGeometry args={[width - 0.08, 0.12, 0.08]} />
-                <meshStandardMaterial color={colors.rackOrange} metalness={0.5} roughness={0.5} />
-              </mesh>
-              
-              {/* Back beam */}
-              <mesh position={[0, y, -depth/2]} castShadow onClick={onClick}>
-                <boxGeometry args={[width - 0.08, 0.12, 0.08]} />
-                <meshStandardMaterial color={colors.rackOrange} metalness={0.5} roughness={0.5} />
-              </mesh>
-              
-              {/* Beam end connectors */}
-              {[-width/2 + 0.04, width/2 - 0.04].map(x => (
-                <group key={`connector-${x}`}>
-                  <mesh position={[x, y, depth/2]} onClick={onClick}>
-                    <boxGeometry args={[0.12, 0.16, 0.12]} />
-                    <meshStandardMaterial color={colors.rackOrange} metalness={0.6} roughness={0.4} />
-                  </mesh>
-                  <mesh position={[x, y, -depth/2]} onClick={onClick}>
-                    <boxGeometry args={[0.12, 0.16, 0.12]} />
-                    <meshStandardMaterial color={colors.rackOrange} metalness={0.6} roughness={0.4} />
-                  </mesh>
-                </group>
-              ))}
+            <group key={`bay-${bayIndex}`}>
+              {/* 2 upright frames per bay position */}
+              {/* Front upright frame */}
+              <group>
+                {/* 2 vertical posts */}
+                <mesh position={[x, height/2, depth/2]} castShadow onClick={onClick}>
+                  <boxGeometry args={[0.08, height, 0.08]} />
+                  <meshStandardMaterial color="#2563eb" metalness={0.6} roughness={0.4} />
+                </mesh>
+                <mesh position={[x, height/2, -depth/2]} castShadow onClick={onClick}>
+                  <boxGeometry args={[0.08, height, 0.08]} />
+                  <meshStandardMaterial color="#2563eb" metalness={0.6} roughness={0.4} />
+                </mesh>
+                
+                {/* Diagonal X-bracing between posts */}
+                <mesh position={[x, height/2, 0]} rotation={[0, 0, Math.PI/6]} castShadow onClick={onClick}>
+                  <boxGeometry args={[depth * 1.1, 0.03, 0.03]} />
+                  <meshStandardMaterial color="#2563eb" metalness={0.7} roughness={0.3} />
+                </mesh>
+                <mesh position={[x, height/2, 0]} rotation={[0, 0, -Math.PI/6]} castShadow onClick={onClick}>
+                  <boxGeometry args={[depth * 1.1, 0.03, 0.03]} />
+                  <meshStandardMaterial color="#2563eb" metalness={0.7} roughness={0.3} />
+                </mesh>
+                
+                {/* Foot plates at bottom */}
+                <mesh position={[x, 0.03, depth/2]} castShadow onClick={onClick}>
+                  <boxGeometry args={[0.2, 0.06, 0.2]} />
+                  <meshStandardMaterial color={colors.darkGray} metalness={0.4} roughness={0.7} />
+                </mesh>
+                <mesh position={[x, 0.03, -depth/2]} castShadow onClick={onClick}>
+                  <boxGeometry args={[0.2, 0.06, 0.2]} />
+                  <meshStandardMaterial color={colors.darkGray} metalness={0.4} roughness={0.7} />
+                </mesh>
+              </group>
             </group>
           );
         })}
         
-        {/* Wire deck shelving at each level except ground */}
-        {Array.from({ length: levels }, (_, i) => {
-          const y = ((i + 1) * height / levels) + 0.06;
+        {/* For EACH level - horizontal beams and wire decks */}
+        {Array.from({ length: levels + 1 }, (_, levelIndex) => {
+          const y = (levelIndex * height / levels);
           return (
-            <group key={`deck-${i}`}>
-              {/* Wire mesh pattern */}
-              {Array.from({ length: Math.floor(width * 5) }, (_, j) => (
-                <mesh key={`wire-long-${j}`} position={[(j - width * 2.5) * 0.2, y, 0]} onClick={onClick}>
-                  <boxGeometry args={[0.01, 0.01, depth - 0.1]} />
-                  <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
-                </mesh>
-              ))}
-              {Array.from({ length: Math.floor(depth * 8) }, (_, j) => (
-                <mesh key={`wire-cross-${j}`} position={[0, y, (j - depth * 4) * 0.125]} onClick={onClick}>
-                  <boxGeometry args={[width - 0.1, 0.01, 0.01]} />
-                  <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
-                </mesh>
-              ))}
+            <group key={`level-${levelIndex}`}>
+              {/* For each bay, create horizontal beams */}
+              {Array.from({ length: bays }, (_, bayIndex) => {
+                const bayX = (bayIndex - (bays-1)/2) * 2.5;
+                return (
+                  <group key={`bay-beams-${bayIndex}`}>
+                    {/* 2 horizontal beams per bay (front and back) */}
+                    <mesh position={[bayX, y, depth/2]} castShadow onClick={onClick}>
+                      <boxGeometry args={[2.4, 0.12, 0.08]} />
+                      <meshStandardMaterial color="#f97316" metalness={0.5} roughness={0.5} />
+                    </mesh>
+                    <mesh position={[bayX, y, -depth/2]} castShadow onClick={onClick}>
+                      <boxGeometry args={[2.4, 0.12, 0.08]} />
+                      <meshStandardMaterial color="#f97316" metalness={0.5} roughness={0.5} />
+                    </mesh>
+                    
+                    {/* Wire deck surface only if not ground level */}
+                    {levelIndex > 0 && (
+                      <group>
+                        {/* Wire mesh pattern */}
+                        {Array.from({ length: Math.floor(2.4 * 5) }, (_, j) => (
+                          <mesh key={`wire-long-${j}`} position={[bayX + (j - 6) * 0.2, y + 0.06, 0]} onClick={onClick}>
+                            <boxGeometry args={[0.01, 0.01, depth - 0.1]} />
+                            <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
+                          </mesh>
+                        ))}
+                        {Array.from({ length: Math.floor(depth * 8) }, (_, j) => (
+                          <mesh key={`wire-cross-${j}`} position={[bayX, y + 0.06, (j - depth * 4) * 0.125]} onClick={onClick}>
+                            <boxGeometry args={[2.3, 0.01, 0.01]} />
+                            <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
+                          </mesh>
+                        ))}
+                      </group>
+                    )}
+                  </group>
+                );
+              })}
             </group>
           );
         })}
         
-        {/* Foot plates at base */}
-        {[-width/2, width/2].map(x => 
-          [-depth/2, depth/2].map(z => (
-            <mesh key={`foot-${x}-${z}`} position={[x, 0.03, z]} castShadow onClick={onClick}>
-              <boxGeometry args={[0.2, 0.06, 0.2]} />
-              <meshStandardMaterial color={colors.darkGray} metalness={0.4} roughness={0.7} />
-            </mesh>
-          ))
-        )}
-        
-        {/* Safety pins / load clips */}
+        {/* Safety pins / load clips on beams */}
         {Array.from({ length: levels }, (_, i) => {
           const y = ((i + 1) * height / levels);
           return (
             <group key={`pins-${i}`}>
-              {[-width/2 + 0.04, width/2 - 0.04].map(x => (
-                <mesh key={`pin-${x}`} position={[x, y - 0.02, depth/2 + 0.05]} onClick={onClick}>
-                  <cylinderGeometry args={[0.01, 0.01, 0.04]} />
-                  <meshStandardMaterial color={colors.warningRed} metalness={0.4} roughness={0.6} />
-                </mesh>
-              ))}
+              {Array.from({ length: bays + 1 }, (_, bayIndex) => {
+                const x = (bayIndex - bays/2) * 2.5;
+                return (
+                  <group key={`bay-pins-${bayIndex}`}>
+                    <mesh position={[x, y - 0.02, depth/2 + 0.05]} onClick={onClick}>
+                      <cylinderGeometry args={[0.01, 0.01, 0.04]} />
+                      <meshStandardMaterial color={colors.warningRed} metalness={0.4} roughness={0.6} />
+                    </mesh>
+                    <mesh position={[x, y - 0.02, -depth/2 - 0.05]} onClick={onClick}>
+                      <cylinderGeometry args={[0.01, 0.01, 0.04]} />
+                      <meshStandardMaterial color={colors.warningRed} metalness={0.4} roughness={0.6} />
+                    </mesh>
+                  </group>
+                );
+              })}
             </group>
           );
         })}
@@ -450,29 +567,32 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
 
     return (
       <group>
-        {/* Foundation slab */}
+        {/* Foundation slab - slightly raised from ground */}
         <mesh position={[0, 0.1, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[width + 1, 0.2, depth + 1]} />
           <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
         </mesh>
         
-        {/* Side walls */}
-        <mesh position={[-width/2, height/2, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.3, height, depth]} />
-          <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
-        </mesh>
-        <mesh position={[width/2, height/2, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.3, height, depth]} />
-          <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
-        </mesh>
-        
+        {/* 4 walls - back, left, right, partial front with opening */}
         {/* Back wall */}
         <mesh position={[0, height/2, -depth/2]} castShadow onClick={onClick}>
           <boxGeometry args={[width, height, 0.3]} />
           <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
         </mesh>
         
-        {/* Front wall with large opening */}
+        {/* Left wall */}
+        <mesh position={[-width/2, height/2, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.3, height, depth]} />
+          <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Right wall */}
+        <mesh position={[width/2, height/2, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.3, height, depth]} />
+          <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Partial front wall with large opening (loading dock) */}
         <mesh position={[0, height - 1, depth/2]} castShadow onClick={onClick}>
           <boxGeometry args={[width, 2, 0.3]} />
           <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
@@ -488,33 +608,65 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
           <meshStandardMaterial color={colors.concrete} metalness={0.1} roughness={0.8} />
         </mesh>
         
-        {/* Roof structure - steel frame */}
-        {Array.from({ length: Math.ceil(depth / 4) }, (_, i) => {
-          const z = (i - Math.floor(depth / 8)) * 4;
+        {/* Roof: flat top with 3-4 triangular roof trusses visible inside */}
+        <mesh position={[0, height + 0.1, 0]} onClick={onClick}>
+          <boxGeometry args={[width + 0.5, 0.2, depth + 0.5]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.7} roughness={0.4} />
+        </mesh>
+        
+        {/* 4 triangular roof trusses made of angled boxes */}
+        {Array.from({ length: 4 }, (_, i) => {
+          const z = (i - 1.5) * depth/3;
           return (
             <group key={`truss-${i}`}>
-              {/* Main roof beam */}
-              <mesh position={[0, height + 0.3, z]} castShadow onClick={onClick}>
-                <boxGeometry args={[width, 0.4, 0.2]} />
+              {/* Main horizontal beam */}
+              <mesh position={[0, height - 0.2, z]} castShadow onClick={onClick}>
+                <boxGeometry args={[width - 1, 0.15, 0.15]} />
                 <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
               </mesh>
               
-              {/* Diagonal roof trusses */}
-              {[-1, 1].map(side => (
-                <mesh key={`truss-diag-${side}`} position={[side * width/4, height + 0.5, z]} rotation={[0, 0, side * Math.PI/12]} castShadow onClick={onClick}>
-                  <boxGeometry args={[width/2, 0.15, 0.15]} />
-                  <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
-                </mesh>
-              ))}
+              {/* Left diagonal */}
+              <mesh position={[-width/4, height - 0.1, z]} rotation={[0, 0, Math.PI/6]} castShadow onClick={onClick}>
+                <boxGeometry args={[width/2, 0.1, 0.1]} />
+                <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
+              </mesh>
+              
+              {/* Right diagonal */}
+              <mesh position={[width/4, height - 0.1, z]} rotation={[0, 0, -Math.PI/6]} castShadow onClick={onClick}>
+                <boxGeometry args={[width/2, 0.1, 0.1]} />
+                <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
+              </mesh>
+              
+              {/* Center vertical support */}
+              <mesh position={[0, height + 0.3, z]} castShadow onClick={onClick}>
+                <boxGeometry args={[0.1, 0.6, 0.1]} />
+                <meshStandardMaterial color={colors.steel} metalness={0.8} roughness={0.3} />
+              </mesh>
             </group>
           );
         })}
         
-        {/* Roof panels */}
-        <mesh position={[0, height + 0.7, 0]} onClick={onClick}>
-          <boxGeometry args={[width + 0.5, 0.1, depth + 0.5]} />
-          <meshStandardMaterial color={colors.mediumSteel} metalness={0.7} roughness={0.4} />
-        </mesh>
+        {/* Columns along walls */}
+        {Array.from({ length: Math.ceil(width / 5) }, (_, i) => {
+          const x = (i - Math.floor(width/10)) * 5;
+          return (
+            <group key={`columns-${i}`}>
+              {/* Back wall column */}
+              <mesh position={[x, height/2, -depth/2 + 0.15]} castShadow onClick={onClick}>
+                <boxGeometry args={[0.3, height, 0.3]} />
+                <meshStandardMaterial color={colors.mediumSteel} metalness={0.6} roughness={0.4} />
+              </mesh>
+              
+              {/* Front wall columns (where wall exists) */}
+              {(Math.abs(x) > width/4) && (
+                <mesh position={[x, height/2, depth/2 - 0.15]} castShadow onClick={onClick}>
+                  <boxGeometry args={[0.3, height, 0.3]} />
+                  <meshStandardMaterial color={colors.mediumSteel} metalness={0.6} roughness={0.4} />
+                </mesh>
+              )}
+            </group>
+          );
+        })}
         
         {/* Loading dock */}
         <mesh position={[0, 0.6, depth/2 + 0.5]} castShadow onClick={onClick}>
@@ -530,13 +682,19 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
           </mesh>
         ))}
         
-        {/* Exterior lighting */}
+        {/* Exterior lights - small emissive boxes on front wall */}
         {Array.from({ length: 4 }, (_, i) => {
-          const x = (i - 1.5) * width/3;
+          const x = (i - 1.5) * width/4;
           return (
             <mesh key={`light-${i}`} position={[x, height - 0.5, depth/2 + 0.2]} castShadow onClick={onClick}>
-              <boxGeometry args={[0.6, 0.3, 0.2]} />
-              <meshStandardMaterial color={colors.darkGray} metalness={0.6} roughness={0.4} />
+              <boxGeometry args={[0.3, 0.2, 0.15]} />
+              <meshStandardMaterial 
+                color="#ffffff" 
+                metalness={0.1} 
+                roughness={0.8}
+                emissive="#ffffff"
+                emissiveIntensity={0.2}
+              />
             </mesh>
           );
         })}
