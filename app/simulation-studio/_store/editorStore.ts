@@ -143,6 +143,7 @@ interface EditorState {
   addProcessNode: (type: ProcessNode['type'], position: [number, number, number]) => void;
   addEnvironmentAsset: (type: EnvironmentAsset['type'], position: [number, number, number]) => void;
   addActor: (type: Actor['type'], position: [number, number, number]) => void;
+  addProduct: (productType: string, position: [number, number, number], nodeId?: string) => void;
   
   // Snapping actions
   setSnapMode: (enabled: boolean) => void;
@@ -288,6 +289,23 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       actors: [...state.actors, newActor],
       selectedObjectId: newActor.id,
       selectedObjectType: 'actor',
+      isDirty: true,
+    }));
+  },
+
+  addProduct: (productType, position, nodeId) => {
+    const newProduct: SimulationItem = {
+      id: uuidv4(),
+      productId: productType,
+      position: position,
+      targetPosition: position,
+      currentNode: nodeId || '',
+      progress: nodeId ? 1 : 0, // If placed on a node, start with full progress
+      speed: 2.0,
+    };
+    
+    set(state => ({
+      simulationItems: [...state.simulationItems, newProduct],
       isDirty: true,
     }));
   },

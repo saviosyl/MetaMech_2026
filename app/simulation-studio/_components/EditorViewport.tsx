@@ -35,13 +35,31 @@ function PlacementPreview({ type, category, position }: { type: string, category
     }
   });
 
+  // Get preview geometry based on category and type
+  const getPreviewGeometry = () => {
+    if (category === 'product') {
+      const productDimensions: Record<string, [number, number, number]> = {
+        'box': [0.25, 0.3, 0.25],
+        'tote': [0.4, 0.4, 0.3],
+        'pallet': [1.2, 0.15, 0.8],
+        'bottle': [0.1, 0.35, 0.1],
+        'bag': [0.3, 0.2, 0.2],
+        'drum': [0.6, 0.9, 0.6],
+      };
+      const dims = productDimensions[type] || [0.25, 0.3, 0.25];
+      return <boxGeometry args={dims} />;
+    } else {
+      return <boxGeometry args={[1, 1, 1]} />;
+    }
+  };
+
   return (
     <group ref={groupRef} position={position}>
       {/* Preview wireframe */}
       <mesh>
-        <boxGeometry args={[1, 1, 1]} />
+        {getPreviewGeometry()}
         <meshBasicMaterial 
-          color="#06b6d4" 
+          color={category === 'product' ? "#f97316" : "#06b6d4"} 
           wireframe 
           transparent 
           opacity={0.6} 
@@ -49,8 +67,8 @@ function PlacementPreview({ type, category, position }: { type: string, category
       </mesh>
       {/* Preview label */}
       <Html position={[0, 1.5, 0]} center>
-        <div className="bg-[#06b6d4] text-white px-2 py-1 rounded text-sm font-medium pointer-events-none">
-          {type.replace('-', ' ')}
+        <div className={`${category === 'product' ? 'bg-[#f97316]' : 'bg-[#06b6d4]'} text-white px-2 py-1 rounded text-sm font-medium pointer-events-none`}>
+          {category === 'product' ? `${type} product` : type.replace('-', ' ')}
         </div>
       </Html>
     </group>
@@ -76,6 +94,7 @@ function Scene() {
     addProcessNode,
     addEnvironmentAsset,
     addActor,
+    addProduct,
     removeObject,
   } = useEditorStore();
 
@@ -88,7 +107,7 @@ function Scene() {
   const [placementMode, setPlacementMode] = useState<{
     active: boolean;
     type: string;
-    category: 'process' | 'environment' | 'actor';
+    category: 'process' | 'environment' | 'actor' | 'product';
   } | null>(null);
   const [previewPosition, setPreviewPosition] = useState<[number, number, number]>([0, 0, 0]);
 
@@ -140,9 +159,21 @@ function Scene() {
       }
     };
 
+    const handleProductPlacementRequest = (event: CustomEvent) => {
+      const { productType } = event.detail;
+      setPlacementMode({ active: true, type: productType, category: 'product' });
+      
+      // Disable orbit controls during placement
+      if (orbitControlsRef.current) {
+        orbitControlsRef.current.enabled = false;
+      }
+    };
+
     window.addEventListener('requestPlacement', handlePlacementRequest as EventListener);
+    window.addEventListener('requestProductPlacement', handleProductPlacementRequest as EventListener);
     return () => {
       window.removeEventListener('requestPlacement', handlePlacementRequest as EventListener);
+      window.removeEventListener('requestProductPlacement', handleProductPlacementRequest as EventListener);
     };
   }, []);
 
@@ -165,6 +196,30 @@ function Scene() {
       case 'actor':
         addActor(type as any, previewPosition);
         break;
+      case 'product':
+        // For products, check if we're near a conveyor and snap to its surface
+        const nearbyConveyor = findNearbyConveyor(previewPosition);
+        if (nearbyConveyor) {
+          // Place product ON TOP of the conveyor (y = conveyor_height + product_height/2)
+          const conveyorHeight = nearbyConveyor.position[1] + 0.5; // Assuming conveyor height is 0.5
+          const productHeight = getProductHeight(type);
+          const productPosition: [number, number, number] = [
+            nearbyConveyor.position[0], 
+            conveyorHeight + productHeight / 2,
+            nearbyConveyor.position[2]
+          ];
+          addProduct(type, productPosition, nearbyConveyor.id);
+        } else {
+          // Place product at preview position if not near a conveyor
+          const productHeight = getProductHeight(type);
+          const productPosition: [number, number, number] = [
+            previewPosition[0], 
+            previewPosition[1] + productHeight / 2,
+            previewPosition[2]
+          ];
+          addProduct(type, productPosition);
+        }
+        break;
     }
     
     // Exit placement mode
@@ -172,6 +227,35 @@ function Scene() {
     if (orbitControlsRef.current) {
       orbitControlsRef.current.enabled = true;
     }
+  };
+
+  // Helper function to find nearby conveyor
+  const findNearbyConveyor = (position: [number, number, number]) => {
+    const snapDistance = 2.0; // Distance to snap to conveyor
+    
+    return processNodes.find(node => {
+      if (node.type === 'conveyor') {
+        const distance = Math.sqrt(
+          Math.pow(node.position[0] - position[0], 2) +
+          Math.pow(node.position[2] - position[2], 2)
+        );
+        return distance <= snapDistance;
+      }
+      return false;
+    });
+  };
+
+  // Helper function to get product height
+  const getProductHeight = (productType: string) => {
+    const heights: Record<string, number> = {
+      'box': 0.3,
+      'tote': 0.4,
+      'pallet': 0.15,
+      'bottle': 0.35,
+      'bag': 0.2,
+      'drum': 0.9,
+    };
+    return heights[productType] || 0.3;
   };
 
   // Handle object selection with raycast
