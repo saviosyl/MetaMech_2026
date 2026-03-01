@@ -311,7 +311,10 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
   };
 
   const renderMachine = () => {
-    return (
+    const machineType = node.parameters?.type || 'cnc';
+    
+    // Common machine base structure
+    const baseMachine = (
       <group>
         {/* Main cabinet body */}
         <mesh position={[0, 1, 0]} castShadow onClick={onClick}>
@@ -326,9 +329,23 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
         </mesh>
         
         {/* Front door panel */}
-        <mesh position={[1.11, 1, 0]} onClick={onClick}>
+        <mesh position={[1.11, 1, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[0.02, 1.5, 1.2]} />
           <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
+        </mesh>
+        
+        {/* Door frame */}
+        <mesh position={[1.11, 1, 0.61]} onClick={onClick}>
+          <boxGeometry args={[0.03, 1.52, 0.02]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[1.11, 1, -0.61]} onClick={onClick}>
+          <boxGeometry args={[0.03, 1.52, 0.02]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[1.11, 1.76, 0]} onClick={onClick}>
+          <boxGeometry args={[0.03, 0.02, 1.22]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.3} />
         </mesh>
         
         {/* Door handle */}
@@ -349,8 +366,14 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
           <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
         </mesh>
         
+        {/* Screen bezel */}
+        <mesh position={[0.815, 2.1, 0.6]} rotation={[0, 0, -0.2]} onClick={onClick}>
+          <boxGeometry args={[0.32, 0.015, 0.22]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
+        </mesh>
+        
         {/* Status tower light pole */}
-        <mesh position={[0, 2.7, 0]} onClick={onClick}>
+        <mesh position={[0, 2.7, 0]} castShadow onClick={onClick}>
           <cylinderGeometry args={[0.02, 0.02, 0.4]} />
           <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
         </mesh>
@@ -378,7 +401,7 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
         ))}
         
         {/* Cable tray on back */}
-        <mesh position={[-1.11, 1.5, 0]} onClick={onClick}>
+        <mesh position={[-1.11, 1.5, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[0.05, 0.2, 1.4]} />
           <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
         </mesh>
@@ -397,6 +420,199 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
         <mesh position={[0.9, 1.8, 0.6]} onClick={onClick}>
           <cylinderGeometry args={[0.03, 0.03, 0.05]} />
           <meshStandardMaterial color={colors.safetyRed} emissive={colors.safetyRed} emissiveIntensity={0.1} />
+        </mesh>
+        
+        {/* Emergency stop button */}
+        <mesh position={[0.6, 2.05, 0.81]} onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.02]} />
+          <meshStandardMaterial color={colors.safetyRed} emissive={colors.safetyRed} emissiveIntensity={0.2} />
+        </mesh>
+        
+        {/* Nameplate */}
+        <mesh position={[1.11, 0.8, 0]} onClick={onClick}>
+          <boxGeometry args={[0.005, 0.15, 0.3]} />
+          <meshStandardMaterial color="#e5e5e5" metalness={0.1} roughness={0.7} />
+        </mesh>
+      </group>
+    );
+
+    // Machine-specific additions
+    let specificFeatures;
+    switch (machineType) {
+      case 'cnc':
+        specificFeatures = (
+          <group>
+            {/* Spindle housing on top */}
+            <mesh position={[0, 2.6, 0]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.15, 0.15, 0.3]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            
+            {/* Tool changer */}
+            <mesh position={[-0.8, 2.5, 0]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.12, 0.12, 0.4]} />
+              <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
+            </mesh>
+            
+            {/* Coolant lines */}
+            <mesh position={[0.4, 2.4, 0.4]} onClick={onClick}>
+              <cylinderGeometry args={[0.01, 0.01, 0.6]} />
+              <meshStandardMaterial color="#0066cc" metalness={0.6} roughness={0.3} />
+            </mesh>
+            
+            {/* Chip conveyor */}
+            <mesh position={[0, 0.1, -1]} onClick={onClick}>
+              <boxGeometry args={[1.5, 0.1, 0.3]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.5} roughness={0.6} />
+            </mesh>
+          </group>
+        );
+        break;
+        
+      case 'assembly':
+        specificFeatures = (
+          <group>
+            {/* Assembly fixtures */}
+            <mesh position={[-0.5, 2.5, 0.3]} castShadow onClick={onClick}>
+              <boxGeometry args={[0.3, 0.2, 0.3]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+            </mesh>
+            <mesh position={[0.5, 2.5, 0.3]} castShadow onClick={onClick}>
+              <boxGeometry args={[0.3, 0.2, 0.3]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+            </mesh>
+            
+            {/* Pneumatic actuators */}
+            <mesh position={[0, 2.6, 0]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.06, 0.06, 0.4]} />
+              <meshStandardMaterial color="#666666" metalness={0.8} roughness={0.2} />
+            </mesh>
+            
+            {/* Air lines */}
+            <mesh position={[-0.7, 2.3, 0]} onClick={onClick}>
+              <cylinderGeometry args={[0.008, 0.008, 0.8]} />
+              <meshStandardMaterial color="#ffff00" metalness={0.3} roughness={0.7} />
+            </mesh>
+            
+            {/* Parts feeder */}
+            <mesh position={[-1, 2.1, 0.5]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.2, 0.15, 0.3]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.6} roughness={0.4} />
+            </mesh>
+          </group>
+        );
+        break;
+        
+      case 'inspection':
+        specificFeatures = (
+          <group>
+            {/* Camera/vision system */}
+            <mesh position={[0, 2.7, 0]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.08, 0.08, 0.15]} />
+              <meshStandardMaterial color="#1a1a1a" metalness={0.8} roughness={0.1} />
+            </mesh>
+            
+            {/* Lens */}
+            <mesh position={[0, 2.7, 0.08]} onClick={onClick}>
+              <cylinderGeometry args={[0.04, 0.04, 0.02]} />
+              <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.05} />
+            </mesh>
+            
+            {/* LED ring lights */}
+            {Array.from({ length: 12 }, (_, i) => {
+              const angle = (i / 12) * Math.PI * 2;
+              const x = Math.cos(angle) * 0.1;
+              const z = Math.sin(angle) * 0.1;
+              return (
+                <mesh key={`led-${i}`} position={[x, 2.65, z]} onClick={onClick}>
+                  <cylinderGeometry args={[0.01, 0.01, 0.02]} />
+                  <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />
+                </mesh>
+              );
+            })}
+            
+            {/* Measurement probe */}
+            <mesh position={[0.3, 2.4, 0]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.02, 0.02, 0.3]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            
+            {/* Inspection table */}
+            <mesh position={[0, 2.15, 0]} onClick={onClick}>
+              <cylinderGeometry args={[0.4, 0.4, 0.05]} />
+              <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.8} />
+            </mesh>
+          </group>
+        );
+        break;
+        
+      case 'packaging':
+        specificFeatures = (
+          <group>
+            {/* Sealing bars */}
+            <mesh position={[0, 2.6, 0.4]} castShadow onClick={onClick}>
+              <boxGeometry args={[0.6, 0.05, 0.05]} />
+              <meshStandardMaterial color="#cc6600" metalness={0.7} roughness={0.3} />
+            </mesh>
+            <mesh position={[0, 2.6, -0.4]} castShadow onClick={onClick}>
+              <boxGeometry args={[0.6, 0.05, 0.05]} />
+              <meshStandardMaterial color="#cc6600" metalness={0.7} roughness={0.3} />
+            </mesh>
+            
+            {/* Film roller */}
+            <mesh position={[-0.8, 2.8, 0]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.1, 0.1, 0.8]} />
+              <meshStandardMaterial color="#cccccc" metalness={0.5} roughness={0.6} />
+            </mesh>
+            
+            {/* Cutting blade */}
+            <mesh position={[0.6, 2.5, 0]} onClick={onClick}>
+              <boxGeometry args={[0.02, 0.3, 0.6]} />
+              <meshStandardMaterial color="#c0c0c0" metalness={0.9} roughness={0.1} />
+            </mesh>
+            
+            {/* Label dispenser */}
+            <mesh position={[0, 2.8, 0.6]} castShadow onClick={onClick}>
+              <boxGeometry args={[0.3, 0.15, 0.2]} />
+              <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
+            </mesh>
+            
+            {/* Conveyor integration */}
+            <mesh position={[0, 2.2, -0.8]} castShadow onClick={onClick}>
+              <boxGeometry args={[1.8, 0.1, 0.3]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+            </mesh>
+          </group>
+        );
+        break;
+    }
+
+    return (
+      <group>
+        {baseMachine}
+        {specificFeatures}
+        
+        {/* Connection ports for snapping */}
+        <mesh position={[0, 0.5, -1]} onClick={onClick}>
+          <sphereGeometry args={[0.05]} />
+          <meshStandardMaterial 
+            color="#22c55e" 
+            emissive="#22c55e" 
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+        
+        <mesh position={[0, 0.5, 1]} onClick={onClick}>
+          <sphereGeometry args={[0.05]} />
+          <meshStandardMaterial 
+            color="#3b82f6" 
+            emissive="#3b82f6" 
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.8}
+          />
         </mesh>
       </group>
     );

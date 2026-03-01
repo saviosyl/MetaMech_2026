@@ -20,6 +20,7 @@ import EnvironmentAssetComponent from './assets/EnvironmentAssetComponent';
 import ActorComponent from './assets/ActorComponent';
 import SimulationItem from './SimulationItem';
 import EdgeComponent from './EdgeComponent';
+import ConnectionManager from './ConnectionManager';
 
 // Placement preview component
 function PlacementPreview({ type, category, position }: { type: string, category: string, position: [number, number, number] }) {
@@ -496,6 +497,9 @@ function Scene() {
           </div>
         </Html>
       )}
+
+      {/* Connection Manager for snapping */}
+      <ConnectionManager />
     </>
   );
 }
