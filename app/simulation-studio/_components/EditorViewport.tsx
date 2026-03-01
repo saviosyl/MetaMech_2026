@@ -30,12 +30,15 @@ function PlacementPreview({ type, category, position }: { type: string, category
     if (groupRef.current) {
       // Gentle floating animation
       groupRef.current.position.y = position[1] + Math.sin(clock.getElapsedTime() * 3) * 0.1;
-      // Gentle rotation
+      // Gentle rotation for better visibility
       groupRef.current.rotation.y = clock.getElapsedTime() * 0.5;
+      // Pulse scale effect
+      const scale = 1 + Math.sin(clock.getElapsedTime() * 4) * 0.05;
+      groupRef.current.scale.setScalar(scale);
     }
   });
 
-  // Get preview geometry based on category and type
+  // Get preview geometry based on category and type with more detail
   const getPreviewGeometry = () => {
     if (category === 'product') {
       const productDimensions: Record<string, [number, number, number]> = {
@@ -48,8 +51,47 @@ function PlacementPreview({ type, category, position }: { type: string, category
       };
       const dims = productDimensions[type] || [0.25, 0.3, 0.25];
       return <boxGeometry args={dims} />;
+    } else if (category === 'process') {
+      // Different geometries for different process types
+      if (type.includes('conveyor')) {
+        return <boxGeometry args={[1, 0.3, 5]} />;
+      } else if (type === 'machine') {
+        return <boxGeometry args={[1.5, 2, 1.5]} />;
+      } else if (type === 'buffer') {
+        return <boxGeometry args={[1, 1.5, 1]} />;
+      } else if (type === 'source' || type === 'sink') {
+        return <boxGeometry args={[1, 1, 1]} />;
+      } else {
+        return <boxGeometry args={[1.5, 1, 1.5]} />;
+      }
+    } else if (category === 'environment') {
+      if (type === 'wall') {
+        return <boxGeometry args={[5, 3, 0.2]} />;
+      } else if (type === 'pallet-rack') {
+        return <boxGeometry args={[3, 4, 1.2]} />;
+      } else {
+        return <boxGeometry args={[2, 2, 2]} />;
+      }
+    } else if (category === 'actor') {
+      if (type === 'forklift') {
+        return <boxGeometry args={[1.2, 1.8, 2.5]} />;
+      } else if (type === 'agv') {
+        return <boxGeometry args={[1.2, 0.3, 2]} />;
+      } else {
+        return <boxGeometry args={[0.5, 2, 0.5]} />;
+      }
     } else {
       return <boxGeometry args={[1, 1, 1]} />;
+    }
+  };
+
+  const getColor = () => {
+    switch (category) {
+      case 'product': return "#f97316";
+      case 'process': return "#06b6d4";
+      case 'environment': return "#22c55e"; 
+      case 'actor': return "#8b5cf6";
+      default: return "#06b6d4";
     }
   };
 
@@ -59,18 +101,39 @@ function PlacementPreview({ type, category, position }: { type: string, category
       <mesh>
         {getPreviewGeometry()}
         <meshBasicMaterial 
-          color={category === 'product' ? "#f97316" : "#06b6d4"} 
+          color={getColor()} 
           wireframe 
           transparent 
-          opacity={0.6} 
+          opacity={0.7} 
+        />
+      </mesh>
+      {/* Solid preview (slightly transparent) */}
+      <mesh>
+        {getPreviewGeometry()}
+        <meshStandardMaterial 
+          color={getColor()} 
+          transparent 
+          opacity={0.2} 
         />
       </mesh>
       {/* Preview label */}
-      <Html position={[0, 1.5, 0]} center>
-        <div className={`${category === 'product' ? 'bg-[#f97316]' : 'bg-[#06b6d4]'} text-white px-2 py-1 rounded text-sm font-medium pointer-events-none`}>
-          {category === 'product' ? `${type} product` : type.replace('-', ' ')}
+      <Html position={[0, 1.8, 0]} center>
+        <div 
+          className="text-white px-3 py-1 rounded-lg text-sm font-medium pointer-events-none shadow-lg"
+          style={{ backgroundColor: getColor() }}
+        >
+          {type.replace('-', ' ').replace('_', ' ')}
         </div>
       </Html>
+      {/* Ground projection circle */}
+      <mesh position={[0, -position[1] + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.8, 1.2]} />
+        <meshBasicMaterial 
+          color={getColor()} 
+          transparent 
+          opacity={0.3} 
+        />
+      </mesh>
     </group>
   );
 }
@@ -167,7 +230,17 @@ function Scene() {
         intersection.z = Math.round(intersection.z / gridSize) * gridSize;
         intersection.y = 0;
         
-        setPreviewPosition([intersection.x, intersection.y, intersection.z]);
+        // Adjust Y position based on object type
+        let yOffset = 0;
+        if (placementMode.category === 'process' && placementMode.type.includes('conveyor')) {
+          yOffset = 0.15; // Conveyor base height
+        } else if (placementMode.category === 'environment' && placementMode.type === 'wall') {
+          yOffset = 1.5; // Wall center height
+        } else if (placementMode.category === 'actor') {
+          yOffset = placementMode.type === 'agv' ? 0.15 : 1; // AGV or human height
+        }
+        
+        setPreviewPosition([intersection.x, yOffset, intersection.z]);
       }
     };
 
@@ -217,16 +290,22 @@ function Scene() {
     
     const { type, category } = placementMode;
     
+    // Place the object and get the new object ID for selection
+    let newObjectId: string | null = null;
+    
     // Place the object
     switch (category) {
       case 'process':
         addProcessNode(type as any, previewPosition);
+        // The store will automatically select the newly added object
         break;
       case 'environment':
         addEnvironmentAsset(type as any, previewPosition);
+        // The store will automatically select the newly added object
         break;
       case 'actor':
         addActor(type as any, previewPosition);
+        // The store will automatically select the newly added object
         break;
       case 'product':
         // For products, check if we're near a conveyor and snap to its surface
@@ -259,6 +338,17 @@ function Scene() {
     if (orbitControlsRef.current) {
       orbitControlsRef.current.enabled = true;
     }
+    
+    // Brief delay to ensure the object is rendered before trying to attach transform controls
+    setTimeout(() => {
+      // The store automatically selects the new object, so transform controls should attach
+      if (transformControlsRef.current && selectedObjectId) {
+        const target = scene.getObjectByName(selectedObjectId);
+        if (target) {
+          transformControlsRef.current.attach(target);
+        }
+      }
+    }, 100);
   };
 
   // Helper function to find nearby conveyor
@@ -380,12 +470,16 @@ function Scene() {
         if (orbitControlsRef.current) {
           orbitControlsRef.current.enabled = true;
         }
+        // Dispatch event to inform main page
+        window.dispatchEvent(new CustomEvent('placementCanceled'));
         return;
       }
 
       // Delete key
       if (e.key === 'Delete' && selectedObjectId && selectedObjectType) {
-        removeObject(selectedObjectId, selectedObjectType);
+        if (confirm('Are you sure you want to delete this object?')) {
+          removeObject(selectedObjectId, selectedObjectType);
+        }
         return;
       }
 
@@ -643,11 +737,15 @@ function Scene() {
 
       {/* Placement instructions */}
       {placementMode?.active && (
-        <Html position={[0, 5, 0]} center>
-          <div className="bg-[#06b6d4] text-white px-4 py-2 rounded-lg shadow-lg pointer-events-none">
-            <div className="text-center">
-              <div className="font-medium">Placing: {placementMode.type.replace('-', ' ')}</div>
-              <div className="text-sm opacity-90">Click to place • ESC to cancel</div>
+        <Html position={[0, 6, 0]} center>
+          <div className="bg-[#252536] border border-[#3a3a4a] text-[#e0e0e0] px-4 py-3 rounded-lg shadow-xl pointer-events-none backdrop-blur-sm">
+            <div className="text-center space-y-1">
+              <div className="font-semibold text-lg">Placing: {placementMode.type.replace('-', ' ')}</div>
+              <div className="text-sm text-[#888] space-y-0.5">
+                <div>• <span className="text-[#06b6d4]">Click</span> to place at cursor position</div>
+                <div>• <span className="text-[#06b6d4]">ESC</span> to cancel placement mode</div>
+                <div>• Objects snap to 0.5m grid automatically</div>
+              </div>
             </div>
           </div>
         </Html>
