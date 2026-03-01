@@ -427,41 +427,35 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
   const renderForklift = () => {
     return (
       <group>
-        {/* Main chassis body */}
+        {/* Chassis body: box, yellow #eab308 */}
         <mesh position={[0, 0.4, -0.5]} castShadow onClick={onClick}>
           <boxGeometry args={[1.2, 0.6, 2]} />
-          <meshStandardMaterial color={colors.forkliftYellow} metalness={0.4} roughness={0.6} />
+          <meshStandardMaterial color="#eab308" metalness={0.4} roughness={0.6} />
         </mesh>
         
-        {/* Engine compartment hood */}
-        <mesh position={[0, 0.5, -1.3]} castShadow onClick={onClick}>
-          <boxGeometry args={[1.1, 0.4, 0.6]} />
-          <meshStandardMaterial color={colors.forkliftYellow} metalness={0.4} roughness={0.6} />
+        {/* Counterweight: heavy dark box at rear, slightly wider */}
+        <mesh position={[0, 0.5, -1.6]} castShadow onClick={onClick}>
+          <boxGeometry args={[1.3, 0.8, 0.4]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.6} roughness={0.4} />
         </mesh>
         
-        {/* Driver cabin frame */}
-        <mesh position={[0, 1.3, 0.3]} castShadow onClick={onClick}>
-          <boxGeometry args={[1.1, 0.05, 1.4]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
-        </mesh>
-        
-        {/* Cabin roof */}
-        <mesh position={[0, 1.8, 0.3]} onClick={onClick}>
-          <boxGeometry args={[1.2, 0.03, 1.5]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.7} roughness={0.3} />
-        </mesh>
-        
-        {/* Overhead guard - 4 posts */}
+        {/* Driver compartment: frame (4 posts + roof) */}
         {[-0.5, 0.5].map(x =>
           [-0.4, 1].map(z => (
-            <mesh key={`guard-${x}-${z}`} position={[x, 1.55, z]} castShadow onClick={onClick}>
+            <mesh key={`frame-post-${x}-${z}`} position={[x, 1.55, z]} castShadow onClick={onClick}>
               <cylinderGeometry args={[0.03, 0.03, 1]} />
               <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
             </mesh>
           ))
         )}
         
-        {/* Driver seat */}
+        {/* Compartment roof */}
+        <mesh position={[0, 1.8, 0.3]} onClick={onClick}>
+          <boxGeometry args={[1.2, 0.03, 1.5]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* Seat: small box inside compartment */}
         <mesh position={[0, 1.0, 0.2]} castShadow onClick={onClick}>
           <boxGeometry args={[0.5, 0.1, 0.5]} />
           <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
@@ -473,51 +467,52 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
           <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
         </mesh>
         
-        {/* Steering wheel */}
-        <mesh position={[0, 1.4, 0.4]} rotation={[-0.3, 0, 0]} onClick={onClick}>
-          <torusGeometry args={[0.15, 0.02]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
-        </mesh>
-        
-        {/* Steering column */}
+        {/* Steering column: thin cylinder + small torus (wheel) */}
         <mesh position={[0, 1.2, 0.3]} rotation={[-0.3, 0, 0]} onClick={onClick}>
           <cylinderGeometry args={[0.02, 0.02, 0.3]} />
           <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.4} />
         </mesh>
         
-        {/* Mast structure - two vertical channels */}
-        <mesh position={[-0.25, 2, 1.2]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.08, 3.5, 0.08]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
-        </mesh>
-        <mesh position={[0.25, 2, 1.2]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.08, 3.5, 0.08]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        <mesh position={[0, 1.4, 0.4]} rotation={[-0.3, 0, 0]} onClick={onClick}>
+          <torusGeometry args={[0.15, 0.02]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
         </mesh>
         
-        {/* Mast cross braces */}
-        {[1, 2, 3].map(i => (
-          <mesh key={`brace-${i}`} position={[0, 0.5 + i * 0.8, 1.2]} onClick={onClick}>
-            <boxGeometry args={[0.5, 0.04, 0.04]} />
-            <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
-          </mesh>
+        {/* Mast: 2 vertical C-channel posts (each = 3 thin boxes) */}
+        {[-0.25, 0.25].map(x => (
+          <group key={`mast-${x}`}>
+            {/* Main vertical post */}
+            <mesh position={[x, 2, 1.2]} castShadow onClick={onClick}>
+              <boxGeometry args={[0.08, 3.5, 0.08]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+            </mesh>
+            {/* C-channel flanges */}
+            <mesh position={[x + (x > 0 ? -0.04 : 0.04), 2, 1.16]} onClick={onClick}>
+              <boxGeometry args={[0.04, 3.5, 0.02]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+            </mesh>
+            <mesh position={[x + (x > 0 ? -0.04 : 0.04), 2, 1.24]} onClick={onClick}>
+              <boxGeometry args={[0.04, 3.5, 0.02]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+            </mesh>
+          </group>
         ))}
         
-        {/* Fork carriage plate */}
+        {/* Fork carriage: flat plate between masts */}
         <mesh position={[0, 1.5, 1.24]} castShadow onClick={onClick}>
           <boxGeometry args={[0.6, 0.8, 0.08]} />
           <meshStandardMaterial color={colors.lightSteel} metalness={0.7} roughness={0.3} />
         </mesh>
         
-        {/* Fork tines - L-shaped cross section */}
+        {/* 2 Forks: L-shaped (horizontal prong + vertical back plate each) */}
         {[-0.2, 0.2].map(x => (
           <group key={`fork-${x}`}>
-            {/* Horizontal fork blade */}
+            {/* Horizontal prong */}
             <mesh position={[x, 1.2, 1.8]} castShadow onClick={onClick}>
               <boxGeometry args={[0.08, 0.04, 1.2]} />
               <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.2} />
             </mesh>
-            {/* Vertical fork back */}
+            {/* Vertical back plate */}
             <mesh position={[x, 1.35, 1.28]} castShadow onClick={onClick}>
               <boxGeometry args={[0.08, 0.3, 0.04]} />
               <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.2} />
@@ -525,7 +520,7 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
           </group>
         ))}
         
-        {/* Hydraulic lift cylinders */}
+        {/* Hydraulic cylinders: 2 thin shiny cylinders along masts */}
         <mesh position={[-0.15, 2.5, 1.05]} castShadow onClick={onClick}>
           <cylinderGeometry args={[0.04, 0.04, 2]} />
           <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
@@ -535,67 +530,90 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
           <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
         </mesh>
         
-        {/* Four wheels - front smaller, rear larger */}
-        {/* Front wheels (steerable, smaller) */}
+        {/* 4 Wheels: each = dark cylinder (tire, roughness:0.9) + lighter cylinder (hub, metalness:0.8) */}
+        {/* Front wheels */}
         <mesh position={[-0.5, 0.25, 1]} rotation={[Math.PI/2, 0, 0]} castShadow onClick={onClick}>
           <cylinderGeometry args={[0.25, 0.25, 0.2]} />
           <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
         </mesh>
-        <mesh position={[0.5, 0.25, 1]} rotation={[Math.PI/2, 0, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.25, 0.25, 0.2]} />
-          <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
-        </mesh>
-        
-        {/* Front wheel hubs */}
         <mesh position={[-0.5, 0.25, 1]} rotation={[Math.PI/2, 0, 0]} onClick={onClick}>
           <cylinderGeometry args={[0.15, 0.15, 0.05]} />
           <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        
+        <mesh position={[0.5, 0.25, 1]} rotation={[Math.PI/2, 0, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.25, 0.25, 0.2]} />
+          <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
         </mesh>
         <mesh position={[0.5, 0.25, 1]} rotation={[Math.PI/2, 0, 0]} onClick={onClick}>
           <cylinderGeometry args={[0.15, 0.15, 0.05]} />
           <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
         </mesh>
         
-        {/* Rear wheels (drive, larger) */}
+        {/* Rear wheels */}
         <mesh position={[-0.5, 0.35, -1]} rotation={[Math.PI/2, 0, 0]} castShadow onClick={onClick}>
           <cylinderGeometry args={[0.35, 0.35, 0.25]} />
           <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
         </mesh>
-        <mesh position={[0.5, 0.35, -1]} rotation={[Math.PI/2, 0, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.35, 0.35, 0.25]} />
-          <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
-        </mesh>
-        
-        {/* Rear wheel hubs */}
         <mesh position={[-0.5, 0.35, -1]} rotation={[Math.PI/2, 0, 0]} onClick={onClick}>
           <cylinderGeometry args={[0.2, 0.2, 0.05]} />
           <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        
+        <mesh position={[0.5, 0.35, -1]} rotation={[Math.PI/2, 0, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.35, 0.35, 0.25]} />
+          <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
         </mesh>
         <mesh position={[0.5, 0.35, -1]} rotation={[Math.PI/2, 0, 0]} onClick={onClick}>
           <cylinderGeometry args={[0.2, 0.2, 0.05]} />
           <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
         </mesh>
         
-        {/* Counterweight at back */}
-        <mesh position={[0, 0.5, -1.6]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.9, 0.8, 0.4]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.6} roughness={0.4} />
+        {/* Overhead guard: 4 posts + flat frame on top */}
+        {[-0.5, 0.5].map(x =>
+          [-0.4, 1].map(z => (
+            <mesh key={`guard-${x}-${z}`} position={[x, 1.55, z]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.03, 0.03, 1]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+            </mesh>
+          ))
+        )}
+        
+        <mesh position={[0, 1.8, 0.3]} onClick={onClick}>
+          <boxGeometry args={[1.2, 0.03, 1.5]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.7} roughness={0.3} />
         </mesh>
         
-        {/* Warning beacon on top */}
+        {/* Warning beacon: small orange emissive sphere on roof */}
         <mesh position={[0, 1.85, 0.8]} onClick={onClick}>
-          <cylinderGeometry args={[0.06, 0.06, 0.08]} />
-          <meshStandardMaterial color={colors.safetyRed} emissive={colors.safetyRed} emissiveIntensity={0.2} />
+          <sphereGeometry args={[0.06]} />
+          <meshStandardMaterial color="#f97316" emissive="#f97316" emissiveIntensity={0.3} />
         </mesh>
         
-        {/* Side mirrors */}
-        <mesh position={[-0.7, 1.6, 0.8]} onClick={onClick}>
-          <boxGeometry args={[0.15, 0.1, 0.02]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.9} roughness={0.1} />
+        {/* Headlights: 2 small white rectangles on front */}
+        <mesh position={[-0.3, 0.6, 1.1]} onClick={onClick}>
+          <boxGeometry args={[0.15, 0.08, 0.05]} />
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.2} />
         </mesh>
-        <mesh position={[0.7, 1.6, 0.8]} onClick={onClick}>
-          <boxGeometry args={[0.15, 0.1, 0.02]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.9} roughness={0.1} />
+        <mesh position={[0.3, 0.6, 1.1]} onClick={onClick}>
+          <boxGeometry args={[0.15, 0.08, 0.05]} />
+          <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.2} />
+        </mesh>
+        
+        {/* Rear lights: 2 small red rectangles on back */}
+        <mesh position={[-0.3, 0.6, -1.7]} onClick={onClick}>
+          <boxGeometry args={[0.12, 0.06, 0.03]} />
+          <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.2} />
+        </mesh>
+        <mesh position={[0.3, 0.6, -1.7]} onClick={onClick}>
+          <boxGeometry args={[0.12, 0.06, 0.03]} />
+          <meshStandardMaterial color="#ef4444" emissive="#ef4444" emissiveIntensity={0.2} />
+        </mesh>
+        
+        {/* Step plate: small box on side for driver step */}
+        <mesh position={[-0.7, 0.3, 0.2]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.3, 0.08, 0.4]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.7} roughness={0.4} />
         </mesh>
       </group>
     );
@@ -604,65 +622,19 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
   const renderAGV = () => {
     return (
       <group>
-        {/* Main platform body - low and flat */}
+        {/* Low flat platform body (box, dark gray with blue accent stripe) */}
         <mesh position={[0, 0.15, 0]} castShadow onClick={onClick}>
           <boxGeometry args={[1.2, 0.3, 2]} />
-          <meshStandardMaterial color={colors.agvBlue} metalness={0.6} roughness={0.4} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.6} roughness={0.4} />
         </mesh>
         
-        {/* Chassis frame underneath */}
-        <mesh position={[0, 0.08, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[1, 0.16, 1.8]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        {/* Blue accent stripe */}
+        <mesh position={[0, 0.31, 0]} onClick={onClick}>
+          <boxGeometry args={[1.15, 0.02, 1.95]} />
+          <meshStandardMaterial color="#2563eb" metalness={0.3} roughness={0.6} />
         </mesh>
         
-        {/* Battery compartment */}
-        <mesh position={[0, 0.25, -0.6]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.8, 0.2, 0.6]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
-        </mesh>
-        
-        {/* Control electronics box */}
-        <mesh position={[0, 0.25, 0.6]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.6, 0.2, 0.4]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
-        </mesh>
-        
-        {/* Sensor dome (LIDAR) on top */}
-        <mesh position={[0, 0.45, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.08, 0.08, 0.12]} />
-          <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
-        </mesh>
-        
-        {/* Sensor dome lens */}
-        <mesh position={[0, 0.51, 0]} onClick={onClick}>
-          <cylinderGeometry args={[0.06, 0.06, 0.02]} />
-          <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
-        </mesh>
-        
-        {/* Navigation cameras */}
-        {[-0.3, 0.3].map(x => (
-          <mesh key={`camera-${x}`} position={[x, 0.35, 0.9]} onClick={onClick}>
-            <cylinderGeometry args={[0.03, 0.03, 0.06]} />
-            <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.2} />
-          </mesh>
-        ))}
-        
-        {/* Camera lenses */}
-        {[-0.3, 0.3].map(x => (
-          <mesh key={`lens-${x}`} position={[x, 0.35, 0.93]} onClick={onClick}>
-            <cylinderGeometry args={[0.02, 0.02, 0.01]} />
-            <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
-          </mesh>
-        ))}
-        
-        {/* LED status strip */}
-        <mesh position={[0, 0.31, 1]} name="ledStrip" onClick={onClick}>
-          <boxGeometry args={[0.8, 0.02, 0.02]} />
-          <meshStandardMaterial color={colors.safetyGreen} emissive={colors.safetyGreen} emissiveIntensity={0.2} />
-        </mesh>
-        
-        {/* Mecanum wheels (special omni-directional wheels) */}
+        {/* 4 mecanum wheels (cylinders at corners, visible underneath) */}
         {[-0.5, 0.5].map(x =>
           [-0.8, 0.8].map(z => (
             <group key={`wheel-${x}-${z}`}>
@@ -687,9 +659,75 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
           ))
         )}
         
-        {/* Emergency stop button */}
+        {/* LIDAR dome: hemisphere on top center */}
+        <mesh position={[0, 0.45, 0]} castShadow onClick={onClick}>
+          <sphereGeometry args={[0.08, 16, 8, 0, Math.PI * 2, 0, Math.PI/2]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* LIDAR dome lens */}
+        <mesh position={[0, 0.51, 0]} onClick={onClick}>
+          <cylinderGeometry args={[0.06, 0.06, 0.02]} />
+          <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
+        </mesh>
+        
+        {/* 2 navigation cameras: small boxes on front corners */}
+        {[-0.3, 0.3].map(x => (
+          <mesh key={`camera-${x}`} position={[x, 0.35, 0.9]} castShadow onClick={onClick}>
+            <boxGeometry args={[0.06, 0.04, 0.08]} />
+            <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.2} />
+          </mesh>
+        ))}
+        
+        {/* Camera lenses */}
+        {[-0.3, 0.3].map(x => (
+          <mesh key={`lens-${x}`} position={[x, 0.35, 0.94]} onClick={onClick}>
+            <cylinderGeometry args={[0.015, 0.015, 0.01]} />
+            <meshStandardMaterial color="#000000" metalness={0.9} roughness={0.1} />
+          </mesh>
+        ))}
+        
+        {/* LED strip: thin emissive teal bar running around platform edge */}
+        <mesh position={[0, 0.31, 1]} name="ledStrip" onClick={onClick}>
+          <boxGeometry args={[1.1, 0.01, 0.01]} />
+          <meshStandardMaterial color="#14b8a6" emissive="#14b8a6" emissiveIntensity={0.3} />
+        </mesh>
+        <mesh position={[0, 0.31, -1]} onClick={onClick}>
+          <boxGeometry args={[1.1, 0.01, 0.01]} />
+          <meshStandardMaterial color="#14b8a6" emissive="#14b8a6" emissiveIntensity={0.3} />
+        </mesh>
+        <mesh position={[0.6, 0.31, 0]} onClick={onClick}>
+          <boxGeometry args={[0.01, 0.01, 1.8]} />
+          <meshStandardMaterial color="#14b8a6" emissive="#14b8a6" emissiveIntensity={0.3} />
+        </mesh>
+        <mesh position={[-0.6, 0.31, 0]} onClick={onClick}>
+          <boxGeometry args={[0.01, 0.01, 1.8]} />
+          <meshStandardMaterial color="#14b8a6" emissive="#14b8a6" emissiveIntensity={0.3} />
+        </mesh>
+        
+        {/* Sensor bumper: thin curved box on front edge */}
+        <mesh position={[0, 0.12, 1.01]} castShadow onClick={onClick}>
+          <boxGeometry args={[1, 0.04, 0.02]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        
+        {/* Battery indicator: small rectangles on side (green blocks) */}
+        {Array.from({ length: 5 }, (_, i) => (
+          <mesh key={`battery-${i}`} position={[-0.61, 0.25, -0.4 + i * 0.2]} onClick={onClick}>
+            <boxGeometry args={[0.02, 0.06, 0.15]} />
+            <meshStandardMaterial color={colors.safetyGreen} emissive={colors.safetyGreen} emissiveIntensity={0.1} />
+          </mesh>
+        ))}
+        
+        {/* Logo plate: small rectangle on top */}
+        <mesh position={[0, 0.31, -0.5]} onClick={onClick}>
+          <boxGeometry args={[0.3, 0.005, 0.2]} />
+          <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Emergency stop: small red circle on top */}
         <mesh position={[0.4, 0.32, 0]} onClick={onClick}>
-          <cylinderGeometry args={[0.04, 0.04, 0.03]} />
+          <cylinderGeometry args={[0.04, 0.04, 0.02]} />
           <meshStandardMaterial color={colors.safetyRed} metalness={0.4} roughness={0.6} />
         </mesh>
         
@@ -699,29 +737,23 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
           <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.3} />
         </mesh>
         
-        {/* Safety bumper sensors around perimeter */}
-        {[-0.6, 0, 0.6].map(x => (
-          <mesh key={`bumper-front-${x}`} position={[x, 0.12, 1.01]} onClick={onClick}>
-            <boxGeometry args={[0.05, 0.04, 0.02]} />
-            <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
-          </mesh>
-        ))}
-        
-        {/* Load indicators */}
-        {[-0.2, 0.2].map(x => (
-          <mesh key={`load-indicator-${x}`} position={[x, 0.32, -0.2]} onClick={onClick}>
-            <cylinderGeometry args={[0.02, 0.02, 0.01]} />
-            <meshStandardMaterial color={colors.safetyGreen} emissive={colors.safetyGreen} emissiveIntensity={0.1} />
-          </mesh>
-        ))}
-        
         {/* Charging contacts on side */}
         {[0, 1].map(i => (
-          <mesh key={`contact-${i}`} position={[-0.61, 0.2, -0.2 + i * 0.1]} onClick={onClick}>
+          <mesh key={`contact-${i}`} position={[-0.61, 0.15, -0.1 + i * 0.2]} onClick={onClick}>
             <cylinderGeometry args={[0.02, 0.02, 0.02]} />
             <meshStandardMaterial color={colors.lightSteel} metalness={0.9} roughness={0.1} />
           </mesh>
         ))}
+        
+        {/* Status lights */}
+        <mesh position={[0.2, 0.32, -0.3]} onClick={onClick}>
+          <cylinderGeometry args={[0.015, 0.015, 0.01]} />
+          <meshStandardMaterial color={colors.safetyGreen} emissive={colors.safetyGreen} emissiveIntensity={0.4} />
+        </mesh>
+        <mesh position={[0.35, 0.32, -0.3]} onClick={onClick}>
+          <cylinderGeometry args={[0.015, 0.015, 0.01]} />
+          <meshStandardMaterial color="#fbbf24" emissive="#fbbf24" emissiveIntensity={0.3} />
+        </mesh>
       </group>
     );
   };
