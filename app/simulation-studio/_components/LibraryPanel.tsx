@@ -49,6 +49,14 @@ const libraryItems = {
     { type: 'forklift', name: 'Forklift', icon: '🚗', description: 'Material handling vehicle' },
     { type: 'agv', name: 'AGV', icon: '🤖', description: 'Automated guided vehicle' },
   ],
+  products: [
+    { type: 'box', name: 'Cardboard Box', icon: '📦', description: 'Standard shipping box' },
+    { type: 'tote', name: 'Plastic Tote', icon: '🪣', description: 'Reusable storage container' },
+    { type: 'pallet', name: 'Wooden Pallet', icon: '🪵', description: 'Euro standard pallet' },
+    { type: 'bottle', name: 'Glass Bottle', icon: '🍾', description: 'Beverage container' },
+    { type: 'bag', name: 'Flexible Bag', icon: '👜', description: 'Flexible packaging' },
+    { type: 'drum', name: 'Metal Drum', icon: '🛢️', description: 'Industrial container' },
+  ],
 } as const;
 
 interface LibraryItemProps {
@@ -123,6 +131,7 @@ export default function LibraryPanel() {
     { id: 'process', name: 'Process', icon: Package },
     { id: 'environment', name: 'Environment', icon: Building },
     { id: 'actors', name: 'Actors', icon: Users },
+    { id: 'products', name: 'Products', icon: Box },
     { id: 'samples', name: 'Samples', icon: Settings },
   ] as const;
 
@@ -130,6 +139,13 @@ export default function LibraryPanel() {
     // Request placement mode in viewport
     window.dispatchEvent(new CustomEvent('requestPlacement', {
       detail: { type, category }
+    }));
+  };
+
+  const handleAddProduct = (productType: string) => {
+    // Request product placement mode - products should be dragged onto conveyors
+    window.dispatchEvent(new CustomEvent('requestProductPlacement', {
+      detail: { productType }
     }));
   };
 
@@ -177,7 +193,7 @@ export default function LibraryPanel() {
     }, 50);
   };
 
-  const currentItems = activeLibraryTab === 'samples' ? [] : libraryItems[activeLibraryTab];
+  const currentItems = (activeLibraryTab === 'samples' || activeLibraryTab === 'products') ? [] : libraryItems[activeLibraryTab];
   
   const sampleLayouts = [
     { 
@@ -247,6 +263,9 @@ export default function LibraryPanel() {
             {activeLibraryTab === 'actors' && 
               'People and vehicles that operate within your simulation.'
             }
+            {activeLibraryTab === 'products' && 
+              'Products and materials that flow through your simulation. Drag onto conveyors.'
+            }
             {activeLibraryTab === 'samples' && 
               'Pre-built sample layouts to get started quickly.'
             }
@@ -260,6 +279,16 @@ export default function LibraryPanel() {
                   key={layout.id}
                   item={layout}
                   onAdd={() => createSampleLayout(layout.id)}
+                />
+              ))}
+            </div>
+          ) : activeLibraryTab === 'products' ? (
+            <div className="space-y-2">
+              {libraryItems.products.map((product) => (
+                <LibraryItem
+                  key={product.type}
+                  item={product}
+                  onAdd={() => handleAddProduct(product.type)}
                 />
               ))}
             </div>

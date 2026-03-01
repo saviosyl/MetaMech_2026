@@ -62,95 +62,143 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
   const renderOperator = () => {
     return (
       <group>
-        {/* Body - capsule shape using cylinder + spheres */}
+        {/* Torso - proper box body */}
         <mesh position={[0, 1.4, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.18, 0.22, 0.8]} />
+          <boxGeometry args={[0.36, 0.7, 0.2]} />
           <meshStandardMaterial color={colors.operatorBlue} metalness={0.1} roughness={0.8} />
         </mesh>
         
-        {/* Chest/shoulders - upper body bulk */}
-        <mesh position={[0, 1.65, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.45, 0.3, 0.2]} />
-          <meshStandardMaterial color={colors.operatorBlue} metalness={0.1} roughness={0.8} />
-        </mesh>
-        
-        {/* Head */}
+        {/* Head with slight face indication */}
         <mesh position={[0, 1.95, 0]} castShadow onClick={onClick}>
           <sphereGeometry args={[0.12]} />
           <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
         </mesh>
         
-        {/* Hard hat */}
-        <mesh position={[0, 2.08, 0]} castShadow onClick={onClick}>
-          <sphereGeometry args={[0.14]} />
+        {/* Nose bump for face indication */}
+        <mesh position={[0, 1.95, 0.1]} onClick={onClick}>
+          <sphereGeometry args={[0.02]} />
+          <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Yellow hard hat - flattened hemisphere */}
+        <mesh position={[0, 2.05, 0]} castShadow onClick={onClick}>
+          <sphereGeometry args={[0.14, 16, 8, 0, Math.PI * 2, 0, Math.PI/2]} />
           <meshStandardMaterial color={colors.hardHatYellow} metalness={0.4} roughness={0.6} />
         </mesh>
         
         {/* Hard hat brim */}
-        <mesh position={[0, 2.02, 0.12]} onClick={onClick}>
-          <cylinderGeometry args={[0.16, 0.16, 0.02]} />
+        <mesh position={[0, 1.98, 0.12]} onClick={onClick}>
+          <cylinderGeometry args={[0.17, 0.17, 0.02]} />
           <meshStandardMaterial color={colors.hardHatYellow} metalness={0.4} roughness={0.6} />
         </mesh>
         
-        {/* Arms */}
-        <mesh position={[-0.28, 1.5, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.06, 0.06, 0.6]} />
+        {/* Neck */}
+        <mesh position={[0, 1.82, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.05, 0.05, 0.08]} />
+          <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Upper arms - separated from body for natural pose */}
+        <mesh position={[-0.25, 1.55, 0]} rotation={[0, 0, -0.2]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.05, 0.05, 0.32]} />
           <meshStandardMaterial color={colors.operatorBlue} metalness={0.1} roughness={0.8} />
         </mesh>
-        <mesh position={[0.28, 1.5, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.06, 0.06, 0.6]} />
+        <mesh position={[0.25, 1.55, 0]} rotation={[0, 0, 0.2]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.05, 0.05, 0.32]} />
+          <meshStandardMaterial color={colors.operatorBlue} metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Lower arms/forearms */}
+        <mesh position={[-0.35, 1.25, 0]} rotation={[0, 0, -0.1]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.28]} />
+          <meshStandardMaterial color={colors.operatorBlue} metalness={0.1} roughness={0.8} />
+        </mesh>
+        <mesh position={[0.35, 1.25, 0]} rotation={[0, 0, 0.1]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.28]} />
           <meshStandardMaterial color={colors.operatorBlue} metalness={0.1} roughness={0.8} />
         </mesh>
         
         {/* Hands */}
-        <mesh position={[-0.28, 1.2, 0]} castShadow onClick={onClick}>
-          <sphereGeometry args={[0.05]} />
+        <mesh position={[-0.42, 1.1, 0]} castShadow onClick={onClick}>
+          <sphereGeometry args={[0.045]} />
           <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
         </mesh>
-        <mesh position={[0.28, 1.2, 0]} castShadow onClick={onClick}>
-          <sphereGeometry args={[0.05]} />
+        <mesh position={[0.42, 1.1, 0]} castShadow onClick={onClick}>
+          <sphereGeometry args={[0.045]} />
           <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
         </mesh>
         
-        {/* Legs */}
-        <mesh position={[-0.12, 0.75, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.08, 0.08, 0.8]} />
+        {/* Upper legs - thighs */}
+        <mesh position={[-0.12, 0.85, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.08, 0.06, 0.5]} />
           <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
         </mesh>
-        <mesh position={[0.12, 0.75, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.08, 0.08, 0.8]} />
+        <mesh position={[0.12, 0.85, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.08, 0.06, 0.5]} />
           <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
         </mesh>
         
-        {/* Safety boots */}
-        <mesh position={[-0.12, 0.32, 0.08]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.12, 0.12, 0.25]} />
+        {/* Lower legs - shins */}
+        <mesh position={[-0.12, 0.45, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.06, 0.07, 0.4]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
+        </mesh>
+        <mesh position={[0.12, 0.45, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.06, 0.07, 0.4]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
+        </mesh>
+        
+        {/* Safety boots - larger, more detailed */}
+        <mesh position={[-0.12, 0.25, 0.06]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.14, 0.14, 0.28]} />
           <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
         </mesh>
-        <mesh position={[0.12, 0.32, 0.08]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.12, 0.12, 0.25]} />
+        <mesh position={[0.12, 0.25, 0.06]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.14, 0.14, 0.28]} />
           <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Boot soles */}
+        <mesh position={[-0.12, 0.18, 0.06]} onClick={onClick}>
+          <boxGeometry args={[0.16, 0.04, 0.32]} />
+          <meshStandardMaterial color="#2a2a2a" metalness={0.1} roughness={0.9} />
+        </mesh>
+        <mesh position={[0.12, 0.18, 0.06]} onClick={onClick}>
+          <boxGeometry args={[0.16, 0.04, 0.32]} />
+          <meshStandardMaterial color="#2a2a2a" metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Safety vest - high-vis yellow-green band */}
+        <mesh position={[0, 1.45, 0.105]} onClick={onClick}>
+          <boxGeometry args={[0.38, 0.5, 0.01]} />
+          <meshStandardMaterial color="#d4ff00" metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Reflective strips */}
+        <mesh position={[0, 1.6, 0.112]} onClick={onClick}>
+          <boxGeometry args={[0.35, 0.03, 0.005]} />
+          <meshStandardMaterial color={colors.reflectiveVest} metalness={0.9} roughness={0.1} />
+        </mesh>
+        <mesh position={[0, 1.3, 0.112]} onClick={onClick}>
+          <boxGeometry args={[0.35, 0.03, 0.005]} />
+          <meshStandardMaterial color={colors.reflectiveVest} metalness={0.9} roughness={0.1} />
         </mesh>
         
         {/* Tool belt */}
         <mesh position={[0, 1.1, 0]} onClick={onClick}>
-          <cylinderGeometry args={[0.24, 0.24, 0.06]} />
+          <cylinderGeometry args={[0.22, 0.22, 0.08]} />
           <meshStandardMaterial color={colors.darkGray} metalness={0.3} roughness={0.7} />
         </mesh>
         
-        {/* Safety vest reflective strips */}
-        <mesh position={[0, 1.6, 0.21]} onClick={onClick}>
-          <boxGeometry args={[0.4, 0.04, 0.01]} />
-          <meshStandardMaterial color={colors.reflectiveVest} metalness={0.8} roughness={0.2} />
-        </mesh>
-        <mesh position={[0, 1.4, 0.21]} onClick={onClick}>
-          <boxGeometry args={[0.4, 0.04, 0.01]} />
-          <meshStandardMaterial color={colors.reflectiveVest} metalness={0.8} roughness={0.2} />
+        {/* Tools on belt */}
+        <mesh position={[0.18, 1.1, 0]} onClick={onClick}>
+          <boxGeometry args={[0.03, 0.08, 0.15]} />
+          <meshStandardMaterial color="#8B4513" metalness={0.2} roughness={0.8} />
         </mesh>
         
         {/* ID badge */}
-        <mesh position={[-0.1, 1.65, 0.21]} onClick={onClick}>
-          <boxGeometry args={[0.08, 0.12, 0.01]} />
+        <mesh position={[-0.12, 1.65, 0.112]} onClick={onClick}>
+          <boxGeometry args={[0.08, 0.12, 0.005]} />
           <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.8} />
         </mesh>
       </group>
@@ -160,45 +208,164 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
   const renderEngineer = () => {
     return (
       <group>
-        {/* Body - similar to operator but different color scheme */}
+        {/* Torso - proper box body */}
         <mesh position={[0, 1.4, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.18, 0.22, 0.8]} />
+          <boxGeometry args={[0.36, 0.7, 0.2]} />
           <meshStandardMaterial color={colors.engineerOrange} metalness={0.1} roughness={0.8} />
         </mesh>
         
-        {/* Chest/shoulders */}
-        <mesh position={[0, 1.65, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.45, 0.3, 0.2]} />
-          <meshStandardMaterial color={colors.engineerOrange} metalness={0.1} roughness={0.8} />
-        </mesh>
-        
-        {/* Head */}
+        {/* Head with slight face indication */}
         <mesh position={[0, 1.95, 0]} castShadow onClick={onClick}>
           <sphereGeometry args={[0.12]} />
           <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
         </mesh>
         
-        {/* Hard hat */}
-        <mesh position={[0, 2.08, 0]} castShadow onClick={onClick}>
-          <sphereGeometry args={[0.14]} />
+        {/* Nose bump for face indication */}
+        <mesh position={[0, 1.95, 0.1]} onClick={onClick}>
+          <sphereGeometry args={[0.02]} />
+          <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* White hard hat - flattened hemisphere */}
+        <mesh position={[0, 2.05, 0]} castShadow onClick={onClick}>
+          <sphereGeometry args={[0.14, 16, 8, 0, Math.PI * 2, 0, Math.PI/2]} />
           <meshStandardMaterial color="#ffffff" metalness={0.4} roughness={0.6} />
         </mesh>
         
         {/* Hard hat brim */}
-        <mesh position={[0, 2.02, 0.12]} onClick={onClick}>
-          <cylinderGeometry args={[0.16, 0.16, 0.02]} />
+        <mesh position={[0, 1.98, 0.12]} onClick={onClick}>
+          <cylinderGeometry args={[0.17, 0.17, 0.02]} />
           <meshStandardMaterial color="#ffffff" metalness={0.4} roughness={0.6} />
         </mesh>
         
-        {/* Arms */}
-        <mesh position={[-0.28, 1.5, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.06, 0.06, 0.6]} />
+        {/* Neck */}
+        <mesh position={[0, 1.82, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.05, 0.05, 0.08]} />
+          <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Upper arms - left arm holding clipboard */}
+        <mesh position={[-0.25, 1.55, 0.1]} rotation={[0.3, 0, -0.3]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.05, 0.05, 0.32]} />
           <meshStandardMaterial color={colors.engineerOrange} metalness={0.1} roughness={0.8} />
         </mesh>
-        <mesh position={[0.28, 1.5, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.06, 0.06, 0.6]} />
+        <mesh position={[0.25, 1.55, 0]} rotation={[0, 0, 0.2]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.05, 0.05, 0.32]} />
           <meshStandardMaterial color={colors.engineerOrange} metalness={0.1} roughness={0.8} />
         </mesh>
+        
+        {/* Lower arms/forearms */}
+        <mesh position={[-0.32, 1.25, 0.2]} rotation={[0.5, 0, -0.2]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.28]} />
+          <meshStandardMaterial color={colors.engineerOrange} metalness={0.1} roughness={0.8} />
+        </mesh>
+        <mesh position={[0.35, 1.25, 0]} rotation={[0, 0, 0.1]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.28]} />
+          <meshStandardMaterial color={colors.engineerOrange} metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Hands */}
+        <mesh position={[-0.35, 1.1, 0.3]} castShadow onClick={onClick}>
+          <sphereGeometry args={[0.045]} />
+          <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
+        </mesh>
+        <mesh position={[0.42, 1.1, 0]} castShadow onClick={onClick}>
+          <sphereGeometry args={[0.045]} />
+          <meshStandardMaterial color={colors.skinTone} metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Clipboard - held in left hand area */}
+        <mesh position={[-0.38, 1.15, 0.35]} rotation={[0.3, -0.3, 0]} onClick={onClick}>
+          <boxGeometry args={[0.15, 0.005, 0.2]} />
+          <meshStandardMaterial color="#8B4513" metalness={0.3} roughness={0.7} />
+        </mesh>
+        
+        {/* Paper on clipboard */}
+        <mesh position={[-0.38, 1.15, 0.36]} rotation={[0.3, -0.3, 0]} onClick={onClick}>
+          <boxGeometry args={[0.13, 0.002, 0.18]} />
+          <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Upper legs - thighs */}
+        <mesh position={[-0.12, 0.85, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.08, 0.06, 0.5]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
+        </mesh>
+        <mesh position={[0.12, 0.85, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.08, 0.06, 0.5]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
+        </mesh>
+        
+        {/* Lower legs - shins */}
+        <mesh position={[-0.12, 0.45, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.06, 0.07, 0.4]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
+        </mesh>
+        <mesh position={[0.12, 0.45, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.06, 0.07, 0.4]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.2} roughness={0.8} />
+        </mesh>
+        
+        {/* Safety boots - larger, more detailed */}
+        <mesh position={[-0.12, 0.25, 0.06]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.14, 0.14, 0.28]} />
+          <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
+        </mesh>
+        <mesh position={[0.12, 0.25, 0.06]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.14, 0.14, 0.28]} />
+          <meshStandardMaterial color={colors.blackRubber} metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Boot soles */}
+        <mesh position={[-0.12, 0.18, 0.06]} onClick={onClick}>
+          <boxGeometry args={[0.16, 0.04, 0.32]} />
+          <meshStandardMaterial color="#2a2a2a" metalness={0.1} roughness={0.9} />
+        </mesh>
+        <mesh position={[0.12, 0.18, 0.06]} onClick={onClick}>
+          <boxGeometry args={[0.16, 0.04, 0.32]} />
+          <meshStandardMaterial color="#2a2a2a" metalness={0.1} roughness={0.9} />
+        </mesh>
+        
+        {/* Orange/blue safety vest */}
+        <mesh position={[0, 1.45, 0.105]} onClick={onClick}>
+          <boxGeometry args={[0.38, 0.5, 0.01]} />
+          <meshStandardMaterial color="#ff6600" metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Blue accents on vest */}
+        <mesh position={[0, 1.55, 0.107]} onClick={onClick}>
+          <boxGeometry args={[0.35, 0.08, 0.005]} />
+          <meshStandardMaterial color="#0066cc" metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Reflective strips */}
+        <mesh position={[0, 1.6, 0.112]} onClick={onClick}>
+          <boxGeometry args={[0.35, 0.03, 0.005]} />
+          <meshStandardMaterial color={colors.reflectiveVest} metalness={0.9} roughness={0.1} />
+        </mesh>
+        <mesh position={[0, 1.3, 0.112]} onClick={onClick}>
+          <boxGeometry args={[0.35, 0.03, 0.005]} />
+          <meshStandardMaterial color={colors.reflectiveVest} metalness={0.9} roughness={0.1} />
+        </mesh>
+        
+        {/* ID badge */}
+        <mesh position={[-0.12, 1.65, 0.112]} onClick={onClick}>
+          <boxGeometry args={[0.08, 0.12, 0.005]} />
+          <meshStandardMaterial color="#ffffff" metalness={0.1} roughness={0.8} />
+        </mesh>
+        
+        {/* Engineering tools in pocket */}
+        <mesh position={[0.1, 1.35, 0.11]} onClick={onClick}>
+          <cylinderGeometry args={[0.005, 0.005, 0.12]} />
+          <meshStandardMaterial color="#ffcc00" metalness={0.6} roughness={0.3} />
+        </mesh>
+        <mesh position={[0.13, 1.35, 0.11]} onClick={onClick}>
+          <cylinderGeometry args={[0.005, 0.005, 0.1]} />
+          <meshStandardMaterial color="#cc0000" metalness={0.6} roughness={0.3} />
+        </mesh>
+      </group>
+    );
+  };
         
         {/* Hands */}
         <mesh position={[-0.28, 1.2, 0]} castShadow onClick={onClick}>
