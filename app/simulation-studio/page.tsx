@@ -14,8 +14,8 @@ const ADMIN_ACCOUNTS = [
   { email: 'saviosyl@gmail.com', password: '@Meta123456', role: 'admin' },
 ];
 
-// The URL of the Simulation Studio app (separate deployment)
-const STUDIO_URL = 'https://metamech-simulation-studio.vercel.app';
+// The URL of the Simulation Studio app (integrated into this app)
+const STUDIO_URL = '/simulation-studio/dashboard';
 
 export default function SimulationStudioPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -73,8 +73,8 @@ export default function SimulationStudioPage() {
       setAuthenticated(true);
       setLoading(false);
 
-      // Redirect to simulation studio with auth token
-      window.location.href = `${STUDIO_URL}?auth=${encodeURIComponent(token)}`;
+      // Redirect to integrated simulation studio dashboard
+      window.location.href = STUDIO_URL;
     }, 800);
   };
 
@@ -86,12 +86,7 @@ export default function SimulationStudioPage() {
   };
 
   const handleGoToStudio = () => {
-    const session = localStorage.getItem('sim_studio_session');
-    if (session) {
-      const data = JSON.parse(session);
-      const token = btoa(JSON.stringify({ email: data.email, role: data.role, exp: data.expires }));
-      window.location.href = `${STUDIO_URL}?auth=${encodeURIComponent(token)}`;
-    }
+    window.location.href = STUDIO_URL;
   };
 
   return (
