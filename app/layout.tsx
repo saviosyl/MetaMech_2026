@@ -106,6 +106,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navigation />
         <main className="relative z-[1]">{children}</main>
         <Footer />
+        {/* Hide website nav/footer on simulation studio pages */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            if (window.location.pathname.startsWith('/simulation-studio/editor') || window.location.pathname.startsWith('/simulation-studio/dashboard')) {
+              var style = document.createElement('style');
+              style.textContent = 'nav, footer, [class*="ParticleBackground"], .particle-bg { display: none !important; } body { background: #1e1e2e !important; } main { padding: 0 !important; margin: 0 !important; }';
+              document.head.appendChild(style);
+            }
+          })();
+        `}} />
       </body>
     </html>
   );
