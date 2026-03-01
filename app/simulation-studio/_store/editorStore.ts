@@ -130,7 +130,7 @@ interface EditorState {
   addEnvironmentAsset: (type: EnvironmentAsset['type'], position: [number, number, number]) => void;
   addActor: (type: Actor['type'], position: [number, number, number]) => void;
   
-  updateObject: (id: string, type: 'process' | 'environment' | 'actor', updates: Partial<ProcessNode | EnvironmentAsset | Actor>) => void;
+  updateObject: (id: string, type: 'process' | 'environment' | 'actor', updates: any) => void;
   removeObject: (id: string, type: 'process' | 'environment' | 'actor') => void;
   
   setSelectedObject: (id: string | null, type: 'process' | 'environment' | 'actor' | null) => void;

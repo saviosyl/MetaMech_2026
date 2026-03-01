@@ -114,25 +114,6 @@ export default function EditorPage() {
     }
   }, [projectId, loadScene, setProjectName]);
 
-  // Auto-save setup
-  useEffect(() => {
-    if (autosaveInterval.current) {
-      clearInterval(autosaveInterval.current);
-    }
-
-    autosaveInterval.current = setInterval(() => {
-      if (isDirty && projectId) {
-        saveProject(false); // Silent autosave
-      }
-    }, 30000); // Autosave every 30 seconds
-
-    return () => {
-      if (autosaveInterval.current) {
-        clearInterval(autosaveInterval.current);
-      }
-    };
-  }, [isDirty, projectId]);
-
   // Save project function
   const saveProject = useCallback(async (showMessage = true) => {
     if (!projectId) return;
@@ -179,6 +160,25 @@ export default function EditorPage() {
       setIsSaving(false);
     }
   }, [projectId, projectName, getSceneData, markClean]);
+
+  // Auto-save setup
+  useEffect(() => {
+    if (autosaveInterval.current) {
+      clearInterval(autosaveInterval.current);
+    }
+
+    autosaveInterval.current = setInterval(() => {
+      if (isDirty && projectId) {
+        saveProject(false); // Silent autosave
+      }
+    }, 30000); // Autosave every 30 seconds
+
+    return () => {
+      if (autosaveInterval.current) {
+        clearInterval(autosaveInterval.current);
+      }
+    };
+  }, [isDirty, projectId, saveProject]);
 
   // Export project
   const exportProject = () => {

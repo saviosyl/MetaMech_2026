@@ -52,7 +52,12 @@ const libraryItems = {
 } as const;
 
 interface LibraryItemProps {
-  item: typeof libraryItems.process[0];
+  item: {
+    type: string;
+    name: string;
+    icon: string;
+    description: string;
+  };
   onAdd: () => void;
 }
 
