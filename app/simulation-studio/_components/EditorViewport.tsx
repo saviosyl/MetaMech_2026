@@ -197,6 +197,7 @@ function Scene() {
   const transformControlsRef = useRef<any>();
   const orbitControlsRef = useRef<any>();
   const lastTime = useRef(0);
+  const prevEdgeCount = useRef(edges.length);
   
   // Placement state
   const [placementMode, setPlacementMode] = useState<{
@@ -507,7 +508,7 @@ function Scene() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [placementMode, selectedObjectId, selectedObjectType, removeObject]);
 
-  // Update simulation
+  // Update simulation and check for new connections
   useFrame((state) => {
     const currentTime = state.clock.getElapsedTime();
     const deltaTime = currentTime - lastTime.current;
@@ -515,6 +516,34 @@ function Scene() {
 
     if (isPlaying && deltaTime > 0) {
       updateSimulation(deltaTime);
+    }
+
+    // Check for new connections and trigger flash effect
+    if (edges.length > prevEdgeCount.current) {
+      const newEdge = edges[edges.length - 1]; // Get the most recent edge
+      const fromNode = processNodes.find(n => n.id === newEdge.from);
+      const toNode = processNodes.find(n => n.id === newEdge.to);
+      
+      if (fromNode && toNode) {
+        // Calculate midpoint for flash effect
+        const midpoint: [number, number, number] = [
+          (fromNode.position[0] + toNode.position[0]) / 2,
+          (fromNode.position[1] + toNode.position[1]) / 2 + 1,
+          (fromNode.position[2] + toNode.position[2]) / 2
+        ];
+        
+        setConnectionFlash({ position: midpoint, active: true });
+        
+        // Auto-hide flash after 1 second
+        setTimeout(() => {
+          setConnectionFlash(null);
+        }, 1000);
+      }
+      
+      prevEdgeCount.current = edges.length;
+    } else if (edges.length < prevEdgeCount.current) {
+      // Edges were removed
+      prevEdgeCount.current = edges.length;
     }
   });
 
