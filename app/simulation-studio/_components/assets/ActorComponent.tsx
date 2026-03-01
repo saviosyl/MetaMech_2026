@@ -8,10 +8,11 @@ import { Actor } from '../../_store/editorStore';
 interface Props {
   actor: Actor;
   onClick: (event: any) => void;
+  onContextMenu?: (event: any) => void;
   isSelected: boolean;
 }
 
-export default function ActorComponent({ actor, onClick, isSelected }: Props) {
+export default function ActorComponent({ actor, onClick, onContextMenu, isSelected }: Props) {
   const groupRef = useRef<THREE.Group>(null);
   
   // Animation for selected objects and moving actors
@@ -782,6 +783,8 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
       position={actor.position}
       rotation={actor.rotation}
       scale={actor.scale}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
     >
       {renderGeometry()}
       

@@ -98,6 +98,38 @@ function Scene() {
     removeObject,
   } = useEditorStore();
 
+  // Duplicate object function
+  const duplicateSelectedObject = () => {
+    if (selectedObjectId && selectedObjectType) {
+      let sourceObject;
+      if (selectedObjectType === 'process') {
+        sourceObject = processNodes.find(n => n.id === selectedObjectId);
+      } else if (selectedObjectType === 'environment') {
+        sourceObject = environmentAssets.find(a => a.id === selectedObjectId);
+      } else if (selectedObjectType === 'actor') {
+        sourceObject = actors.find(a => a.id === selectedObjectId);
+      }
+      
+      if (sourceObject) {
+        // Create duplicate at offset position
+        const offset = 2.0;
+        const newPosition: [number, number, number] = [
+          sourceObject.position[0] + offset,
+          sourceObject.position[1],
+          sourceObject.position[2] + offset
+        ];
+        
+        if (selectedObjectType === 'process') {
+          addProcessNode(sourceObject.type as any, newPosition);
+        } else if (selectedObjectType === 'environment') {
+          addEnvironmentAsset(sourceObject.type as any, newPosition);
+        } else if (selectedObjectType === 'actor') {
+          addActor(sourceObject.type as any, newPosition);
+        }
+      }
+    }
+  };
+
   const { camera, gl, scene, raycaster, pointer } = useThree();
   const transformControlsRef = useRef<any>();
   const orbitControlsRef = useRef<any>();
@@ -288,31 +320,44 @@ function Scene() {
     event.preventDefault();
     
     if (objectId && objectType) {
+      // Select the object first
+      setSelectedObject(objectId, objectType);
+      
       // Show context menu for object
       const contextMenu = document.createElement('div');
-      contextMenu.className = 'fixed bg-white border border-gray-300 rounded shadow-lg z-50 py-1';
+      contextMenu.className = 'fixed bg-[#252536] border border-[#3a3a4a] rounded shadow-lg z-50 py-1 text-[#e0e0e0] min-w-[120px]';
       contextMenu.style.left = `${event.clientX}px`;
       contextMenu.style.top = `${event.clientY}px`;
       
       const deleteOption = document.createElement('button');
-      deleteOption.className = 'block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50';
-      deleteOption.textContent = 'Delete';
+      deleteOption.className = 'block w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-900/20 flex items-center gap-2';
+      deleteOption.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"></polyline><path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path></svg>Delete`;
       deleteOption.onclick = () => {
-        removeObject(objectId, objectType);
+        if (confirm('Are you sure you want to delete this object?')) {
+          removeObject(objectId, objectType);
+        }
         document.body.removeChild(contextMenu);
       };
       
       const duplicateOption = document.createElement('button');
-      duplicateOption.className = 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50';
-      duplicateOption.textContent = 'Duplicate';
+      duplicateOption.className = 'block w-full text-left px-3 py-2 text-sm text-[#e0e0e0] hover:bg-[#333345] flex items-center gap-2';
+      duplicateOption.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5,15H4a2,2 0 0,1-2-2V4a2,2 0 0,1,2-2H13a2,2 0 0,1,2,2v1"></path></svg>Duplicate`;
       duplicateOption.onclick = () => {
-        // TODO: Implement duplication
-        console.log('Duplicate:', objectId);
+        duplicateSelectedObject();
+        document.body.removeChild(contextMenu);
+      };
+
+      const selectOption = document.createElement('button');
+      selectOption.className = 'block w-full text-left px-3 py-2 text-sm text-[#06b6d4] hover:bg-[#333345] flex items-center gap-2';
+      selectOption.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 11 3 3 8-8"></path><path d="M21,12v7a2,2 0 0,1-2,2H5a2,2 0 0,1-2-2V5a2,2 0 0,1,2-2h11"></path></svg>Select`;
+      selectOption.onclick = () => {
+        setSelectedObject(objectId, objectType);
         document.body.removeChild(contextMenu);
       };
       
-      contextMenu.appendChild(deleteOption);
+      contextMenu.appendChild(selectOption);
       contextMenu.appendChild(duplicateOption);
+      contextMenu.appendChild(deleteOption);
       document.body.appendChild(contextMenu);
       
       // Remove context menu on outside click
@@ -498,6 +543,7 @@ function Scene() {
           <ProcessNodeComponent 
             node={node}
             onClick={(event) => handleObjectClick(node.id, 'process', event)}
+            onContextMenu={(event) => handleContextMenu(event, node.id, 'process')}
             isSelected={selectedObjectId === node.id}
           />
         </group>
@@ -509,6 +555,7 @@ function Scene() {
           <EnvironmentAssetComponent 
             asset={asset}
             onClick={(event) => handleObjectClick(asset.id, 'environment', event)}
+            onContextMenu={(event) => handleContextMenu(event, asset.id, 'environment')}
             isSelected={selectedObjectId === asset.id}
           />
         </group>
@@ -520,6 +567,7 @@ function Scene() {
           <ActorComponent 
             actor={actor}
             onClick={(event) => handleObjectClick(actor.id, 'actor', event)}
+            onContextMenu={(event) => handleContextMenu(event, actor.id, 'actor')}
             isSelected={selectedObjectId === actor.id}
           />
         </group>

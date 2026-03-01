@@ -9,10 +9,11 @@ import ConveyorComponent from './ConveyorComponent';
 interface Props {
   node: ProcessNode;
   onClick: (event: any) => void;
+  onContextMenu?: (event: any) => void;
   isSelected: boolean;
 }
 
-export default function ProcessNodeComponent({ node, onClick, isSelected }: Props) {
+export default function ProcessNodeComponent({ node, onClick, onContextMenu, isSelected }: Props) {
   const groupRef = useRef<THREE.Group>(null);
   
   // Animation for selected objects and working machines
@@ -1535,6 +1536,8 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
       position={node.position}
       rotation={node.rotation}
       scale={node.scale}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
     >
       {renderGeometry()}
       

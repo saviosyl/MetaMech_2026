@@ -8,10 +8,11 @@ import { EnvironmentAsset } from '../../_store/editorStore';
 interface Props {
   asset: EnvironmentAsset;
   onClick: (event: any) => void;
+  onContextMenu?: (event: any) => void;
   isSelected: boolean;
 }
 
-export default function EnvironmentAssetComponent({ asset, onClick, isSelected }: Props) {
+export default function EnvironmentAssetComponent({ asset, onClick, onContextMenu, isSelected }: Props) {
   const groupRef = useRef<THREE.Group>(null);
   
   // Animation for selected objects
@@ -737,6 +738,8 @@ export default function EnvironmentAssetComponent({ asset, onClick, isSelected }
       position={asset.position}
       rotation={asset.rotation}
       scale={asset.scale}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
     >
       {renderGeometry()}
       

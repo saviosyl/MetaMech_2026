@@ -84,6 +84,9 @@ export default function EditorPage() {
     setProjectName,
     markClean,
     removeObject,
+    addProcessNode,
+    addEnvironmentAsset,
+    addActor,
   } = useEditorStore();
 
   // Autosave interval
@@ -247,10 +250,36 @@ export default function EditorPage() {
     }
   };
 
-  // Duplicate selected object (placeholder)
+  // Duplicate selected object
   const duplicateSelectedObject = () => {
-    // TODO: Implement duplication logic
-    console.log('Duplicate object:', selectedObjectId);
+    if (selectedObjectId && selectedObjectType) {
+      let sourceObject;
+      if (selectedObjectType === 'process') {
+        sourceObject = processNodes.find(n => n.id === selectedObjectId);
+      } else if (selectedObjectType === 'environment') {
+        sourceObject = environmentAssets.find(a => a.id === selectedObjectId);
+      } else if (selectedObjectType === 'actor') {
+        sourceObject = actors.find(a => a.id === selectedObjectId);
+      }
+      
+      if (sourceObject) {
+        // Create duplicate at offset position
+        const offset = 2.0;
+        const newPosition: [number, number, number] = [
+          sourceObject.position[0] + offset,
+          sourceObject.position[1],
+          sourceObject.position[2] + offset
+        ];
+        
+        if (selectedObjectType === 'process') {
+          addProcessNode(sourceObject.type as any, newPosition);
+        } else if (selectedObjectType === 'environment') {
+          addEnvironmentAsset(sourceObject.type as any, newPosition);
+        } else if (selectedObjectType === 'actor') {
+          addActor(sourceObject.type as any, newPosition);
+        }
+      }
+    }
   };
 
   // Keyboard shortcuts
