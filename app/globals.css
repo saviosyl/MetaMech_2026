@@ -162,6 +162,15 @@
   .shadow-glow-gold {
     box-shadow: 0 0 30px rgba(245, 158, 11, 0.3), 0 0 60px rgba(245, 158, 11, 0.1);
   }
+
+  /* Touch-friendly targets for mobile/tablet */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+
+  .touch-target.btn {
+    @apply px-4 py-3;
+  }
 }
 
 @layer utilities {
