@@ -627,86 +627,133 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
           <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
         </mesh>
         
-        {/* Base rotation joint */}
+        {/* Base rotation joint - J1 housing */}
         <mesh position={[0, 0.25, 0]} castShadow onClick={onClick}>
           <cylinderGeometry args={[0.15, 0.15, 0.3]} />
-          <meshStandardMaterial color={colors.machineBody} metalness={0.8} roughness={0.2} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.2} />
         </mesh>
         
-        {/* J1 body (main vertical) */}
+        {/* J1-J2 shoulder housing */}
         <mesh position={[0, 0.7, 0]} castShadow onClick={onClick}>
-          <cylinderGeometry args={[0.12, 0.18, 0.9]} />
-          <meshStandardMaterial color={colors.machineBody} metalness={0.6} roughness={0.4} />
+          <boxGeometry args={[0.25, 0.3, 0.2]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.6} roughness={0.4} />
         </mesh>
         
-        {/* J2 shoulder joint */}
-        <mesh position={[0, 1.15, 0.1]} castShadow onClick={onClick}>
-          <sphereGeometry args={[0.12]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.2} />
-        </mesh>
-        
-        {/* Upper arm */}
+        {/* Upper arm - long tapered box, orange */}
         <mesh position={[0.6, 1.15, 0.1]} castShadow onClick={onClick}>
           <boxGeometry args={[1.2, 0.15, 0.15]} />
-          <meshStandardMaterial color={colors.machineBody} metalness={0.6} roughness={0.4} />
+          <meshStandardMaterial color="#f97316" metalness={0.4} roughness={0.6} />
         </mesh>
         
-        {/* J3 elbow joint */}
+        {/* J2-J3 elbow joint */}
         <mesh position={[1.2, 1.15, 0.1]} castShadow onClick={onClick}>
-          <sphereGeometry args={[0.08]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.2} />
+          <cylinderGeometry args={[0.08, 0.08, 0.12]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.2} />
         </mesh>
         
-        {/* Forearm */}
+        {/* Forearm - thinner box, orange */}
         <mesh position={[1.2, 0.85, 0.1]} castShadow onClick={onClick}>
           <boxGeometry args={[0.1, 0.6, 0.1]} />
-          <meshStandardMaterial color={colors.machineBody} metalness={0.6} roughness={0.4} />
+          <meshStandardMaterial color="#f97316" metalness={0.4} roughness={0.6} />
         </mesh>
         
-        {/* J4 wrist rotation */}
+        {/* J4-J5 wrist assembly - small cylinders */}
         <mesh position={[1.2, 0.55, 0.1]} castShadow onClick={onClick}>
           <cylinderGeometry args={[0.05, 0.05, 0.12]} />
-          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.2} />
         </mesh>
         
-        {/* J5 wrist bend */}
         <mesh position={[1.2, 0.5, 0.1]} rotation={[Math.PI/2, 0, 0]} castShadow onClick={onClick}>
           <cylinderGeometry args={[0.04, 0.04, 0.08]} />
-          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.2} />
         </mesh>
         
-        {/* J6 flange */}
+        {/* J6 flange - thin disk */}
         <mesh position={[1.2, 0.45, 0.1]} onClick={onClick}>
           <cylinderGeometry args={[0.06, 0.06, 0.03]} />
           <meshStandardMaterial color={colors.lightSteel} metalness={0.9} roughness={0.1} />
         </mesh>
         
-        {/* End effector / gripper */}
+        {/* Gripper mounting plate */}
         <mesh position={[1.2, 0.4, 0.1]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.12, 0.08, 0.12]} />
-          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.6} />
-        </mesh>
-        
-        {/* Gripper fingers */}
-        <mesh position={[1.15, 0.36, 0.1]} onClick={onClick}>
-          <boxGeometry args={[0.02, 0.08, 0.04]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.2} />
-        </mesh>
-        <mesh position={[1.25, 0.36, 0.1]} onClick={onClick}>
-          <boxGeometry args={[0.02, 0.08, 0.04]} />
+          <boxGeometry args={[0.12, 0.04, 0.12]} />
           <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.2} />
         </mesh>
         
-        {/* Cable bundle on back of arm */}
-        <mesh position={[0.6, 1.05, 0.0]} onClick={onClick}>
-          <cylinderGeometry args={[0.02, 0.02, 1.2]} />
-          <meshStandardMaterial color="#000000" metalness={0.1} roughness={0.9} />
+        {/* Gripper fingers - 2 parallel finger bars */}
+        <mesh position={[1.15, 0.36, 0.1]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.02, 0.08, 0.04]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        <mesh position={[1.25, 0.36, 0.1]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.02, 0.08, 0.04]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.2} />
         </mesh>
         
-        {/* Warning labels on base */}
-        <mesh position={[0.6, 0.17, 0]} rotation={[-Math.PI/2, 0, 0]} onClick={onClick}>
-          <circleGeometry args={[0.08]} />
-          <meshStandardMaterial color={colors.safetyYellow} />
+        {/* Cable harness along back of arm - series of dark cylinders */}
+        {Array.from({ length: 8 }, (_, i) => (
+          <mesh key={`cable-${i}`} position={[0.15 + i * 0.13, 1.05 - i * 0.05, -0.05]} onClick={onClick}>
+            <cylinderGeometry args={[0.015, 0.015, 0.1]} />
+            <meshStandardMaterial color="#000000" metalness={0.1} roughness={0.9} />
+          </mesh>
+        ))}
+        
+        {/* Controller cabinet next to base - separate box, dark gray */}
+        <mesh position={[1.5, 1, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.6, 2, 0.8]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.6} roughness={0.4} />
+        </mesh>
+        
+        {/* Cabinet door */}
+        <mesh position={[1.81, 1, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.02, 1.8, 0.7]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.5} roughness={0.5} />
+        </mesh>
+        
+        {/* Safety fence - 4 yellow posts at corners */}
+        {[-2, 2].map(x =>
+          [-2, 2].map(z => (
+            <mesh key={`fence-post-${x}-${z}`} position={[x, 0.75, z]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.04, 0.04, 1.5]} />
+              <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+            </mesh>
+          ))
+        )}
+        
+        {/* Yellow horizontal bars connecting fence posts */}
+        <mesh position={[0, 1.2, 2]} onClick={onClick}>
+          <boxGeometry args={[4, 0.05, 0.05]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[0, 1.2, -2]} onClick={onClick}>
+          <boxGeometry args={[4, 0.05, 0.05]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[2, 1.2, 0]} onClick={onClick}>
+          <boxGeometry args={[0.05, 0.05, 4]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[-2, 1.2, 0]} onClick={onClick}>
+          <boxGeometry args={[0.05, 0.05, 4]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        
+        {/* Mid-level fence bars */}
+        <mesh position={[0, 0.6, 2]} onClick={onClick}>
+          <boxGeometry args={[4, 0.05, 0.05]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[0, 0.6, -2]} onClick={onClick}>
+          <boxGeometry args={[4, 0.05, 0.05]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[2, 0.6, 0]} onClick={onClick}>
+          <boxGeometry args={[0.05, 0.05, 4]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[-2, 0.6, 0]} onClick={onClick}>
+          <boxGeometry args={[0.05, 0.05, 4]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
         </mesh>
         
         {/* Status indicator on J1 */}
@@ -1180,6 +1227,273 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
     );
   };
 
+  const renderSpiralConveyor = () => {
+    const height = node.parameters?.height || 5;
+    const diameter = node.parameters?.diameter || 4;
+    const direction = node.parameters?.direction || 'up';
+    const spiralTurns = height / 2;
+    const beltSegments = 30;
+
+    return (
+      <group>
+        {/* Central column */}
+        <mesh position={[0, height/2, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.15, 0.15, height]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        
+        {/* Base support structure - ring with legs */}
+        <mesh position={[0, 0.1, 0]} castShadow onClick={onClick}>
+          <torusGeometry args={[diameter/3, 0.1]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* Support legs */}
+        {Array.from({ length: 6 }, (_, i) => {
+          const angle = (i / 6) * Math.PI * 2;
+          const x = Math.cos(angle) * diameter/3;
+          const z = Math.sin(angle) * diameter/3;
+          return (
+            <mesh key={`leg-${i}`} position={[x, 0.3, z]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.04, 0.04, 0.6]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.3} />
+            </mesh>
+          );
+        })}
+        
+        {/* Helical belt surface - spiral of belt segments */}
+        {Array.from({ length: beltSegments }, (_, i) => {
+          const t = i / (beltSegments - 1);
+          const spiralHeight = direction === 'up' ? t * height : (1 - t) * height;
+          const angle = t * spiralTurns * Math.PI * 2;
+          const radius = diameter / 2;
+          const x = Math.cos(angle) * radius;
+          const z = Math.sin(angle) * radius;
+          const nextAngle = ((i + 1) / (beltSegments - 1)) * spiralTurns * Math.PI * 2;
+          const rotY = nextAngle - angle;
+          const tiltAngle = Math.atan2(height / beltSegments, 2 * Math.PI * radius / beltSegments);
+          
+          return (
+            <mesh 
+              key={`belt-${i}`} 
+              position={[x, spiralHeight, z]} 
+              rotation={[0, angle, direction === 'up' ? tiltAngle : -tiltAngle]} 
+              castShadow 
+              onClick={onClick}
+            >
+              <boxGeometry args={[0.6, 0.02, 0.4]} />
+              <meshStandardMaterial color={colors.darkRubber} metalness={0.1} roughness={0.9} />
+            </mesh>
+          );
+        })}
+        
+        {/* Guard rails following the spiral */}
+        {Array.from({ length: beltSegments }, (_, i) => {
+          const t = i / (beltSegments - 1);
+          const spiralHeight = direction === 'up' ? t * height : (1 - t) * height;
+          const angle = t * spiralTurns * Math.PI * 2;
+          const radius = diameter / 2 + 0.4;
+          const x = Math.cos(angle) * radius;
+          const z = Math.sin(angle) * radius;
+          
+          return (
+            <mesh 
+              key={`guard-${i}`} 
+              position={[x, spiralHeight + 0.15, z]} 
+              rotation={[0, angle, 0]} 
+              onClick={onClick}
+            >
+              <cylinderGeometry args={[0.015, 0.015, 0.3]} />
+              <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+            </mesh>
+          );
+        })}
+        
+        {/* Drive motor at base */}
+        <mesh position={[0, 0.3, diameter/2 + 0.3]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.4, 0.3, 0.6]} />
+          <meshStandardMaterial color="#2d3a4a" metalness={0.6} roughness={0.4} />
+        </mesh>
+        
+        {/* Connection ports */}
+        <mesh position={[0, 0.2, diameter/2 + 0.8]} onClick={onClick}>
+          <sphereGeometry args={[0.05]} />
+          <meshStandardMaterial 
+            color="#22c55e" 
+            emissive="#22c55e" 
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+        
+        <mesh position={[0, height - 0.2, diameter/2 + 0.8]} onClick={onClick}>
+          <sphereGeometry args={[0.05]} />
+          <meshStandardMaterial 
+            color="#3b82f6" 
+            emissive="#3b82f6" 
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+      </group>
+    );
+  };
+
+  const renderVerticalLifter = () => {
+    const height = node.parameters?.height || 3;
+    
+    return (
+      <group>
+        {/* 4 corner posts forming frame */}
+        {[-0.8, 0.8].map(x =>
+          [-0.8, 0.8].map(z => (
+            <mesh key={`post-${x}-${z}`} position={[x, height/2, z]} castShadow onClick={onClick}>
+              <boxGeometry args={[0.08, height, 0.08]} />
+              <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+            </mesh>
+          ))
+        )}
+        
+        {/* Top cross beams */}
+        <mesh position={[0, height - 0.05, 0.8]} onClick={onClick}>
+          <boxGeometry args={[1.6, 0.08, 0.08]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, height - 0.05, -0.8]} onClick={onClick}>
+          <boxGeometry args={[1.6, 0.08, 0.08]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[0.8, height - 0.05, 0]} onClick={onClick}>
+          <boxGeometry args={[0.08, 0.08, 1.6]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[-0.8, height - 0.05, 0]} onClick={onClick}>
+          <boxGeometry args={[0.08, 0.08, 1.6]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        
+        {/* Bottom cross beams */}
+        <mesh position={[0, 0.05, 0.8]} onClick={onClick}>
+          <boxGeometry args={[1.6, 0.08, 0.08]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, 0.05, -0.8]} onClick={onClick}>
+          <boxGeometry args={[1.6, 0.08, 0.08]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        
+        {/* Vertical guide rails */}
+        <mesh position={[-0.75, height/2, 0]} onClick={onClick}>
+          <boxGeometry args={[0.04, height - 0.2, 0.04]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        <mesh position={[0.75, height/2, 0]} onClick={onClick}>
+          <boxGeometry args={[0.04, height - 0.2, 0.04]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        
+        {/* Platform at mid-height */}
+        <mesh position={[0, height/2, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[1.4, 0.08, 1.4]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+        </mesh>
+        
+        {/* Safety edges on platform */}
+        <mesh position={[0, height/2 + 0.05, 0.71]} onClick={onClick}>
+          <boxGeometry args={[1.4, 0.02, 0.02]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[0, height/2 + 0.05, -0.71]} onClick={onClick}>
+          <boxGeometry args={[1.4, 0.02, 0.02]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[0.71, height/2 + 0.05, 0]} onClick={onClick}>
+          <boxGeometry args={[0.02, 0.02, 1.4]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        <mesh position={[-0.71, height/2 + 0.05, 0]} onClick={onClick}>
+          <boxGeometry args={[0.02, 0.02, 1.4]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+        
+        {/* Hydraulic cylinder */}
+        <mesh position={[0.9, height/2 - 0.2, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.06, 0.06, height - 0.4]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        
+        {/* Control panel box on post */}
+        <mesh position={[-0.9, 1.4, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.3, 0.4, 0.2]} />
+          <meshStandardMaterial color={colors.darkGray} metalness={0.5} roughness={0.5} />
+        </mesh>
+        
+        {/* Safety gates at each level */}
+        {Array.from({ length: 3 }, (_, i) => {
+          const y = i * (height / 3) + 0.5;
+          return (
+            <group key={`gate-${i}`}>
+              {Array.from({ length: 6 }, (_, j) => (
+                <mesh key={`bar-${j}`} position={[0, y + j * 0.15, 0.85]} onClick={onClick}>
+                  <boxGeometry args={[1.4, 0.02, 0.02]} />
+                  <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+                </mesh>
+              ))}
+            </group>
+          );
+        })}
+      </group>
+    );
+  };
+
+  const renderTransferBridge = () => {
+    const length = node.parameters?.length || 2;
+    
+    return (
+      <group>
+        {/* Two short conveyor sections */}
+        <mesh position={[-length/2 - 0.5, 0.15, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[1, 0.3, 1]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.7} roughness={0.3} />
+        </mesh>
+        <mesh position={[length/2 + 0.5, 0.15, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[1, 0.3, 1]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* Bridge plate that fills the gap */}
+        <mesh position={[0, 0.35, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[length, 0.05, 0.8]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* Pneumatic actuator underneath */}
+        <mesh position={[0, 0.2, 0]} castShadow onClick={onClick}>
+          <cylinderGeometry args={[0.04, 0.04, 0.3]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+        </mesh>
+        
+        {/* Support frame */}
+        <mesh position={[0, 0.05, 0]} onClick={onClick}>
+          <boxGeometry args={[length + 1, 0.08, 0.8]} />
+          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
+        </mesh>
+        
+        {/* Support legs */}
+        {[-length/2 - 0.4, length/2 + 0.4].map(x =>
+          [-0.3, 0.3].map(z => (
+            <mesh key={`leg-${x}-${z}`} position={[x, 0.08, z]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.03, 0.03, 0.16]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.3} />
+            </mesh>
+          ))
+        )}
+      </group>
+    );
+  };
+
   const renderGeometry = () => {
     switch (node.type) {
       case 'conveyor':
@@ -1190,6 +1504,12 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
         return renderPickAndPlace();
       case 'palletizer':
         return renderPalletizer();
+      case 'spiral-conveyor':
+        return renderSpiralConveyor();
+      case 'vertical-lifter':
+        return renderVerticalLifter();
+      case 'transfer-bridge':
+        return renderTransferBridge();
       case 'source':
         return renderSource();
       case 'sink':
