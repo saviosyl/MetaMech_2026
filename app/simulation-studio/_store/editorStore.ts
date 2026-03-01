@@ -125,10 +125,30 @@ interface EditorState {
   isDirty: boolean;
   lastSaved: number;
   
+  // Connection points for snapping
+  connectionPoints: Array<{
+    objectId: string;
+    portId: string;
+    position: [number, number, number];
+    type: 'input' | 'output';
+    connected: boolean;
+  }>;
+  
+  // Snapping state
+  snapMode: boolean;
+  snapDistance: number;
+  highlightedPorts: string[];
+
   // Actions
   addProcessNode: (type: ProcessNode['type'], position: [number, number, number]) => void;
   addEnvironmentAsset: (type: EnvironmentAsset['type'], position: [number, number, number]) => void;
   addActor: (type: Actor['type'], position: [number, number, number]) => void;
+  
+  // Snapping actions
+  setSnapMode: (enabled: boolean) => void;
+  updateConnectionPoints: () => void;
+  setHighlightedPorts: (portIds: string[]) => void;
+  autoConnectPorts: (sourcePortId: string, targetPortId: string) => void;
   
   updateObject: (id: string, type: 'process' | 'environment' | 'actor', updates: any) => void;
   removeObject: (id: string, type: 'process' | 'environment' | 'actor') => void;
@@ -192,6 +212,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   selectedObjectId: null,
   selectedObjectType: null,
   transformMode: 'translate',
+  
+  // Connection points and snapping
+  connectionPoints: [],
+  snapMode: true,
+  snapDistance: 0.5,
+  highlightedPorts: [],
   
   isPlaying: false,
   simulationSpeed: 1.0,
@@ -551,22 +577,136 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       version: '1.0.0',
     };
   },
+  
+  // Snapping actions
+  setSnapMode: (enabled) => {
+    set({ snapMode: enabled });
+  },
+  
+  updateConnectionPoints: () => {
+    const state = get();
+    const points: Array<{
+      objectId: string;
+      portId: string;
+      position: [number, number, number];
+      type: 'input' | 'output';
+      connected: boolean;
+    }> = [];
+    
+    // Generate connection points for process nodes
+    state.processNodes.forEach(node => {
+      if (node.type === 'conveyor' || node.type === 'machine' || 
+          node.type === 'buffer' || node.type === 'source' || node.type === 'sink') {
+        
+        const length = node.parameters?.length || 2;
+        
+        // Input port (rear of object)
+        if (node.type !== 'source') {
+          points.push({
+            objectId: node.id,
+            portId: `${node.id}_input`,
+            position: [
+              node.position[0],
+              node.position[1] + 0.5,
+              node.position[2] - length/2 - 0.1
+            ],
+            type: 'input',
+            connected: state.edges.some(e => e.to === node.id)
+          });
+        }
+        
+        // Output port (front of object)
+        if (node.type !== 'sink') {
+          points.push({
+            objectId: node.id,
+            portId: `${node.id}_output`,
+            position: [
+              node.position[0],
+              node.position[1] + 0.5,
+              node.position[2] + length/2 + 0.1
+            ],
+            type: 'output',
+            connected: state.edges.some(e => e.from === node.id)
+          });
+        }
+      }
+    });
+    
+    set({ connectionPoints: points });
+  },
+  
+  setHighlightedPorts: (portIds) => {
+    set({ highlightedPorts: portIds });
+  },
+  
+  autoConnectPorts: (sourcePortId, targetPortId) => {
+    const state = get();
+    
+    // Extract object IDs from port IDs
+    const sourceObjectId = sourcePortId.replace('_output', '').replace('_input', '');
+    const targetObjectId = targetPortId.replace('_output', '').replace('_input', '');
+    
+    // Verify ports exist and are compatible
+    const sourcePort = state.connectionPoints.find(p => p.portId === sourcePortId);
+    const targetPort = state.connectionPoints.find(p => p.portId === targetPortId);
+    
+    if (sourcePort && targetPort && 
+        sourcePort.type === 'output' && targetPort.type === 'input' &&
+        !sourcePort.connected && !targetPort.connected) {
+      
+      // Create edge
+      const newEdge: ProcessEdge = {
+        id: uuidv4(),
+        from: sourceObjectId,
+        to: targetObjectId,
+        parameters: {},
+      };
+      
+      set(state => ({
+        edges: [...state.edges, newEdge],
+        isDirty: true,
+      }));
+      
+      // Update connection points
+      get().updateConnectionPoints();
+    }
+  },
 }));
 
 // Helper function to get default parameters for different object types
 function getDefaultParameters(type: string): Record<string, any> {
   const defaults: Record<string, Record<string, any>> = {
     // Process nodes
-    source: { spawnRate: 1.0, productType: 'default' },
+    source: { 
+      spawnRate: 1.0, 
+      productType: 'default',
+      itemType: 'box' // box, tote, pallet, bottle
+    },
     sink: { capacity: 100 },
-    conveyor: { length: 5, width: 1, speed: 1.0 },
+    conveyor: { 
+      length: 5, 
+      width: 1, 
+      speed: 1.0, 
+      type: 'roller' // belt, roller, chain, modular-belt
+    },
     buffer: { capacity: 10 },
-    machine: { processingTime: 2.0, capacity: 1 },
-    router: { mode: 'round-robin' },
+    machine: { 
+      processingTime: 2.0, 
+      capacity: 1,
+      type: 'cnc' // cnc, assembly, inspection, packaging
+    },
+    router: { 
+      mode: 'divert' // divert, merge
+    },
     'transfer-bridge': { length: 2 },
     'popup-transfer': { height: 0.5, speed: 1.0 },
     'pusher-transfer': { force: 1.0, angle: 90 },
-    'spiral-conveyor': { radius: 2, height: 5, speed: 0.5 },
+    'spiral-conveyor': { 
+      radius: 2, 
+      height: 5, 
+      speed: 0.5,
+      direction: 'up' // up, down
+    },
     'vertical-lifter': { height: 3, speed: 1.0 },
     'pick-and-place': { reach: 3, speed: 1.0 },
     palletizer: { palletSize: [1.2, 0.8], stackHeight: 1.5 },
@@ -578,7 +718,7 @@ function getDefaultParameters(type: string): Record<string, any> {
     stairs: { width: 2, steps: 10, stepHeight: 0.2 },
     'safety-rail': { length: 5, height: 1.2 },
     'floor-marking': { length: 5, width: 0.2, color: 'yellow' },
-    'pallet-rack': { width: 3, height: 4, depth: 1.2, levels: 4 },
+    'pallet-rack': { width: 3, height: 4, depth: 1.2, levels: 4, bays: 2 },
     'warehouse-shell': { width: 20, height: 8, depth: 15 },
     floor: { width: 50, depth: 50, color: '#f0f0f0' },
     

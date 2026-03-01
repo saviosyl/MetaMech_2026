@@ -59,8 +59,8 @@ function NumberInput({ label, value, onChange, min, max, step = 0.1, unit }: Num
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        {label} {unit && <span className="text-gray-500">({unit})</span>}
+      <label className="block text-sm font-medium text-[#e0e0e0]">
+        {label} {unit && <span className="text-[#888]">({unit})</span>}
       </label>
       <input
         type="number"
@@ -70,7 +70,7 @@ function NumberInput({ label, value, onChange, min, max, step = 0.1, unit }: Num
         min={min}
         max={max}
         step={step}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 touch-target"
+        className="w-full px-3 py-2 bg-[#1a1a2a] border border-[#3a3a4a] rounded-lg text-[#e0e0e0] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50"
       />
     </div>
   );
@@ -89,13 +89,13 @@ function Vector3Input({ label, value, onChange, step = 0.1, unit }: Vector3Input
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        {label} {unit && <span className="text-gray-500">({unit})</span>}
+      <label className="block text-sm font-medium text-[#e0e0e0]">
+        {label} {unit && <span className="text-[#888]">({unit})</span>}
       </label>
       <div className="grid grid-cols-3 gap-2">
         {value.map((val, index) => (
           <div key={index}>
-            <label className="block text-xs text-gray-500 mb-1">{labels[index]}</label>
+            <label className="block text-xs text-[#888] mb-1">{labels[index]}</label>
             <input
               type="number"
               value={val.toFixed(2)}
@@ -105,7 +105,7 @@ function Vector3Input({ label, value, onChange, step = 0.1, unit }: Vector3Input
                 onChange(newValue);
               }}
               step={step}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 touch-target"
+              className="w-full px-2 py-1.5 text-sm bg-[#1a1a2a] border border-[#3a3a4a] rounded text-[#e0e0e0] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50"
             />
           </div>
         ))}
@@ -123,19 +123,19 @@ interface ColorInputProps {
 function ColorInput({ label, value, onChange }: ColorInputProps) {
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label className="block text-sm font-medium text-[#e0e0e0]">{label}</label>
       <div className="flex items-center gap-3">
         <input
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer touch-target"
+          className="w-12 h-12 rounded-lg border border-[#3a3a4a] cursor-pointer"
         />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 touch-target"
+          className="flex-1 px-3 py-2 bg-[#1a1a2a] border border-[#3a3a4a] rounded-lg text-[#e0e0e0] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50"
           placeholder="#ffffff"
         />
       </div>
@@ -201,6 +201,19 @@ export default function PropertiesPanel() {
     switch (obj.type) {
       case 'source':
         parameterInputs.push(
+          <div key="itemType" className="space-y-2">
+            <label className="block text-sm font-medium text-[#e0e0e0]">Item Type</label>
+            <select
+              value={params.itemType || 'box'}
+              onChange={(e) => handleUpdate({ parameters: { ...params, itemType: e.target.value } })}
+              className="w-full px-3 py-2 bg-[#1a1a2a] border border-[#3a3a4a] rounded-lg text-[#e0e0e0] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50"
+            >
+              <option value="box">Box</option>
+              <option value="tote">Tote</option>
+              <option value="pallet">Pallet</option>
+              <option value="bottle">Bottle</option>
+            </select>
+          </div>,
           <NumberInput
             key="spawnRate"
             label="Spawn Rate"
@@ -216,6 +229,19 @@ export default function PropertiesPanel() {
 
       case 'conveyor':
         parameterInputs.push(
+          <div key="conveyorType" className="space-y-2">
+            <label className="block text-sm font-medium text-[#e0e0e0]">Conveyor Type</label>
+            <select
+              value={params.type || 'roller'}
+              onChange={(e) => handleUpdate({ parameters: { ...params, type: e.target.value } })}
+              className="w-full px-3 py-2 bg-[#1a1a2a] border border-[#3a3a4a] rounded-lg text-[#e0e0e0] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50"
+            >
+              <option value="roller">Roller Conveyor</option>
+              <option value="belt">Belt Conveyor</option>
+              <option value="chain">Chain Conveyor</option>
+              <option value="modular-belt">Modular Belt</option>
+            </select>
+          </div>,
           <NumberInput
             key="length"
             label="Length"
@@ -251,6 +277,19 @@ export default function PropertiesPanel() {
 
       case 'machine':
         parameterInputs.push(
+          <div key="machineType" className="space-y-2">
+            <label className="block text-sm font-medium text-[#e0e0e0]">Machine Type</label>
+            <select
+              value={params.type || 'cnc'}
+              onChange={(e) => handleUpdate({ parameters: { ...params, type: e.target.value } })}
+              className="w-full px-3 py-2 bg-[#1a1a2a] border border-[#3a3a4a] rounded-lg text-[#e0e0e0] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50"
+            >
+              <option value="cnc">CNC Machine</option>
+              <option value="assembly">Assembly Station</option>
+              <option value="inspection">Inspection Station</option>
+              <option value="packaging">Packaging Machine</option>
+            </select>
+          </div>,
           <NumberInput
             key="processingTime"
             label="Processing Time"
@@ -289,6 +328,103 @@ export default function PropertiesPanel() {
         );
         break;
 
+      case 'router':
+        parameterInputs.push(
+          <div key="routerMode" className="space-y-2">
+            <label className="block text-sm font-medium text-[#e0e0e0]">Router Mode</label>
+            <select
+              value={params.mode || 'divert'}
+              onChange={(e) => handleUpdate({ parameters: { ...params, mode: e.target.value } })}
+              className="w-full px-3 py-2 bg-[#1a1a2a] border border-[#3a3a4a] rounded-lg text-[#e0e0e0] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50"
+            >
+              <option value="divert">Divert (Y-split)</option>
+              <option value="merge">Merge (Y-merge)</option>
+            </select>
+          </div>
+        );
+        break;
+
+      case 'pallet-rack':
+        parameterInputs.push(
+          <NumberInput
+            key="levels"
+            label="Levels"
+            value={params.levels || 4}
+            onChange={(value) => handleUpdate({ parameters: { ...params, levels: Math.floor(value) } })}
+            min={1}
+            max={6}
+            step={1}
+            unit="levels"
+          />,
+          <NumberInput
+            key="bays"
+            label="Bays"
+            value={params.bays || 2}
+            onChange={(value) => handleUpdate({ parameters: { ...params, bays: Math.floor(value) } })}
+            min={1}
+            max={5}
+            step={1}
+            unit="bays"
+          />,
+          <NumberInput
+            key="width"
+            label="Width"
+            value={params.width || 3}
+            onChange={(value) => handleUpdate({ parameters: { ...params, width: value } })}
+            min={2}
+            max={6}
+            step={0.5}
+            unit="m"
+          />,
+          <NumberInput
+            key="height"
+            label="Height"
+            value={params.height || 4}
+            onChange={(value) => handleUpdate({ parameters: { ...params, height: value } })}
+            min={2}
+            max={8}
+            step={0.5}
+            unit="m"
+          />
+        );
+        break;
+
+      case 'spiral-conveyor':
+        parameterInputs.push(
+          <div key="spiralDirection" className="space-y-2">
+            <label className="block text-sm font-medium text-[#e0e0e0]">Direction</label>
+            <select
+              value={params.direction || 'up'}
+              onChange={(e) => handleUpdate({ parameters: { ...params, direction: e.target.value } })}
+              className="w-full px-3 py-2 bg-[#1a1a2a] border border-[#3a3a4a] rounded-lg text-[#e0e0e0] focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50"
+            >
+              <option value="up">Spiral Up</option>
+              <option value="down">Spiral Down</option>
+            </select>
+          </div>,
+          <NumberInput
+            key="height"
+            label="Height"
+            value={params.height || 5}
+            onChange={(value) => handleUpdate({ parameters: { ...params, height: value } })}
+            min={1}
+            max={10}
+            step={0.5}
+            unit="m"
+          />,
+          <NumberInput
+            key="radius"
+            label="Radius"
+            value={params.radius || 2}
+            onChange={(value) => handleUpdate({ parameters: { ...params, radius: value } })}
+            min={0.5}
+            max={5}
+            step={0.1}
+            unit="m"
+          />
+        );
+        break;
+
       case 'operator':
       case 'engineer':
         parameterInputs.push(
@@ -306,11 +442,11 @@ export default function PropertiesPanel() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col bg-[#252536]">
       {/* Header */}
-      <div className="p-4 lg:p-6 border-b border-gray-200">
+      <div className="p-4 lg:p-6 border-b border-[#3a3a4a]">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-orbitron text-lg font-bold text-gray-900">
+          <h2 className="font-orbitron text-lg font-bold text-[#e0e0e0]">
             Properties
           </h2>
           <button

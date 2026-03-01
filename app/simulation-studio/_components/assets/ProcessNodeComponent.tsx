@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ProcessNode } from '../../_store/editorStore';
+import ConveyorComponent from './ConveyorComponent';
 
 interface Props {
   node: ProcessNode;
@@ -62,23 +63,37 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
   const renderConveyor = () => {
     const length = node.parameters?.length || 5;
     const width = node.parameters?.width || 1;
+    const conveyorType = node.parameters?.type || 'roller';
     const height = 0.8;
 
-    return (
+    // Common frame structure
+    const frameElements = (
       <group>
-        {/* Main frame - left side channel */}
-        <mesh position={[-width/2 + 0.05, height/2, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.1, height, length]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
-        </mesh>
+        {/* Left side C-channel frame */}
+        <group position={[-width/2 + 0.05, height/2, 0]}>
+          <mesh position={[0, -height/4, 0]} castShadow onClick={onClick}>
+            <boxGeometry args={[0.1, height/2, length]} />
+            <meshStandardMaterial color="#8a8a9a" metalness={0.7} roughness={0.3} />
+          </mesh>
+          <mesh position={[0.025, height/4 - 0.025, 0]} castShadow onClick={onClick}>
+            <boxGeometry args={[0.05, 0.05, length]} />
+            <meshStandardMaterial color="#8a8a9a" metalness={0.7} roughness={0.3} />
+          </mesh>
+        </group>
         
-        {/* Main frame - right side channel */}
-        <mesh position={[width/2 - 0.05, height/2, 0]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.1, height, length]} />
-          <meshStandardMaterial color={colors.lightSteel} metalness={0.8} roughness={0.3} />
-        </mesh>
+        {/* Right side C-channel frame */}
+        <group position={[width/2 - 0.05, height/2, 0]}>
+          <mesh position={[0, -height/4, 0]} castShadow onClick={onClick}>
+            <boxGeometry args={[0.1, height/2, length]} />
+            <meshStandardMaterial color="#8a8a9a" metalness={0.7} roughness={0.3} />
+          </mesh>
+          <mesh position={[-0.025, height/4 - 0.025, 0]} castShadow onClick={onClick}>
+            <boxGeometry args={[0.05, 0.05, length]} />
+            <meshStandardMaterial color="#8a8a9a" metalness={0.7} roughness={0.3} />
+          </mesh>
+        </group>
         
-        {/* Cross supports underneath */}
+        {/* Cross braces */}
         {Array.from({ length: Math.ceil(length / 1.5) }, (_, i) => {
           const z = (i - Math.floor((length / 1.5) / 2)) * 1.5;
           return (
@@ -89,68 +104,207 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
           );
         })}
         
-        {/* Roller cylinders - many along the length */}
-        {Array.from({ length: Math.floor(length * 2) }, (_, i) => {
-          const z = (i - Math.floor(length)) * 0.5;
-          return (
-            <mesh 
-              key={`roller-${i}`} 
-              name="roller"
-              position={[0, height - 0.05, z]} 
-              rotation={[0, 0, Math.PI/2]} 
-              castShadow 
-              onClick={onClick}
-            >
-              <cylinderGeometry args={[0.03, 0.03, width - 0.2]} />
-              <meshStandardMaterial color={colors.lightSteel} metalness={0.9} roughness={0.1} />
-            </mesh>
-          );
-        })}
-        
-        {/* Belt surface (above rollers) */}
-        <mesh position={[0, height + 0.02, 0]} onClick={onClick}>
-          <boxGeometry args={[width - 0.15, 0.02, length - 0.1]} />
-          <meshStandardMaterial color={colors.darkRubber} metalness={0.1} roughness={0.9} />
-        </mesh>
-        
-        {/* Side guide rails */}
-        <mesh position={[-width/2 + 0.01, height + 0.15, 0]} onClick={onClick}>
-          <boxGeometry args={[0.02, 0.3, length]} />
-          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
-        </mesh>
-        <mesh position={[width/2 - 0.01, height + 0.15, 0]} onClick={onClick}>
-          <boxGeometry args={[0.02, 0.3, length]} />
-          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
-        </mesh>
-        
-        {/* Adjustable legs with foot pads */}
+        {/* Adjustable legs with adjustment rings and foot pads */}
         {[-1, 1].map(x => 
           [-length/2 + 0.5, length/2 - 0.5].map((z, zi) => (
             <group key={`leg-${x}-${zi}`}>
-              {/* Leg cylinder */}
-              <mesh position={[x * (width/2 - 0.1), 0.25, z]} castShadow onClick={onClick}>
-                <cylinderGeometry args={[0.03, 0.04, 0.5]} />
+              <mesh position={[x * (width/2 - 0.1), 0.3, z]} castShadow onClick={onClick}>
+                <cylinderGeometry args={[0.03, 0.04, 0.6]} />
                 <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.3} />
               </mesh>
-              {/* Foot pad */}
+              <mesh position={[x * (width/2 - 0.1), 0.15, z]} castShadow onClick={onClick}>
+                <cylinderGeometry args={[0.045, 0.045, 0.05]} />
+                <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.5} />
+              </mesh>
               <mesh position={[x * (width/2 - 0.1), 0.02, z]} castShadow onClick={onClick}>
                 <cylinderGeometry args={[0.08, 0.08, 0.04]} />
-                <meshStandardMaterial color={colors.darkGray} metalness={0.4} roughness={0.8} />
+                <meshStandardMaterial color="#1a1a1a" metalness={0.2} roughness={0.9} />
               </mesh>
             </group>
           ))
         )}
         
-        {/* Drive motor housing at one end */}
-        <mesh position={[0, height + 0.1, length/2 - 0.3]} castShadow onClick={onClick}>
-          <boxGeometry args={[0.4, 0.3, 0.6]} />
-          <meshStandardMaterial color={colors.machineBody} metalness={0.6} roughness={0.4} />
+        {/* Side guide rails */}
+        <mesh position={[-width/2 + 0.01, height + 0.15, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.02, 0.3, length]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
         </mesh>
-        
-        {/* Motor */}
-        <mesh position={[0, height + 0.05, length/2 - 0.1]} castShadow onClick={onClick}>
+        <mesh position={[width/2 - 0.01, height + 0.15, 0]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.02, 0.3, length]} />
+          <meshStandardMaterial color={colors.safetyYellow} metalness={0.3} roughness={0.7} />
+        </mesh>
+      </group>
+    );
+
+    // Drive motor assembly
+    const driveMotor = (
+      <group position={[0, height + 0.1, length/2 - 0.3]}>
+        <mesh castShadow onClick={onClick}>
+          <boxGeometry args={[0.4, 0.3, 0.6]} />
+          <meshStandardMaterial color="#2d3a4a" metalness={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, -0.05, 0.1]} castShadow onClick={onClick}>
           <cylinderGeometry args={[0.08, 0.08, 0.2]} />
           <meshStandardMaterial color={colors.darkGray} metalness={0.8} roughness={0.2} />
+        </mesh>
+        <mesh position={[0, 0.05, -0.2]} castShadow onClick={onClick}>
+          <boxGeometry args={[0.25, 0.2, 0.25]} />
+          <meshStandardMaterial color={colors.mediumSteel} metalness={0.7} roughness={0.3} />
+        </mesh>
+        <mesh position={[0.21, 0, 0]} onClick={onClick}>
+          <boxGeometry args={[0.01, 0.1, 0.15]} />
+          <meshStandardMaterial color="#e5e5e5" metalness={0.1} roughness={0.7} />
+        </mesh>
+      </group>
+    );
+
+    // Type-specific conveying surfaces
+    let conveyingSurface;
+    switch (conveyorType) {
+      case 'belt':
+        conveyingSurface = (
+          <group>
+            <mesh position={[0, height - 0.05, length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.08, 0.08, width - 0.1]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            <mesh position={[0, height - 0.05, -length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.08, 0.08, width - 0.1]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            <mesh position={[0, height + 0.01, 0]} name="belt" castShadow onClick={onClick}>
+              <boxGeometry args={[width - 0.1, 0.02, length]} />
+              <meshStandardMaterial color={colors.darkRubber} metalness={0.1} roughness={0.9} />
+            </mesh>
+          </group>
+        );
+        break;
+        
+      case 'roller':
+        const rollerCount = Math.floor(length * 3);
+        const rollerSpacing = length / rollerCount;
+        conveyingSurface = (
+          <group>
+            {Array.from({ length: rollerCount }, (_, i) => {
+              const z = (i - (rollerCount - 1) / 2) * rollerSpacing;
+              return (
+                <mesh 
+                  key={`roller-${i}`} 
+                  name="roller"
+                  position={[0, height - 0.05, z]} 
+                  rotation={[0, 0, Math.PI/2]} 
+                  castShadow 
+                  onClick={onClick}
+                >
+                  <cylinderGeometry args={[0.025, 0.025, width - 0.2]} />
+                  <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
+                </mesh>
+              );
+            })}
+            <mesh position={[width/4, height - 0.2, 0]} onClick={onClick}>
+              <boxGeometry args={[0.02, 0.02, length - 0.2]} />
+              <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
+            </mesh>
+            <mesh position={[-width/4, height - 0.2, 0]} onClick={onClick}>
+              <boxGeometry args={[0.02, 0.02, length - 0.2]} />
+              <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
+            </mesh>
+          </group>
+        );
+        break;
+        
+      case 'chain':
+        const slatCount = Math.floor(length * 2);
+        const slatSpacing = length / slatCount;
+        conveyingSurface = (
+          <group>
+            <mesh position={[width/4, height - 0.05, length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.06, 0.06, 0.04]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            <mesh position={[-width/4, height - 0.05, length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.06, 0.06, 0.04]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            <mesh position={[width/4, height - 0.02, 0]} name="chain" onClick={onClick}>
+              <boxGeometry args={[0.03, 0.02, length]} />
+              <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
+            </mesh>
+            <mesh position={[-width/4, height - 0.02, 0]} name="chain" onClick={onClick}>
+              <boxGeometry args={[0.03, 0.02, length]} />
+              <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
+            </mesh>
+            {Array.from({ length: slatCount }, (_, i) => {
+              const z = (i - (slatCount - 1) / 2) * slatSpacing;
+              return (
+                <mesh key={`slat-${i}`} position={[0, height + 0.01, z]} castShadow onClick={onClick}>
+                  <boxGeometry args={[width - 0.15, 0.02, 0.1]} />
+                  <meshStandardMaterial color={colors.lightSteel} metalness={0.6} roughness={0.4} />
+                </mesh>
+              );
+            })}
+          </group>
+        );
+        break;
+        
+      case 'modular-belt':
+        const segmentCount = Math.floor(length * 4);
+        const segmentLength = length / segmentCount;
+        conveyingSurface = (
+          <group>
+            <mesh position={[0, height - 0.05, length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.08, 0.08, width - 0.1]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            <mesh position={[0, height - 0.05, -length/2]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+              <cylinderGeometry args={[0.08, 0.08, width - 0.1]} />
+              <meshStandardMaterial color={colors.mediumSteel} metalness={0.8} roughness={0.2} />
+            </mesh>
+            {Array.from({ length: segmentCount }, (_, i) => {
+              const z = (i - (segmentCount - 1) / 2) * segmentLength;
+              return (
+                <mesh key={`segment-${i}`} position={[0, height + 0.01, z]} name="belt" castShadow onClick={onClick}>
+                  <boxGeometry args={[width - 0.1, 0.02, segmentLength - 0.01]} />
+                  <meshStandardMaterial 
+                    color={i % 2 === 0 ? colors.darkRubber : '#2a2a3a'} 
+                    metalness={0.1} 
+                    roughness={0.9}
+                  />
+                </mesh>
+              );
+            })}
+          </group>
+        );
+        break;
+    }
+
+    return (
+      <group>
+        {frameElements}
+        {conveyingSurface}
+        {driveMotor}
+        
+        {/* Connection ports for snapping */}
+        <mesh position={[0, 0.5, -length/2 - 0.1]} onClick={onClick}>
+          <sphereGeometry args={[0.05]} />
+          <meshStandardMaterial 
+            color="#22c55e" 
+            emissive="#22c55e" 
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.8}
+          />
+        </mesh>
+        
+        <mesh position={[0, 0.5, length/2 + 0.1]} onClick={onClick}>
+          <sphereGeometry args={[0.05]} />
+          <meshStandardMaterial 
+            color="#3b82f6" 
+            emissive="#3b82f6" 
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.8}
+          />
         </mesh>
       </group>
     );
