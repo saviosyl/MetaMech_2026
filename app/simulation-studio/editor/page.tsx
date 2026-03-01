@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -36,7 +36,7 @@ const PropertiesPanel = dynamic(() => import('../_components/PropertiesPanel'), 
 
 import { useEditorStore } from '../_store/editorStore';
 
-export default function EditorPage() {
+function EditorPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const projectId = searchParams?.get('id');
@@ -487,5 +487,20 @@ export default function EditorPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function EditorPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600 font-medium">Loading Simulation Studio...</p>
+        </div>
+      </div>
+    }>
+      <EditorPageContent />
+    </Suspense>
   );
 }
