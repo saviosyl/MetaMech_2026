@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  Settings, 
-  Trash2, 
-  Copy, 
-  Eye, 
-  EyeOff, 
-  Lock, 
+import {
+  Settings,
+  Trash2,
+  Copy,
+  Eye,
+  EyeOff,
+  Lock,
   Unlock,
   RotateCw,
   Move,
@@ -37,7 +37,7 @@ function NumberInput({ label, value, onChange, min, max, step = 0.1, unit }: Num
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-    
+
     const parsed = parseFloat(newValue);
     if (!isNaN(parsed)) {
       onChange(parsed);
@@ -86,7 +86,7 @@ interface Vector3InputProps {
 
 function Vector3Input({ label, value, onChange, step = 0.1, unit }: Vector3InputProps) {
   const labels = ['X', 'Y', 'Z'];
-  
+
   return (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700">
@@ -144,15 +144,19 @@ function ColorInput({ label, value, onChange }: ColorInputProps) {
 }
 
 export default function PropertiesPanel() {
-  const { 
+  const {
     selectedObjectId,
     selectedObjectType,
     processNodes,
     environmentAssets,
     actors,
+    edges,
     sceneSettings,
     updateObject,
     removeObject,
+    removeEdge,
+    addProcessNode,
+    addEdge,
     setSceneSettings,
   } = useEditorStore();
 
@@ -160,11 +164,15 @@ export default function PropertiesPanel() {
 
   // Get selected object
   const selectedObject = selectedObjectId ? (
-    selectedObjectType === 'process' ? processNodes.find(n => n.id === selectedObjectId) :
+    selectedObjectType === 'process' && processNodes.find(n => n.id === selectedObjectId) ?
+      processNodes.find(n => n.id === selectedObjectId) :
     selectedObjectType === 'environment' ? environmentAssets.find(a => a.id === selectedObjectId) :
     selectedObjectType === 'actor' ? actors.find(a => a.id === selectedObjectId) :
     null
   ) : null;
+
+  // Check if selected object is an edge
+  const selectedEdge = selectedObjectId ? edges.find(e => e.id === selectedObjectId) : null;
 
   // Handle object updates
   const handleUpdate = (updates: any) => {
@@ -308,8 +316,8 @@ export default function PropertiesPanel() {
           <button
             onClick={() => setShowSceneSettings(!showSceneSettings)}
             className={`p-2 rounded-lg transition-colors touch-target ${
-              showSceneSettings 
-                ? 'bg-teal-100 text-teal-600' 
+              showSceneSettings
+                ? 'bg-teal-100 text-teal-600'
                 : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
             }`}
           >
@@ -320,7 +328,34 @@ export default function PropertiesPanel() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
-        {selectedObject ? (
+        {selectedEdge ? (
+          <div className="p-4 lg:p-6 space-y-6">
+            {/* Edge Info */}
+            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-3">Connection</h3>
+                <p><strong>From:</strong> {processNodes.find(n => n.id === selectedEdge.from)?.name || 'Unknown'}</p>
+                <p><strong>To:</strong> {processNodes.find(n => n.id === selectedEdge.to)?.name || 'Unknown'}</p>
+                <p><strong>ID:</strong> {selectedEdge.id.substring(0, 8)}...</p>
+              </div>
+            </div>
+
+            {/* Edge Actions */}
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  if (confirm('Are you sure you want to delete this connection?')) {
+                    removeEdge(selectedEdge.id);
+                  }
+                }}
+                className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2 touch-target"
+              >
+                <Trash2 size={16} />
+                Delete Connection
+              </button>
+            </div>
+          </div>
+        ) : selectedObject ? (
           <div className="p-4 lg:p-6 space-y-6">
             {/* Object Info */}
             <div className="bg-gray-50 rounded-lg p-4 space-y-3">
@@ -335,7 +370,7 @@ export default function PropertiesPanel() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 touch-target"
                 />
               </div>
-              
+
               <div className="text-sm text-gray-600">
                 <p><strong>Type:</strong> {selectedObject.type}</p>
                 <p><strong>ID:</strong> {selectedObject.id.substring(0, 8)}...</p>
@@ -348,23 +383,23 @@ export default function PropertiesPanel() {
                 <Move size={16} />
                 Transform
               </h3>
-              
+
               <Vector3Input
                 label="Position"
                 value={selectedObject.position}
                 onChange={(value) => handleUpdate({ position: value })}
                 unit="m"
               />
-              
+
               <Vector3Input
                 label="Rotation"
                 value={selectedObject.rotation.map(r => r * 180 / Math.PI) as [number, number, number]}
-                onChange={(value) => handleUpdate({ 
-                  rotation: value.map(r => r * Math.PI / 180) as [number, number, number] 
+                onChange={(value) => handleUpdate({
+                  rotation: value.map(r => r * Math.PI / 180) as [number, number, number]
                 })}
                 unit="deg"
               />
-              
+
               <Vector3Input
                 label="Scale"
                 value={selectedObject.scale}
@@ -379,7 +414,7 @@ export default function PropertiesPanel() {
                 <Sliders size={16} />
                 Parameters
               </h3>
-              
+
               <div className="space-y-4">
                 {renderParameters(selectedObject)}
               </div>
@@ -426,7 +461,7 @@ export default function PropertiesPanel() {
               <NumberInput
                 label="Lighting Intensity"
                 value={sceneSettings.lighting.intensity}
-                onChange={(value) => setSceneSettings({ 
+                onChange={(value) => setSceneSettings({
                   lighting: { ...sceneSettings.lighting, intensity: value }
                 })}
                 min={0}
@@ -439,7 +474,7 @@ export default function PropertiesPanel() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700">Show Grid</span>
                   <button
-                    onClick={() => setSceneSettings({ 
+                    onClick={() => setSceneSettings({
                       grid: { ...sceneSettings.grid, visible: !sceneSettings.grid.visible }
                     })}
                     className={`p-2 rounded-lg transition-colors touch-target ${
@@ -457,7 +492,7 @@ export default function PropertiesPanel() {
                     <NumberInput
                       label="Grid Size"
                       value={sceneSettings.grid.size}
-                      onChange={(value) => setSceneSettings({ 
+                      onChange={(value) => setSceneSettings({
                         grid: { ...sceneSettings.grid, size: value }
                       })}
                       min={10}
@@ -465,11 +500,11 @@ export default function PropertiesPanel() {
                       step={5}
                       unit="m"
                     />
-                    
+
                     <NumberInput
                       label="Grid Divisions"
                       value={sceneSettings.grid.divisions}
-                      onChange={(value) => setSceneSettings({ 
+                      onChange={(value) => setSceneSettings({
                         grid: { ...sceneSettings.grid, divisions: value }
                       })}
                       min={10}
@@ -484,7 +519,7 @@ export default function PropertiesPanel() {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">Show Axes</span>
                 <button
-                  onClick={() => setSceneSettings({ 
+                  onClick={() => setSceneSettings({
                     axes: { ...sceneSettings.axes, visible: !sceneSettings.axes.visible }
                   })}
                   className={`p-2 rounded-lg transition-colors touch-target ${
@@ -501,7 +536,7 @@ export default function PropertiesPanel() {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">Enable Shadows</span>
                 <button
-                  onClick={() => setSceneSettings({ 
+                  onClick={() => setSceneSettings({
                     lighting: { ...sceneSettings.lighting, shadows: !sceneSettings.lighting.shadows }
                   })}
                   className={`p-2 rounded-lg transition-colors touch-target ${
@@ -521,15 +556,33 @@ export default function PropertiesPanel() {
               <Settings size={24} className="text-gray-400" />
             </div>
             <h3 className="font-semibold text-gray-900 mb-2">No Selection</h3>
-            <p className="text-sm text-gray-600 mb-4 max-w-48">
+            <p className="text-sm text-gray-600 mb-6 max-w-48">
               Select an object in the 3D viewport to view and edit its properties.
             </p>
-            <button
-              onClick={() => setShowSceneSettings(true)}
-              className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors touch-target"
-            >
-              Scene Settings
-            </button>
+            
+            {/* Quick Actions */}
+            <div className="space-y-2 mb-4 w-full max-w-48">
+              <button
+                onClick={() => {
+                  addProcessNode('source', [-3, 0, 0]);
+                  addProcessNode('sink', [3, 0, 0]);
+                }}
+                className="w-full px-3 py-2 bg-teal-500 text-white text-xs rounded-lg hover:bg-teal-600 transition-colors touch-target"
+              >
+                Quick: Source + Sink
+              </button>
+              
+              <button
+                onClick={() => setShowSceneSettings(true)}
+                className="w-full px-3 py-2 bg-gray-500 text-white text-xs rounded-lg hover:bg-gray-600 transition-colors touch-target"
+              >
+                Scene Settings
+              </button>
+            </div>
+            
+            <div className="text-xs text-gray-400">
+              <p>💡 Use Library panel to add more components</p>
+            </div>
           </div>
         )}
       </div>
