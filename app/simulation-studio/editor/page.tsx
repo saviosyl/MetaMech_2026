@@ -308,19 +308,27 @@ export default function EditorPage() {
         duplicateSelectedObject();
       }
 
-      // Transform modes: W/E/R (only if no input is focused)
+      // Transform modes: W/E/R/M (only if no input is focused)
       if (!e.metaKey && !e.ctrlKey && !e.altKey) {
         const activeElement = document.activeElement;
         if (!activeElement || (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'TEXTAREA')) {
           switch (e.key.toLowerCase()) {
             case 'w':
+              e.preventDefault();
               setTransformMode('translate');
               break;
             case 'e':
+              e.preventDefault();
               setTransformMode('rotate');
               break;
             case 'r':
+              e.preventDefault();
               setTransformMode('scale');
+              break;
+            case 'm':
+              e.preventDefault();
+              // TODO: Implement mate tool mode
+              console.log('Mate tool activated (not yet implemented)');
               break;
             case ' ':
               e.preventDefault();
@@ -518,43 +526,77 @@ export default function EditorPage() {
           {/* Selection tools */}
           <div className="flex items-center bg-[#1a1a2a] rounded border border-[#3a3a4a] p-1">
             <button
-              className="p-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors"
-              title="Selection Tool"
-            >
-              <MousePointer size={14} />
-            </button>
-            <button
-              onClick={() => setTransformMode('translate')}
-              className={`p-1 rounded transition-colors ${
+              onClick={() => setTransformMode('translate')} // When clicked, it acts as select tool but ensures translate mode
+              className={`px-2 py-1 rounded transition-colors flex items-center gap-1 ${
                 transformMode === 'translate'
                   ? 'bg-[#06b6d4] text-white'
                   : 'text-[#e0e0e0] hover:bg-[#333345]'
               }`}
-              title="Move (W)"
+              title="Select Tool (Click to select objects)"
+              style={{ minHeight: '36px' }}
+            >
+              <MousePointer size={14} />
+              <span className="text-xs">Select</span>
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-[#3a3a4a]" />
+
+          {/* Transform tools */}
+          <div className="flex items-center bg-[#1a1a2a] rounded border border-[#3a3a4a] p-1">
+            <button
+              onClick={() => setTransformMode('translate')}
+              className={`px-2 py-1 rounded transition-colors flex items-center gap-1 ${
+                transformMode === 'translate'
+                  ? 'bg-[#06b6d4] text-white'
+                  : 'text-[#e0e0e0] hover:bg-[#333345]'
+              }`}
+              title="Move Tool (W) - Shows XYZ move arrows"
+              style={{ minHeight: '36px' }}
             >
               <Move3D size={14} />
+              <span className="text-xs">Move</span>
             </button>
             <button
               onClick={() => setTransformMode('rotate')}
-              className={`p-1 rounded transition-colors ${
+              className={`px-2 py-1 rounded transition-colors flex items-center gap-1 ${
                 transformMode === 'rotate'
                   ? 'bg-[#06b6d4] text-white'
                   : 'text-[#e0e0e0] hover:bg-[#333345]'
               }`}
-              title="Rotate (E)"
+              title="Rotate Tool (E) - Shows rotation rings"
+              style={{ minHeight: '36px' }}
             >
               <RotateCw size={14} />
+              <span className="text-xs">Rotate</span>
             </button>
             <button
               onClick={() => setTransformMode('scale')}
-              className={`p-1 rounded transition-colors ${
+              className={`px-2 py-1 rounded transition-colors flex items-center gap-1 ${
                 transformMode === 'scale'
                   ? 'bg-[#06b6d4] text-white'
                   : 'text-[#e0e0e0] hover:bg-[#333345]'
               }`}
-              title="Scale (R)"
+              title="Scale Tool (R) - Shows scale handles"
+              style={{ minHeight: '36px' }}
             >
               <Maximize size={14} />
+              <span className="text-xs">Scale</span>
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-[#3a3a4a]" />
+
+          {/* Connection tool */}
+          <div className="flex items-center bg-[#1a1a2a] rounded border border-[#3a3a4a] p-1">
+            <button
+              onClick={() => {/* TODO: Implement mate tool */}}
+              className={`px-2 py-1 rounded transition-colors flex items-center gap-1 text-[#e0e0e0] hover:bg-[#333345]`}
+              title="Mate Tool (M) - Connect objects by dragging near ports"
+              style={{ minHeight: '36px' }}
+            >
+              🔗
+              <span className="text-xs">Mate</span>
             </button>
           </div>
 
@@ -564,25 +606,32 @@ export default function EditorPage() {
           <div className="flex items-center bg-[#1a1a2a] rounded border border-[#3a3a4a] p-1">
             <button
               onClick={isPlaying ? pause : play}
-              className={`p-1 rounded transition-colors ${
+              className={`px-2 py-1 rounded transition-colors flex items-center gap-1 ${
                 isPlaying 
                   ? 'bg-orange-500 text-white hover:bg-orange-600' 
                   : 'bg-green-500 text-white hover:bg-green-600'
               }`}
+              title={isPlaying ? "Pause Simulation (Space)" : "Play Simulation (Space)"}
+              style={{ minHeight: '36px' }}
             >
               {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+              <span className="text-xs">{isPlaying ? 'Pause' : 'Play'}</span>
             </button>
             <button
               onClick={reset}
-              className="p-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors"
-              title="Stop"
+              className="px-2 py-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors flex items-center gap-1"
+              title="Stop and Reset Simulation"
+              style={{ minHeight: '36px' }}
             >
               <Square size={14} />
+              <span className="text-xs">Stop</span>
             </button>
             <select
               value={simulationSpeed}
               onChange={(e) => setSimulationSpeed(parseFloat(e.target.value))}
-              className="bg-transparent text-[#e0e0e0] text-xs px-1"
+              className="bg-transparent text-[#e0e0e0] text-xs px-2 rounded hover:bg-[#333345] transition-colors"
+              title="Simulation Speed"
+              style={{ minHeight: '32px' }}
             >
               <option value={0.25} className="bg-[#252536]">0.25x</option>
               <option value={0.5} className="bg-[#252536]">0.5x</option>
@@ -597,16 +646,20 @@ export default function EditorPage() {
           {/* Edit tools */}
           <div className="flex items-center bg-[#1a1a2a] rounded border border-[#3a3a4a] p-1">
             <button
-              className="p-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors"
-              title="Undo"
+              className="px-2 py-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors flex items-center gap-1"
+              title="Undo (Ctrl+Z)"
+              style={{ minHeight: '36px' }}
             >
               <Undo size={14} />
+              <span className="text-xs">Undo</span>
             </button>
             <button
-              className="p-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors"
-              title="Redo"
+              className="px-2 py-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors flex items-center gap-1"
+              title="Redo (Ctrl+Y)"
+              style={{ minHeight: '36px' }}
             >
               <Redo size={14} />
+              <span className="text-xs">Redo</span>
             </button>
           </div>
 
@@ -617,18 +670,22 @@ export default function EditorPage() {
             <button
               onClick={deleteSelectedObject}
               disabled={!selectedObjectId}
-              className="p-1 text-red-400 hover:bg-red-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Delete Selected"
+              className="px-2 py-1 text-red-400 hover:bg-red-900/20 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              title="Delete Selected Object (Delete)"
+              style={{ minHeight: '36px' }}
             >
               <Trash2 size={14} />
+              <span className="text-xs">Delete</span>
             </button>
             <button
               onClick={duplicateSelectedObject}
               disabled={!selectedObjectId}
-              className="p-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Duplicate Selected"
+              className="px-2 py-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              title="Duplicate Selected Object (Ctrl+D)"
+              style={{ minHeight: '36px' }}
             >
               <Copy size={14} />
+              <span className="text-xs">Duplicate</span>
             </button>
           </div>
         </div>
@@ -636,22 +693,29 @@ export default function EditorPage() {
         {/* Right side tools */}
         <div className="flex items-center bg-[#1a1a2a] rounded border border-[#3a3a4a] p-1">
           <button
-            className="p-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors"
-            title="Zoom In"
+            className="px-2 py-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors flex items-center gap-1"
+            title="Zoom In (+)"
+            style={{ minHeight: '36px' }}
           >
             <ZoomIn size={14} />
+            <span className="text-xs">Zoom+</span>
           </button>
           <button
-            className="p-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors"
-            title="Zoom Out"
+            className="px-2 py-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors flex items-center gap-1"
+            title="Zoom Out (-)"
+            style={{ minHeight: '36px' }}
           >
             <ZoomOut size={14} />
+            <span className="text-xs">Zoom-</span>
           </button>
           <button
-            className="p-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors"
-            title="Fit View"
+            className="px-2 py-1 text-[#e0e0e0] hover:bg-[#333345] rounded transition-colors flex items-center gap-1"
+            title="Fit All Objects to View (F)"
+            style={{ minHeight: '36px' }}
+            onClick={() => window.dispatchEvent(new CustomEvent('fitAllObjects'))}
           >
             <Target size={14} />
+            <span className="text-xs">Fit All</span>
           </button>
         </div>
       </div>

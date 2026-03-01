@@ -712,6 +712,8 @@ function Scene() {
           size={0.8}
           space="world"
           enabled={true}
+          // Use standard RGB=XYZ color convention
+          axisColors={[0xff0000, 0x00ff00, 0x0000ff]} // Red=X, Green=Y, Blue=Z
         />
       )}
 
@@ -745,6 +747,23 @@ function Scene() {
                 <div>• <span className="text-[#06b6d4]">Click</span> to place at cursor position</div>
                 <div>• <span className="text-[#06b6d4]">ESC</span> to cancel placement mode</div>
                 <div>• Objects snap to 0.5m grid automatically</div>
+              </div>
+            </div>
+          </div>
+        </Html>
+      )}
+
+      {/* Empty state message */}
+      {processNodes.length === 0 && environmentAssets.length === 0 && actors.length === 0 && !placementMode?.active && (
+        <Html position={[0, 2, 0]} center>
+          <div className="bg-[#252536]/90 backdrop-blur-sm border border-[#3a3a4a] text-[#e0e0e0] px-8 py-6 rounded-lg shadow-xl pointer-events-none">
+            <div className="text-center space-y-3">
+              <div className="text-2xl font-semibold text-[#06b6d4]">Start Building Your Simulation</div>
+              <div className="text-lg text-[#888]">Click a component from the Library to start building</div>
+              <div className="text-sm text-[#666] space-y-1 mt-4">
+                <div>• Drag objects from the <span className="text-[#06b6d4]">Library panel</span> on the left</div>
+                <div>• Use <span className="text-[#06b6d4]">W/E/R</span> keys to switch between Move/Rotate/Scale tools</div>
+                <div>• Right-click objects for context menu</div>
               </div>
             </div>
           </div>
@@ -838,12 +857,17 @@ export default function EditorViewport() {
       </Canvas>
 
       {/* Viewport overlay instructions */}
-      <div className="absolute top-4 right-4 bg-[#252536]/90 backdrop-blur-sm rounded border border-[#3a3a4a] px-3 py-2 text-xs text-[#e0e0e0] pointer-events-none">
-        <div className="space-y-1">
-          <div><span className="text-[#06b6d4]">Left Click:</span> Select object</div>
-          <div><span className="text-[#06b6d4]">Right Click:</span> Context menu</div>
-          <div><span className="text-[#06b6d4]">Middle Drag:</span> Pan view</div>
-          <div><span className="text-[#06b6d4]">Scroll:</span> Zoom</div>
+      <div className="absolute top-4 right-4 bg-[#252536]/90 backdrop-blur-sm rounded border border-[#3a3a4a] px-4 py-3 text-sm text-[#e0e0e0] pointer-events-none">
+        <div className="space-y-1.5">
+          <div><span className="text-[#06b6d4] font-medium">Left Click:</span> Select object</div>
+          <div><span className="text-[#06b6d4] font-medium">Right Click:</span> Context menu</div>
+          <div><span className="text-[#06b6d4] font-medium">Middle Drag:</span> Pan view</div>
+          <div><span className="text-[#06b6d4] font-medium">Scroll:</span> Zoom</div>
+          <div className="border-t border-[#3a3a4a] pt-1.5 mt-2">
+            <div><span className="text-[#06b6d4] font-medium">W/E/R:</span> Move/Rotate/Scale</div>
+            <div><span className="text-[#06b6d4] font-medium">M:</span> Mate tool</div>
+            <div><span className="text-[#06b6d4] font-medium">Space:</span> Play/Pause</div>
+          </div>
         </div>
       </div>
     </div>

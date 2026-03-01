@@ -1657,12 +1657,25 @@ export default function ProcessNodeComponent({ node, onClick, onContextMenu, isS
     >
       {renderGeometry()}
       
-      {/* Selection outline */}
+      {/* Selection outline with glow effect */}
       {isSelected && (
-        <lineSegments>
-          <edgesGeometry args={[new THREE.BoxGeometry(3, 3, 3)]} />
-          <lineBasicMaterial color="#06b6d4" linewidth={3} />
-        </lineSegments>
+        <group>
+          {/* Outer glow */}
+          <lineSegments>
+            <edgesGeometry args={[new THREE.BoxGeometry(3.2, 3.2, 3.2)]} />
+            <lineBasicMaterial color="#06b6d4" linewidth={6} transparent opacity={0.3} />
+          </lineSegments>
+          {/* Main outline */}
+          <lineSegments>
+            <edgesGeometry args={[new THREE.BoxGeometry(3, 3, 3)]} />
+            <lineBasicMaterial color="#06b6d4" linewidth={4} />
+          </lineSegments>
+          {/* Inner bright line */}
+          <lineSegments>
+            <edgesGeometry args={[new THREE.BoxGeometry(2.8, 2.8, 2.8)]} />
+            <lineBasicMaterial color="#ffffff" linewidth={2} transparent opacity={0.8} />
+          </lineSegments>
+        </group>
       )}
     </group>
   );
