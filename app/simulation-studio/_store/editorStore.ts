@@ -104,7 +104,7 @@ interface EditorState {
   // Selection and tools
   selectedObjectId: string | null;
   selectedObjectType: 'process' | 'environment' | 'actor' | null;
-  transformMode: 'translate' | 'rotate' | 'scale';
+  transformMode: 'translate' | 'rotate' | 'scale' | 'mate';
   
   // Simulation state
   isPlaying: boolean;
@@ -158,7 +158,7 @@ interface EditorState {
   removeEdge: (id: string) => void;
   
   setSelectedObject: (id: string | null, type: 'process' | 'environment' | 'actor' | null) => void;
-  setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
+  setTransformMode: (mode: 'translate' | 'rotate' | 'scale' | 'mate') => void;
   
   setSceneSettings: (settings: Partial<SceneSettings>) => void;
   setActiveLibraryTab: (tab: 'process' | 'environment' | 'actors' | 'products' | 'samples') => void;

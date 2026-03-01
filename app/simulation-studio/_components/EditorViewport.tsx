@@ -205,6 +205,10 @@ function Scene() {
     category: 'process' | 'environment' | 'actor' | 'product';
   } | null>(null);
   const [previewPosition, setPreviewPosition] = useState<[number, number, number]>([0, 0, 0]);
+  const [connectionFlash, setConnectionFlash] = useState<{
+    position: [number, number, number];
+    active: boolean;
+  } | null>(null);
 
   // Handle mouse/pointer move for placement preview
   useEffect(() => {
@@ -700,8 +704,8 @@ function Scene() {
         />
       )}
 
-      {/* Transform Controls - Only show when not in placement mode */}
-      {selectedObject && !placementMode?.active && (
+      {/* Transform Controls - Only show when not in placement mode and not in mate mode */}
+      {selectedObject && !placementMode?.active && transformMode !== 'mate' && (
         <TransformControls
           ref={transformControlsRef}
           object={selectedObject}
@@ -716,6 +720,37 @@ function Scene() {
           axisColors={[0xff0000, 0x00ff00, 0x0000ff]} // Red=X, Green=Y, Blue=Z
         />
       )}
+
+      {/* Connection Ports Visualization - Show all ports in mate mode */}
+      {transformMode === 'mate' && processNodes.map(node => {
+        const length = node.parameters?.length || 5;
+        return (
+          <group key={`ports-${node.id}`} position={node.position}>
+            {/* Input port (green circle) */}
+            <mesh position={[0, 0.5, -length/2 - 0.15]}>
+              <sphereGeometry args={[0.08]} />
+              <meshStandardMaterial 
+                color="#22c55e" 
+                emissive="#22c55e" 
+                emissiveIntensity={0.5}
+                transparent
+                opacity={0.8}
+              />
+            </mesh>
+            {/* Output port (blue circle) */}
+            <mesh position={[0, 0.5, length/2 + 0.15]}>
+              <sphereGeometry args={[0.08]} />
+              <meshStandardMaterial 
+                color="#3b82f6" 
+                emissive="#3b82f6" 
+                emissiveIntensity={0.5}
+                transparent
+                opacity={0.8}
+              />
+            </mesh>
+          </group>
+        );
+      })}
 
       {/* Orbit Controls */}
       <OrbitControls
@@ -753,6 +788,26 @@ function Scene() {
         </Html>
       )}
 
+      {/* Mate tool instructions */}
+      {transformMode === 'mate' && !placementMode?.active && (
+        <Html position={[0, 6, 0]} center>
+          <div className="bg-[#252536] border border-[#3a3a4a] text-[#e0e0e0] px-4 py-3 rounded-lg shadow-xl pointer-events-none backdrop-blur-sm">
+            <div className="text-center space-y-1">
+              <div className="font-semibold text-lg flex items-center justify-center gap-2">
+                🔗 Mate Tool Active
+              </div>
+              <div className="text-sm text-[#888] space-y-0.5">
+                <div>• Select and drag objects near other objects to connect</div>
+                <div>• <span className="text-[#22c55e] font-medium">Green circles</span> = Input ports</div>
+                <div>• <span className="text-[#3b82f6] font-medium">Blue circles</span> = Output ports</div>
+                <div>• Connections snap automatically when objects align</div>
+                <div>• Press <span className="text-[#06b6d4]">W/E/R</span> to exit mate mode</div>
+              </div>
+            </div>
+          </div>
+        </Html>
+      )}
+
       {/* Empty state message */}
       {processNodes.length === 0 && environmentAssets.length === 0 && actors.length === 0 && !placementMode?.active && (
         <Html position={[0, 2, 0]} center>
@@ -768,6 +823,31 @@ function Scene() {
             </div>
           </div>
         </Html>
+      )}
+
+      {/* Connection success flash effect */}
+      {connectionFlash?.active && (
+        <group position={connectionFlash.position}>
+          <mesh>
+            <sphereGeometry args={[1]} />
+            <meshStandardMaterial 
+              color="#06b6d4" 
+              emissive="#06b6d4" 
+              emissiveIntensity={1}
+              transparent
+              opacity={0.6}
+            />
+          </mesh>
+          {/* Expanding ring effect */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.5, 1.5]} />
+            <meshBasicMaterial 
+              color="#06b6d4" 
+              transparent
+              opacity={0.4}
+            />
+          </mesh>
+        </group>
       )}
 
       {/* Connection Manager for snapping */}

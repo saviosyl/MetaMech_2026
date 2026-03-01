@@ -327,8 +327,7 @@ export default function EditorPage() {
               break;
             case 'm':
               e.preventDefault();
-              // TODO: Implement mate tool mode
-              console.log('Mate tool activated (not yet implemented)');
+              setTransformMode('mate');
               break;
             case ' ':
               e.preventDefault();
@@ -350,52 +349,66 @@ export default function EditorPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Track if currently resizing (for overlay)
+  const [isResizing, setIsResizing] = useState(false);
+
   // Global mouse handlers for resize (must be on document, not the handle)
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!resizingRef.current) return;
       e.preventDefault();
+      e.stopPropagation();
+      
+      const delta = e.clientX - startXRef.current;
       
       if (resizingRef.current === 'left') {
-        const newWidth = startWidthRef.current + (e.clientX - startXRef.current);
-        setLeftPanelWidth(Math.max(200, Math.min(500, newWidth)));
+        const newWidth = startWidthRef.current + delta;
+        setLeftPanelWidth(Math.max(60, Math.min(600, newWidth)));
       } else {
-        const newWidth = startWidthRef.current - (e.clientX - startXRef.current);
-        setRightPanelWidth(Math.max(200, Math.min(500, newWidth)));
+        const newWidth = startWidthRef.current - delta;
+        setRightPanelWidth(Math.max(60, Math.min(600, newWidth)));
       }
     };
     
     const handleMouseUp = () => {
-      resizingRef.current = null;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      if (resizingRef.current) {
+        resizingRef.current = null;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        document.body.style.pointerEvents = '';
+        setIsResizing(false);
+      }
     };
     
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove, { capture: true });
+    document.addEventListener('mouseup', handleMouseUp, { capture: true });
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove, { capture: true });
+      document.removeEventListener('mouseup', handleMouseUp, { capture: true });
     };
   }, []);
 
   // Resize handle start functions
   const startLeftResize = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     resizingRef.current = 'left';
     startXRef.current = e.clientX;
     startWidthRef.current = leftPanelWidth;
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
+    setIsResizing(true);
   };
 
   const startRightResize = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     resizingRef.current = 'right';
     startXRef.current = e.clientX;
     startWidthRef.current = rightPanelWidth;
     document.body.style.cursor = 'col-resize';
     document.body.style.userSelect = 'none';
+    setIsResizing(true);
   };
 
   // Keyboard shortcuts
@@ -590,8 +603,12 @@ export default function EditorPage() {
           {/* Connection tool */}
           <div className="flex items-center bg-[#1a1a2a] rounded border border-[#3a3a4a] p-1">
             <button
-              onClick={() => {/* TODO: Implement mate tool */}}
-              className={`px-2 py-1 rounded transition-colors flex items-center gap-1 text-[#e0e0e0] hover:bg-[#333345]`}
+              onClick={() => setTransformMode('mate')}
+              className={`px-2 py-1 rounded transition-colors flex items-center gap-1 ${
+                transformMode === 'mate'
+                  ? 'bg-[#06b6d4] text-white'
+                  : 'text-[#e0e0e0] hover:bg-[#333345]'
+              }`}
               title="Mate Tool (M) - Connect objects by dragging near ports"
               style={{ minHeight: '36px' }}
             >
@@ -727,57 +744,71 @@ export default function EditorPage() {
         </div>
       )}
 
+      {/* Full-screen overlay during resize to prevent canvas stealing mouse events */}
+      {isResizing && (
+        <div className="fixed inset-0 z-[9999] cursor-col-resize" style={{ background: 'transparent' }} />
+      )}
+
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex overflow-hidden">
-        {/* LEFT PANEL - resizable */}
-        <div 
-          className="overflow-hidden flex flex-col relative"
-          style={{ width: isLeftPanelVisible ? leftPanelWidth : 'auto' }}
-        >
-          {/* Library Panel */}
-          <LibraryPanel 
-            isVisible={isLeftPanelVisible} 
-            onVisibilityChange={setIsLeftPanelVisible} 
-          />
-
-          {/* Left Resize Handle */}
-          {isLeftPanelVisible && (
-            <div
-              className="w-2 cursor-col-resize hover:bg-teal-500/50 active:bg-teal-500 transition-colors flex-shrink-0"
-              style={{ minWidth: '8px' }}
-              onMouseDown={startLeftResize}
-              onDoubleClick={() => setLeftPanelWidth(280)}
-              title="Resize panel (double-click to reset)"
+        {/* LEFT PANEL */}
+        {isLeftPanelVisible && (
+          <div 
+            className="overflow-hidden flex-shrink-0"
+            style={{ width: leftPanelWidth }}
+          >
+            <LibraryPanel 
+              isVisible={isLeftPanelVisible} 
+              onVisibilityChange={setIsLeftPanelVisible} 
             />
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* LEFT RESIZE HANDLE — between panel and viewport */}
+        {isLeftPanelVisible && (
+          <div
+            onMouseDown={startLeftResize}
+            onDoubleClick={() => setLeftPanelWidth(280)}
+            title="Drag to resize · Double-click to reset"
+            className="flex-shrink-0 relative group"
+            style={{ width: '6px', cursor: 'col-resize' }}
+          >
+            <div className="absolute inset-y-0 -left-2 -right-2" style={{ cursor: 'col-resize' }} />
+            <div className={`w-full h-full transition-colors ${isResizing ? 'bg-teal-500' : 'bg-[#3a3a4a] group-hover:bg-teal-500/70'}`} />
+          </div>
+        )}
 
         {/* 3D VIEWPORT */}
-        <div className="flex-1 relative bg-[#1a1a2a]">
+        <div className="flex-1 relative bg-[#1a1a2a] min-w-0">
           <EditorViewport />
         </div>
 
-        {/* RIGHT PANEL - resizable */}
-        <div 
-          className="overflow-hidden relative"
-          style={{ width: (isRightPanelVisible && selectedObjectId) ? rightPanelWidth : 'auto' }}
-        >
-          {/* Right Resize Handle */}
-          {isRightPanelVisible && selectedObjectId && (
-            <div
-              className="w-2 cursor-col-resize hover:bg-teal-500/50 active:bg-teal-500 transition-colors flex-shrink-0"
-              style={{ minWidth: '8px' }}
-              onMouseDown={startRightResize}
-              onDoubleClick={() => setRightPanelWidth(300)}
-              title="Resize panel (double-click to reset)"
+        {/* RIGHT RESIZE HANDLE — between viewport and panel */}
+        {isRightPanelVisible && selectedObjectId && (
+          <div
+            onMouseDown={startRightResize}
+            onDoubleClick={() => setRightPanelWidth(300)}
+            title="Drag to resize · Double-click to reset"
+            className="flex-shrink-0 relative group"
+            style={{ width: '6px', cursor: 'col-resize' }}
+          >
+            <div className="absolute inset-y-0 -left-2 -right-2" style={{ cursor: 'col-resize' }} />
+            <div className={`w-full h-full transition-colors ${isResizing ? 'bg-teal-500' : 'bg-[#3a3a4a] group-hover:bg-teal-500/70'}`} />
+          </div>
+        )}
+
+        {/* RIGHT PANEL */}
+        {isRightPanelVisible && selectedObjectId && (
+          <div 
+            className="overflow-hidden flex-shrink-0"
+            style={{ width: rightPanelWidth }}
+          >
+            <PropertiesPanel 
+              isVisible={true}
+              onVisibilityChange={setIsRightPanelVisible}
             />
-          )}
-          
-          <PropertiesPanel 
-            isVisible={isRightPanelVisible && (selectedObjectId !== null)}
-            onVisibilityChange={setIsRightPanelVisible}
-          />
-        </div>
+          </div>
+        )}
       </div>
 
       {/* BOTTOM BAR - 32px height */}

@@ -29,9 +29,9 @@ export default function ConnectionManager() {
     updateConnectionPoints();
   }, [processNodes, updateConnectionPoints]);
 
-  // Monitor for potential connections during transform operations
+  // Monitor for potential connections during transform operations or mate mode
   useFrame(({ clock }) => {
-    if (!snapMode || !selectedObjectId || selectedObjectType !== 'process') return;
+    if ((!snapMode && transformMode !== 'mate') || !selectedObjectId || selectedObjectType !== 'process') return;
     
     // Only check every 100ms to avoid performance issues
     const now = clock.getElapsedTime() * 1000;
