@@ -27,14 +27,15 @@ export default function ProcessNodeComponent({ node, onClick, isSelected }: Prop
         // Special animations for different node types
         if (node.type === 'conveyor') {
           // Roller animation
-          const rollers = groupRef.current.getObjectsByProperty('name', 'roller');
-          rollers.forEach(roller => {
-            roller.rotation.x = clock.getElapsedTime() * 3;
+          groupRef.current.traverse((child) => {
+            if (child.name === 'roller') {
+              child.rotation.x = clock.getElapsedTime() * 3;
+            }
           });
         } else if (node.type === 'machine') {
           // Status light blinking
           const statusLight = groupRef.current.getObjectByName('statusLight');
-          if (statusLight) {
+          if (statusLight && 'material' in statusLight) {
             const intensity = 0.3 + Math.sin(clock.getElapsedTime() * 2) * 0.2;
             (statusLight.material as any).emissiveIntensity = intensity;
           }

@@ -32,7 +32,7 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
         } else if (actor.type === 'agv') {
           // LED strip animation
           const ledStrip = groupRef.current.getObjectByName('ledStrip');
-          if (ledStrip) {
+          if (ledStrip && 'material' in ledStrip) {
             const intensity = 0.2 + Math.sin(clock.getElapsedTime() * 3) * 0.1;
             (ledStrip.material as any).emissiveIntensity = intensity;
           }
@@ -46,6 +46,7 @@ export default function ActorComponent({ actor, onClick, isSelected }: Props) {
     operatorBlue: '#3b82f6',
     engineerOrange: '#f97316', 
     safetyYellow: '#eab308',
+    safetyGreen: '#22c55e',
     hardHatYellow: '#eab308',
     skinTone: '#d4a574',
     darkGray: '#4a5568',
