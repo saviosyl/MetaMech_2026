@@ -16,20 +16,105 @@ interface Props {
 
 // Belt Conveyor GLB Model Component
 function BeltConveyorModel({ onClick }: { onClick: (event: any) => void }) {
-  const { scene } = useGLTF('/models/belt-conveyor/scene.gltf');
-  const model = scene.clone();
-  
-  // Scale and position to fit (conveyors are typically 1-3m long, ~0.6m wide, ~0.8m tall)
-  // Scale down from model size to fit our coordinate system
-  model.scale.set(0.01, 0.01, 0.01);
-  
-  // Center the model at origin
-  const box = new THREE.Box3().setFromObject(model);
-  const center = box.getCenter(new THREE.Vector3());
-  model.position.sub(center);
-  model.position.y += 0.4; // Lift to ground level
-  
-  return <primitive object={model} onClick={onClick} />;
+  try {
+    const { scene } = useGLTF('/models/BELT%20CONVEYOR%20r.glb');
+    const model = scene.clone();
+    
+    // Scale and position to fit (conveyors are typically 1-3m long, ~0.6m wide, ~0.8m tall)
+    // Try different scales until model looks right for a ~2m long conveyor
+    model.scale.set(0.01, 0.01, 0.01);
+    
+    // Center the model at origin
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.sub(center);
+    model.position.y += 0.4; // Lift to ground level
+    
+    return <primitive object={model} onClick={onClick} />;
+  } catch (error) {
+    // Fallback to old model if new one fails
+    try {
+      const { scene } = useGLTF('/models/belt-conveyor/scene.gltf');
+      const model = scene.clone();
+      model.scale.set(0.01, 0.01, 0.01);
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.sub(center);
+      model.position.y += 0.4;
+      return <primitive object={model} onClick={onClick} />;
+    } catch {
+      // Final fallback to procedural geometry
+      return (
+        <group>
+          <mesh position={[0, 0.8 - 0.05, 2.5]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+            <cylinderGeometry args={[0.08, 0.08, 0.9]} />
+            <meshStandardMaterial color="#8a8a9a" metalness={0.8} roughness={0.2} />
+          </mesh>
+          <mesh position={[0, 0.8 - 0.05, -2.5]} rotation={[0, 0, Math.PI/2]} castShadow onClick={onClick}>
+            <cylinderGeometry args={[0.08, 0.08, 0.9]} />
+            <meshStandardMaterial color="#8a8a9a" metalness={0.8} roughness={0.2} />
+          </mesh>
+          <mesh position={[0, 0.8 + 0.01, 0]} name="belt" castShadow onClick={onClick}>
+            <boxGeometry args={[0.9, 0.02, 5]} />
+            <meshStandardMaterial color="#1f2937" metalness={0.1} roughness={0.9} />
+          </mesh>
+        </group>
+      );
+    }
+  }
+}
+
+// Roller Conveyor GLB Model Component
+function RollerConveyorModel({ onClick }: { onClick: (event: any) => void }) {
+  try {
+    const { scene } = useGLTF('/models/ROLLER%20CONVEYOR.glb');
+    const model = scene.clone();
+    
+    // Scale to fit a ~2m long conveyor
+    model.scale.set(0.01, 0.01, 0.01);
+    
+    // Center the model at origin
+    const box = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.sub(center);
+    model.position.y += 0.4; // Lift to ground level
+    
+    return <primitive object={model} onClick={onClick} />;
+  } catch (error) {
+    // Fallback to procedural roller geometry
+    const length = 5;
+    const width = 1;
+    const rollerCount = Math.floor(length * 3);
+    const rollerSpacing = length / rollerCount;
+    return (
+      <group>
+        {Array.from({ length: rollerCount }, (_, i) => {
+          const z = (i - (rollerCount - 1) / 2) * rollerSpacing;
+          return (
+            <mesh 
+              key={`roller-${i}`} 
+              name="roller"
+              position={[0, 0.8 - 0.05, z]} 
+              rotation={[0, 0, Math.PI/2]} 
+              castShadow 
+              onClick={onClick}
+            >
+              <cylinderGeometry args={[0.025, 0.025, width - 0.2]} />
+              <meshStandardMaterial color="#4a5568" metalness={0.7} roughness={0.3} />
+            </mesh>
+          );
+        })}
+        <mesh position={[width/4, 0.8 - 0.2, 0]} onClick={onClick}>
+          <boxGeometry args={[0.02, 0.02, length - 0.2]} />
+          <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[-width/4, 0.8 - 0.2, 0]} onClick={onClick}>
+          <boxGeometry args={[0.02, 0.02, length - 0.2]} />
+          <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
+        </mesh>
+      </group>
+    );
+  }
 }
 
 export default function ProcessNodeComponent({ node, onClick, onContextMenu, isSelected }: Props) {
@@ -186,7 +271,7 @@ export default function ProcessNodeComponent({ node, onClick, onContextMenu, isS
     let conveyingSurface;
     switch (conveyorType) {
       case 'belt':
-        // Try GLB model first, fallback to procedural
+        // Use new GLB model first, with fallbacks
         conveyingSurface = (
           <Suspense fallback={
             <group>
@@ -210,35 +295,38 @@ export default function ProcessNodeComponent({ node, onClick, onContextMenu, isS
         break;
         
       case 'roller':
-        const rollerCount = Math.floor(length * 3);
-        const rollerSpacing = length / rollerCount;
+        // Use new GLB model for roller conveyor
         conveyingSurface = (
-          <group>
-            {Array.from({ length: rollerCount }, (_, i) => {
-              const z = (i - (rollerCount - 1) / 2) * rollerSpacing;
-              return (
-                <mesh 
-                  key={`roller-${i}`} 
-                  name="roller"
-                  position={[0, height - 0.05, z]} 
-                  rotation={[0, 0, Math.PI/2]} 
-                  castShadow 
-                  onClick={onClick}
-                >
-                  <cylinderGeometry args={[0.025, 0.025, width - 0.2]} />
-                  <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
-                </mesh>
-              );
-            })}
-            <mesh position={[width/4, height - 0.2, 0]} onClick={onClick}>
-              <boxGeometry args={[0.02, 0.02, length - 0.2]} />
-              <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
-            </mesh>
-            <mesh position={[-width/4, height - 0.2, 0]} onClick={onClick}>
-              <boxGeometry args={[0.02, 0.02, length - 0.2]} />
-              <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
-            </mesh>
-          </group>
+          <Suspense fallback={
+            <group>
+              {Array.from({ length: Math.floor(length * 3) }, (_, i) => {
+                const z = (i - (Math.floor(length * 3) - 1) / 2) * (length / Math.floor(length * 3));
+                return (
+                  <mesh 
+                    key={`roller-${i}`} 
+                    name="roller"
+                    position={[0, height - 0.05, z]} 
+                    rotation={[0, 0, Math.PI/2]} 
+                    castShadow 
+                    onClick={onClick}
+                  >
+                    <cylinderGeometry args={[0.025, 0.025, width - 0.2]} />
+                    <meshStandardMaterial color={colors.darkGray} metalness={0.7} roughness={0.3} />
+                  </mesh>
+                );
+              })}
+              <mesh position={[width/4, height - 0.2, 0]} onClick={onClick}>
+                <boxGeometry args={[0.02, 0.02, length - 0.2]} />
+                <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
+              </mesh>
+              <mesh position={[-width/4, height - 0.2, 0]} onClick={onClick}>
+                <boxGeometry args={[0.02, 0.02, length - 0.2]} />
+                <meshStandardMaterial color="#5a5a6a" metalness={0.8} roughness={0.3} />
+              </mesh>
+            </group>
+          }>
+            <RollerConveyorModel onClick={onClick} />
+          </Suspense>
         );
         break;
         
@@ -1581,4 +1669,7 @@ export default function ProcessNodeComponent({ node, onClick, onContextMenu, isS
 }
 
 // Preload the GLB models
+useGLTF.preload('/models/BELT%20CONVEYOR%20r.glb');
+useGLTF.preload('/models/ROLLER%20CONVEYOR.glb');
+// Keep old model as backup
 useGLTF.preload('/models/belt-conveyor/scene.gltf');

@@ -54,11 +54,14 @@ export default function EditorPage() {
   const [leftPanelWidth, setLeftPanelWidth] = useState(280);
   const [rightPanelWidth, setRightPanelWidth] = useState(300);
   const [scenePreset, setScenePreset] = useState('warehouse');
-  const [isResizingLeft, setIsResizingLeft] = useState(false);
-  const [isResizingRight, setIsResizingRight] = useState(false);
   const [isLeftPanelVisible, setIsLeftPanelVisible] = useState(true);
   const [isRightPanelVisible, setIsRightPanelVisible] = useState(true);
   const [showSceneSettings, setShowSceneSettings] = useState(false);
+  
+  // Panel resize state using refs (for performance during drag)
+  const resizingRef = useRef<'left' | 'right' | null>(null);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(0);
   
   // Store state
   const {
@@ -339,65 +342,53 @@ export default function EditorPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Panel resize handlers
-  const handleLeftResizeStart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizingLeft(true);
-  };
-
-  const handleRightResizeStart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizingRight(true);
-  };
-
+  // Global mouse handlers for resize (must be on document, not the handle)
   useEffect(() => {
-    let animationFrame: number;
-    let currentMouseX = 0;
-
     const handleMouseMove = (e: MouseEvent) => {
-      currentMouseX = e.clientX;
+      if (!resizingRef.current) return;
+      e.preventDefault();
       
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
+      if (resizingRef.current === 'left') {
+        const newWidth = startWidthRef.current + (e.clientX - startXRef.current);
+        setLeftPanelWidth(Math.max(200, Math.min(500, newWidth)));
+      } else {
+        const newWidth = startWidthRef.current - (e.clientX - startXRef.current);
+        setRightPanelWidth(Math.max(200, Math.min(500, newWidth)));
       }
-      
-      animationFrame = requestAnimationFrame(() => {
-        if (isResizingLeft) {
-          const newWidth = Math.min(Math.max(currentMouseX, 200), 500);
-          setLeftPanelWidth(newWidth);
-        }
-        if (isResizingRight) {
-          const newWidth = Math.min(Math.max(window.innerWidth - currentMouseX, 200), 500);
-          setRightPanelWidth(newWidth);
-        }
-      });
     };
-
+    
     const handleMouseUp = () => {
-      setIsResizingLeft(false);
-      setIsResizingRight(false);
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
+      resizingRef.current = null;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
     };
-
-    if (isResizingLeft || isResizingRight) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-    }
-
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
     };
-  }, [isResizingLeft, isResizingRight]);
+  }, []);
+
+  // Resize handle start functions
+  const startLeftResize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    resizingRef.current = 'left';
+    startXRef.current = e.clientX;
+    startWidthRef.current = leftPanelWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const startRightResize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    resizingRef.current = 'right';
+    startXRef.current = e.clientX;
+    startWidthRef.current = rightPanelWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -688,8 +679,9 @@ export default function EditorPage() {
           {/* Left Resize Handle */}
           {isLeftPanelVisible && (
             <div
-              className="absolute right-0 top-0 bottom-0 w-1.5 bg-transparent hover:bg-teal-500 cursor-col-resize transition-colors"
-              onMouseDown={handleLeftResizeStart}
+              className="w-2 cursor-col-resize hover:bg-teal-500/50 active:bg-teal-500 transition-colors flex-shrink-0"
+              style={{ minWidth: '8px' }}
+              onMouseDown={startLeftResize}
               onDoubleClick={() => setLeftPanelWidth(280)}
               title="Resize panel (double-click to reset)"
             />
@@ -709,8 +701,9 @@ export default function EditorPage() {
           {/* Right Resize Handle */}
           {isRightPanelVisible && selectedObjectId && (
             <div
-              className="absolute left-0 top-0 bottom-0 w-1.5 bg-transparent hover:bg-teal-500 cursor-col-resize transition-colors"
-              onMouseDown={handleRightResizeStart}
+              className="w-2 cursor-col-resize hover:bg-teal-500/50 active:bg-teal-500 transition-colors flex-shrink-0"
+              style={{ minWidth: '8px' }}
+              onMouseDown={startRightResize}
               onDoubleClick={() => setRightPanelWidth(300)}
               title="Resize panel (double-click to reset)"
             />
