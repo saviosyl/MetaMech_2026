@@ -746,15 +746,21 @@ export default function EditorPage() {
 
       {/* Full-screen overlay during resize to prevent canvas stealing mouse events */}
       {isResizing && (
-        <div className="fixed inset-0 z-[9999] cursor-col-resize" style={{ background: 'transparent' }} />
+        <div className="fixed inset-0 z-[9999] cursor-col-resize" />
       )}
 
-      {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* LEFT PANEL */}
+      {/* MAIN CONTENT AREA — relative container, panels absolutely positioned */}
+      <div className="flex-1 relative overflow-hidden">
+        
+        {/* 3D VIEWPORT — fills entire area */}
+        <div className="absolute inset-0 bg-[#1a1a2a]">
+          <EditorViewport />
+        </div>
+
+        {/* LEFT PANEL — absolutely positioned, independent */}
         {isLeftPanelVisible && (
           <div 
-            className="overflow-hidden flex-shrink-0"
+            className="absolute top-0 bottom-0 left-0 z-20 overflow-hidden"
             style={{ width: leftPanelWidth }}
           >
             <LibraryPanel 
@@ -764,49 +770,42 @@ export default function EditorPage() {
           </div>
         )}
 
-        {/* LEFT RESIZE HANDLE — between panel and viewport */}
+        {/* LEFT RESIZE HANDLE — absolutely positioned at left panel edge */}
         {isLeftPanelVisible && (
           <div
             onMouseDown={startLeftResize}
             onDoubleClick={() => setLeftPanelWidth(280)}
-            title="Drag to resize · Double-click to reset"
-            className="flex-shrink-0 relative group"
-            style={{ width: '6px', cursor: 'col-resize' }}
+            title="Drag to resize"
+            className="absolute top-0 bottom-0 z-30 group"
+            style={{ left: leftPanelWidth - 3, width: '10px', cursor: 'col-resize' }}
           >
-            <div className="absolute inset-y-0 -left-2 -right-2" style={{ cursor: 'col-resize' }} />
-            <div className={`w-full h-full transition-colors ${isResizing ? 'bg-teal-500' : 'bg-[#3a3a4a] group-hover:bg-teal-500/70'}`} />
+            <div className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[4px] transition-colors rounded ${isResizing ? 'bg-teal-500' : 'bg-transparent group-hover:bg-teal-500/70'}`} />
           </div>
         )}
 
-        {/* 3D VIEWPORT */}
-        <div className="flex-1 relative bg-[#1a1a2a] min-w-0">
-          <EditorViewport />
-        </div>
-
-        {/* RIGHT RESIZE HANDLE — between viewport and panel */}
-        {isRightPanelVisible && selectedObjectId && (
-          <div
-            onMouseDown={startRightResize}
-            onDoubleClick={() => setRightPanelWidth(300)}
-            title="Drag to resize · Double-click to reset"
-            className="flex-shrink-0 relative group"
-            style={{ width: '6px', cursor: 'col-resize' }}
-          >
-            <div className="absolute inset-y-0 -left-2 -right-2" style={{ cursor: 'col-resize' }} />
-            <div className={`w-full h-full transition-colors ${isResizing ? 'bg-teal-500' : 'bg-[#3a3a4a] group-hover:bg-teal-500/70'}`} />
-          </div>
-        )}
-
-        {/* RIGHT PANEL */}
+        {/* RIGHT PANEL — absolutely positioned, independent */}
         {isRightPanelVisible && selectedObjectId && (
           <div 
-            className="overflow-hidden flex-shrink-0"
+            className="absolute top-0 bottom-0 right-0 z-20 overflow-hidden"
             style={{ width: rightPanelWidth }}
           >
             <PropertiesPanel 
               isVisible={true}
               onVisibilityChange={setIsRightPanelVisible}
             />
+          </div>
+        )}
+
+        {/* RIGHT RESIZE HANDLE — absolutely positioned at right panel edge */}
+        {isRightPanelVisible && selectedObjectId && (
+          <div
+            onMouseDown={startRightResize}
+            onDoubleClick={() => setRightPanelWidth(300)}
+            title="Drag to resize"
+            className="absolute top-0 bottom-0 z-30 group"
+            style={{ right: rightPanelWidth - 3, width: '10px', cursor: 'col-resize' }}
+          >
+            <div className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[4px] transition-colors rounded ${isResizing ? 'bg-teal-500' : 'bg-transparent group-hover:bg-teal-500/70'}`} />
           </div>
         )}
       </div>
