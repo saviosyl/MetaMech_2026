@@ -54,6 +54,8 @@ export default function EditorPage() {
   const [leftPanelWidth, setLeftPanelWidth] = useState(280);
   const [rightPanelWidth, setRightPanelWidth] = useState(300);
   const [scenePreset, setScenePreset] = useState('warehouse');
+  const [isResizingLeft, setIsResizingLeft] = useState(false);
+  const [isResizingRight, setIsResizingRight] = useState(false);
   
   // Store state
   const {
@@ -305,6 +307,49 @@ export default function EditorPage() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Panel resize handlers
+  const handleLeftResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingLeft(true);
+  };
+
+  const handleRightResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingRight(true);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isResizingLeft) {
+        const newWidth = Math.min(Math.max(e.clientX, 200), 400);
+        setLeftPanelWidth(newWidth);
+      }
+      if (isResizingRight) {
+        const newWidth = Math.min(Math.max(window.innerWidth - e.clientX, 200), 450);
+        setRightPanelWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingLeft(false);
+      setIsResizingRight(false);
+    };
+
+    if (isResizingLeft || isResizingRight) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizingLeft, isResizingRight]);
+
   return (
     <div className="h-screen bg-[#1e1e2e] flex flex-col overflow-hidden font-inter text-sm text-[#e0e0e0]">
       {/* TOP BAR - 48px height */}
@@ -536,9 +581,9 @@ export default function EditorPage() {
 
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex overflow-hidden">
-        {/* LEFT PANEL - 280px width */}
+        {/* LEFT PANEL - resizable */}
         <div 
-          className="bg-[#252536] border-r border-[#3a3a4a] overflow-hidden flex flex-col"
+          className="bg-[#252536] border-r border-[#3a3a4a] overflow-hidden flex flex-col relative"
           style={{ width: leftPanelWidth }}
         >
           {/* Search bar */}
@@ -557,6 +602,12 @@ export default function EditorPage() {
           <div className="flex-1 overflow-hidden">
             <LibraryPanel />
           </div>
+
+          {/* Left Resize Handle */}
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 bg-[#3a3a4a] hover:bg-[#06b6d4] cursor-col-resize transition-colors"
+            onMouseDown={handleLeftResizeStart}
+          />
         </div>
 
         {/* 3D VIEWPORT */}
@@ -564,12 +615,17 @@ export default function EditorPage() {
           <EditorViewport />
         </div>
 
-        {/* RIGHT PANEL - 300px width (only when object selected) */}
+        {/* RIGHT PANEL - resizable (only when object selected) */}
         {selectedObjectId && (
           <div 
-            className="bg-[#252536] border-l border-[#3a3a4a] overflow-hidden"
+            className="bg-[#252536] border-l border-[#3a3a4a] overflow-hidden relative"
             style={{ width: rightPanelWidth }}
           >
+            {/* Right Resize Handle */}
+            <div
+              className="absolute left-0 top-0 bottom-0 w-1 bg-[#3a3a4a] hover:bg-[#06b6d4] cursor-col-resize transition-colors"
+              onMouseDown={handleRightResizeStart}
+            />
             <PropertiesPanel />
           </div>
         )}
