@@ -176,7 +176,7 @@ export default function ConnectionManager() {
         
         if (targetPoint && targetPoint.objectId !== selectedObjectId) {
           // Calculate snap position
-          const isOutputToInput = sourcePort.includes(selectedObjectId);
+          const isOutputToInput = (sourcePort as string).includes(selectedObjectId);
           const targetNode = processNodes.find(n => n.id === targetPoint.objectId);
           
           if (targetNode) {
