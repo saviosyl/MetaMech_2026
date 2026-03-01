@@ -58,6 +58,7 @@ export default function EditorPage() {
     totalItemsProduced,
     totalItemsConsumed,
     simulationTime,
+    simulationItems,
     activeLibraryTab,
     selectedObjectId,
     play,
@@ -410,14 +411,20 @@ export default function EditorPage() {
           {/* KPI Bar */}
           <div className="absolute bottom-4 left-4 right-4 lg:right-80 bg-black bg-opacity-75 text-white px-4 py-2 rounded-lg backdrop-blur-sm">
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-4 lg:gap-6">
+              <div className="flex items-center gap-4 lg:gap-6 flex-wrap">
                 <span>Produced: <strong className="text-teal-400">{totalItemsProduced}</strong></span>
                 <span>Consumed: <strong className="text-orange-400">{totalItemsConsumed}</strong></span>
+                <span>Active: <strong className="text-purple-400">{simulationItems.length}</strong></span>
                 <span>Time: <strong className="text-blue-400">{formatTime(simulationTime)}</strong></span>
+                {simulationTime > 0 && (
+                  <span>Throughput: <strong className="text-green-400">
+                    {((totalItemsConsumed / simulationTime) * 60).toFixed(1)} items/min
+                  </strong></span>
+                )}
               </div>
               
               {selectedObjectId && (
-                <div className="text-xs text-gray-300">
+                <div className="text-xs text-gray-300 hidden lg:block">
                   Selected: {selectedObjectId.substring(0, 8)}...
                 </div>
               )}

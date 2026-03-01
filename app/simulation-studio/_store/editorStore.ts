@@ -133,6 +133,9 @@ interface EditorState {
   updateObject: (id: string, type: 'process' | 'environment' | 'actor', updates: any) => void;
   removeObject: (id: string, type: 'process' | 'environment' | 'actor') => void;
   
+  addEdge: (from: string, to: string) => void;
+  removeEdge: (id: string) => void;
+  
   setSelectedObject: (id: string | null, type: 'process' | 'environment' | 'actor' | null) => void;
   setTransformMode: (mode: 'translate' | 'rotate' | 'scale') => void;
   
@@ -315,6 +318,27 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set({ transformMode: mode });
   },
   
+  addEdge: (from, to) => {
+    const newEdge: ProcessEdge = {
+      id: uuidv4(),
+      from,
+      to,
+      parameters: {},
+    };
+    
+    set(state => ({
+      edges: [...state.edges, newEdge],
+      isDirty: true,
+    }));
+  },
+  
+  removeEdge: (id) => {
+    set(state => ({
+      edges: state.edges.filter(edge => edge.id !== id),
+      isDirty: true,
+    }));
+  },
+  
   setSceneSettings: (settings) => {
     set(state => ({
       sceneSettings: { ...state.sceneSettings, ...settings },
@@ -368,48 +392,84 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const sources = state.processNodes.filter(node => node.type === 'source');
     sources.forEach(source => {
       const spawnRate = source.parameters.spawnRate || 1.0;
-      const shouldSpawn = Math.random() < (spawnRate * dt);
+      const shouldSpawn = Math.random() < (spawnRate * dt * 0.5); // Reduce spawn rate for better visualization
       
       if (shouldSpawn) {
         const newItem: SimulationItem = {
           id: uuidv4(),
           productId: source.parameters.productType || 'default',
-          position: [...source.position] as [number, number, number],
-          targetPosition: [...source.position] as [number, number, number],
+          position: [source.position[0], source.position[1] + 0.5, source.position[2]] as [number, number, number],
+          targetPosition: [source.position[0], source.position[1] + 0.5, source.position[2]] as [number, number, number],
           currentNode: source.id,
-          progress: 0,
-          speed: 1.0,
+          progress: 1, // Start at 100% progress to find next node
+          speed: 2.0,
         };
         newItems.push(newItem);
         produced++;
       }
     });
     
-    // Update item positions
+    // Update item positions and find paths
     newItems = newItems.map(item => {
       const updatedItem = { ...item };
       
-      // Simple movement logic - move towards target
-      if (updatedItem.progress < 1) {
+      // If item has completed its path to current node, find next destination
+      if (updatedItem.progress >= 1 && !updatedItem.nextNode) {
+        const currentNode = state.processNodes.find(n => n.id === updatedItem.currentNode);
+        
+        if (currentNode) {
+          // Find outgoing edges from current node
+          const outgoingEdges = state.edges.filter(edge => edge.from === updatedItem.currentNode);
+          
+          if (outgoingEdges.length > 0) {
+            // For now, just take the first outgoing edge (could add routing logic here)
+            const nextEdge = outgoingEdges[0];
+            const nextNode = state.processNodes.find(n => n.id === nextEdge.to);
+            
+            if (nextNode) {
+              updatedItem.nextNode = nextNode.id;
+              updatedItem.targetPosition = [
+                nextNode.position[0], 
+                nextNode.position[1] + 0.5, 
+                nextNode.position[2]
+              ] as [number, number, number];
+              updatedItem.progress = 0;
+            }
+          } else if (currentNode.type === 'sink') {
+            // Item reached sink, mark for removal
+            updatedItem.progress = 2; // Special value to mark for removal
+          }
+        }
+      }
+      
+      // Move item towards target
+      if (updatedItem.progress < 1 && updatedItem.targetPosition) {
         updatedItem.progress = Math.min(1, updatedItem.progress + dt * updatedItem.speed);
         
         // Linear interpolation to target
         const t = updatedItem.progress;
+        const startPos = updatedItem.position;
+        const targetPos = updatedItem.targetPosition;
+        
         updatedItem.position = [
-          updatedItem.position[0] * (1 - t) + updatedItem.targetPosition[0] * t,
-          updatedItem.position[1] * (1 - t) + updatedItem.targetPosition[1] * t,
-          updatedItem.position[2] * (1 - t) + updatedItem.targetPosition[2] * t,
+          startPos[0] * (1 - t) + targetPos[0] * t,
+          startPos[1] * (1 - t) + targetPos[1] * t,
+          startPos[2] * (1 - t) + targetPos[2] * t,
         ];
+        
+        // If reached target, update current node
+        if (updatedItem.progress >= 1 && updatedItem.nextNode) {
+          updatedItem.currentNode = updatedItem.nextNode;
+          updatedItem.nextNode = undefined;
+        }
       }
       
       return updatedItem;
     });
     
     // Remove items at sinks
-    const sinks = state.processNodes.filter(node => node.type === 'sink');
     newItems = newItems.filter(item => {
-      const currentNode = state.processNodes.find(n => n.id === item.currentNode);
-      if (currentNode && currentNode.type === 'sink' && item.progress >= 1) {
+      if (item.progress >= 2) { // Items marked for removal at sink
         consumed++;
         return false;
       }
