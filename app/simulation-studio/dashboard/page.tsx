@@ -40,6 +40,8 @@ export default function DashboardPage() {
   const [newProjectName, setNewProjectName] = useState('');
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState('');
 
   // Auth guard
   useEffect(() => {
@@ -160,6 +162,63 @@ export default function DashboardPage() {
     });
   };
 
+  const importProject = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.metamech-sim.json,.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            setIsImporting(true);
+            setImportError('');
+            
+            const content = event.target?.result as string;
+            const projectData = JSON.parse(content);
+            
+            // Validate the import data
+            if (!projectData.name && !projectData.sceneData) {
+              throw new Error('Invalid project file format');
+            }
+            
+            // Generate new project
+            const newProject: Project = {
+              id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              name: projectData.name || 'Imported Project',
+              description: `Imported from ${file.name}`,
+              lastModified: Date.now(),
+              created: Date.now(),
+              version: projectData.version || '1.0.0',
+            };
+            
+            // Save project to localStorage
+            localStorage.setItem(`sim_project_${newProject.id}`, JSON.stringify({
+              ...newProject,
+              sceneData: projectData.sceneData || projectData,
+            }));
+            
+            // Add to projects list
+            const updatedProjects = [...projects, newProject];
+            saveProjects(updatedProjects);
+            
+            // Open the imported project
+            router.push(`/simulation-studio/editor?id=${newProject.id}`);
+            
+          } catch (error) {
+            console.error('Import error:', error);
+            setImportError(error instanceof Error ? error.message : 'Failed to import project');
+          } finally {
+            setIsImporting(false);
+          }
+        };
+        reader.readAsText(file);
+      }
+    };
+    input.click();
+  };
+
   const sortedProjects = filteredProjects.sort((a, b) => b.lastModified - a.lastModified);
 
   return (
@@ -236,6 +295,15 @@ export default function DashboardPage() {
                   </button>
                 </div>
 
+                {/* Import Project */}
+                <button
+                  onClick={importProject}
+                  className="px-4 py-2 bg-gradient-to-r from-gold to-amber-400 text-navy font-bold rounded-lg hover:shadow-glow-gold transition-all duration-300 flex items-center gap-2"
+                >
+                  <Upload size={16} />
+                  Import
+                </button>
+
                 {/* New Project */}
                 <button
                   onClick={() => setIsCreating(true)}
@@ -248,6 +316,25 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Import Error */}
+        {importError && (
+          <div className="max-w-7xl mx-auto px-6 pt-4">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 flex items-center gap-3">
+              <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center text-white text-sm">!</div>
+              <div>
+                <h3 className="text-red-400 font-medium">Import Failed</h3>
+                <p className="text-red-300 text-sm mt-1">{importError}</p>
+              </div>
+              <button
+                onClick={() => setImportError('')}
+                className="ml-auto p-1 text-red-400 hover:text-red-300 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-6 py-8">
