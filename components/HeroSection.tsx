@@ -135,6 +135,12 @@ export default function HeroSection() {
               minimize errors, and accelerate your product development workflow.
             </p>
 
+            <div className="flex flex-wrap gap-3 sm:gap-4 mb-4">
+              <Link href="/simulation-studio" className="cta-btn flex items-center gap-2 px-6 py-3 rounded-xl font-orbitron font-bold text-sm sm:text-base bg-gradient-to-r from-gold to-gold-light text-navy hover:shadow-glow-gold transition-all duration-300 hover:scale-105">
+                🏭 Simulation Studio
+                <ArrowRight size={18} />
+              </Link>
+            </div>
             <div className="flex flex-wrap gap-3 sm:gap-4 mb-8">
               <Link href="/tools" className="cta-btn btn-primary flex items-center gap-2">
                 Explore Tools

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 
 const navLinks = [
+  { name: 'Simulation Studio', href: '/simulation-studio', highlight: true },
   { name: 'Tools', href: '/tools' },
   { name: 'Services', href: '/services' },
   { name: 'Industries', href: '/industries' },
@@ -77,10 +78,16 @@ export default function Navigation() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="relative px-4 py-2 text-sm text-gray-400 hover:text-cyan-400 transition-colors duration-200 group"
+                  className={`relative px-4 py-2 text-sm transition-colors duration-200 group ${
+                    (link as any).highlight
+                      ? 'text-gold font-semibold hover:text-gold-light'
+                      : 'text-gray-400 hover:text-cyan-400'
+                  }`}
                 >
                   {link.name}
-                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-cyan-400 transition-all duration-250 group-hover:w-4/5" />
+                  <span className={`absolute bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 transition-all duration-250 group-hover:w-4/5 ${
+                    (link as any).highlight ? 'bg-gold' : 'bg-cyan-400'
+                  }`} />
                 </Link>
               ))}
             </div>
