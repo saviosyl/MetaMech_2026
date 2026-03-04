@@ -15,7 +15,7 @@ const ADMIN_ACCOUNTS = [
 ];
 
 // The URL of the Simulation Studio app (integrated into this app)
-const STUDIO_URL = '/simulation-studio/dashboard';
+const STUDIO_URL = 'https://metamech-studio.pages.dev';
 
 export default function SimulationStudioPage() {
   const [showPassword, setShowPassword] = useState(false);
